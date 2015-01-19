@@ -9,35 +9,44 @@ Adds some thermodynamics tables for calculating **critical values, heat capacity
 then properties can retured using chemical
 [CasNo](http://en.wikipedia.org/wiki/List_of_CAS_numbers_by_chemical_compound) as key index.
 ##Usage
-`getValueForCasNo(tableName::String , CasNo::String)`
-with one of the folowing values for **tableName**:
+`getvalueforcasno(property::String , casno::String)`
+with one of the folowing values for **property**:
 - **"Criticals"** 
   
   Refference: 
   
   Perry 8ed. TABLE 2-141 Critical Constants and Acentric Factors of Inorganic and Organic Compounds
   
-  Return values:
+  Return value:
   (Tc *in Kelvin*,Pc *in Pascal*,Zc)
   
-- **"C0Hyper"**
+- **"CpHyper"**
 
   Refference:
   
   Perry 8ed. TABLE 2-156 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Functions Cp [J/(kmolK)]
   
-  Return values:
+  Return value:
   (C1,C2,C3,C4,C5)
   
   Formula -> `Cp=C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2`
 
-- **"C0Poly"**
+- **"CpPoly"**
   
   Refference: 
   
   Perry 8ed. TABLE 2-155 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial Cp [J/(kmolK)]
   
-  Return values:
+  Return value:
   (C1,C2,C3,C4,C5)
   
   Formula -> `Cp=C1+C2*T+C3*T^2+C4*T^3+C5*T^4`
+
+- **Profile**
+
+  Return value:
+  (name,formula,molarweight)
+
+Also if you want casno for matrial name or formula please use the followings:
+
+`getcasnoforname(name::String)` and `getcasnoforformula(formula::String)`
