@@ -60,7 +60,7 @@ module ThermodynamicsTable
     end
   end
   function getallnamesforproperty(property::String)
-    names=[]
+    names=String[]
 		if property=="CpPoly"
       data=getdatamatrix("fpoly")
 		elseif property=="CpHyper"
