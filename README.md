@@ -48,6 +48,10 @@ with one of the following values for *property*:
   Refference: 
   Perry 8ed. TABLE 2-155 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial Cp [J/(kmol.K)]
 
+`getallnamesforproperty(property::String)`
+
+with property one of the aboves, returns all available chemical names
+
 Also to get *matrial name* for *casno* or *formula* use the followings:
 
 `getnameforcasno(casno::String)` and `getnameforformula(formula::String)`

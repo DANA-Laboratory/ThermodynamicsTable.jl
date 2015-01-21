@@ -1,5 +1,5 @@
 module ThermodynamicsTable
-  export getvalueforname, getnameforcasno, getnameforformula
+  export getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
   thisfiledirname=dirname(@__FILE__())
   fhyper=nothing
   fcriti=nothing
@@ -58,6 +58,27 @@ module ThermodynamicsTable
     else
       return nothing,formula * " not exists"
     end
+  end
+  function getallnamesforproperty(property::String)
+    names=[]
+		if property=="CpPoly"
+      data=getdatamatrix("fpoly")
+		elseif property=="CpHyper"
+      data=getdatamatrix("fhyper")
+		elseif property=="Criticals"
+      data=getdatamatrix("fcriti")
+    elseif property=="Profile"
+      data=getdatamatrix("fcriti")
+    else
+      return nothing,"property not found"
+    end
+    i=1
+    len=size(data)[1]
+    while i<=len
+      push!(names,data[i,2])
+      i+=1
+    end
+    return names
   end
   function getvalueforname(property::String , name::String)
 		if property=="CpPoly"

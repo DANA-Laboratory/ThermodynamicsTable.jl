@@ -12,3 +12,6 @@ end
 @test getnameforcasno("7440-37-1") == "Argon"
 @test getnameforformula("Ar") == "Argon"
 @test getvalueforname("Profile","Argon") == ("Ar","7440-37-1",39.948) 
+@test length(getallnamesforproperty("CpPoly")) == 61 
+@test length(getallnamesforproperty("CpHyper")) == 341 
+@test length(getallnamesforproperty("Criticals")) == 345 
