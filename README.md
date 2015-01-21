@@ -3,50 +3,51 @@
 [![Build Status](https://travis-ci.org/DANA-Laboratory/ThermodynamicsTable.jl.svg?branch=master)](https://travis-ci.org/DANA-Laboratory/ThermodynamicsTable.jl)
 
 ##Introduction
-Adds some thermodynamics tables for calculating **critical values, heat capacity, ...**
+`use ThermodynamicsTable` Adds some thermodynamics tables for calculating **critical values, heat capacity, ...**
 
-`use ThermodynamicsTable` loads all values from local files.
-then properties can retured using chemical
-[CasNo](http://en.wikipedia.org/wiki/List_of_CAS_numbers_by_chemical_compound) as key index.
+Each table loads only once after first call 
+
+Properties can retured using a chemical name
+
+Also names can be found a using *chemical formula* or [CasNo](http://en.wikipedia.org/wiki/List_of_CAS_numbers_by_chemical_compound).
+
 ##Usage
-`getvalueforcasno(property::String , casno::String)`
-with one of the folowing values for **property**:
+`getvalueforname(property::String , name::String)`
+with one of the following values for *property*:
+- **"Profile"**
+
+  Return value:
+  (formula,casno,molarweight)
+
 - **"Criticals"** 
   
+  Return value: Chemical critical values
+
+  (Tc *Critical Temprature in Kelvin* ,Pc *Critical Pressure in Pascal*, Zc *Critical Compresibility*) 
+  
   Refference: 
-  
   Perry 8ed. TABLE 2-141 Critical Constants and Acentric Factors of Inorganic and Organic Compounds
-  
-  Return value:
-  (Tc *in Kelvin*,Pc *in Pascal*,Zc)
-  
+
 - **"CpHyper"**
 
-  Refference:
-  
-  Perry 8ed. TABLE 2-156 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Functions Cp [J/(kmolK)]
-  
-  Return value:
+  Return value: Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Function in J/(kmol.Kelvin)
   (C1,C2,C3,C4,C5)
   
-  Formula -> `Cp=C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2`
+  Constants in this table can be used in the following equation to calculate the ideal gas heat capacity `Cp=C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2`
 
+  Refference:
+  Perry 8ed. TABLE 2-156 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Functions Cp [J/(kmol.Kelvin)]
+  
 - **"CpPoly"**
   
-  Refference: 
-  
-  Perry 8ed. TABLE 2-155 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial Cp [J/(kmolK)]
-  
-  Return value:
+  Return value: Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial in J/(kmol.Kelvin)
   (C1,C2,C3,C4,C5)
   
-  Formula -> `Cp=C1+C2*T+C3*T^2+C4*T^3+C5*T^4`
+  Constants in this table can be used in the following equation to calculate the ideal gas heat capacity `Cp=C1+C2*T+C3*T^2+C4*T^3+C5*T^4`
 
-- **Profile**
+  Refference: 
+  Perry 8ed. TABLE 2-155 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial Cp [J/(kmol.K)]
 
-  Return value:
-  (name,formula,molarweight)
+Also to get *matrial name* for *casno* or *formula* use the followings:
 
-Also if you want casno for matrial name or formula please use the followings:
-
-`getcasnoforname(name::String)` and `getcasnoforformula(formula::String)`
+`getnameforcasno(casno::String)` and `getnameforformula(formula::String)`
