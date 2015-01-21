@@ -50,8 +50,9 @@ with one of the following values for *property*:
 
 `getallnamesforproperty(property::String)`
 
-with property one of the aboves, returns all available chemical names
-
-Also to get *matrial name* for *casno* or *formula* use the followings:
+With *property* one of the aboves, returns all available chemical names
 
 `getnameforcasno(casno::String)` and `getnameforformula(formula::String)`
+
+Gets *matrial name* for *casno* or *formula*
+
