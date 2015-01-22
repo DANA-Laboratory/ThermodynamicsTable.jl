@@ -27,6 +27,8 @@ module ThermodynamicsTable
         close(criticals_af)
       end
       return fcriti
+    else
+      throw (ArgumentError)
     end
   end
   function findindex(data::Array{Any,2},keyvalue::String,keycolumnindex=2)
@@ -38,26 +40,18 @@ module ThermodynamicsTable
 		if (i<=len)
       return i
     else
-      return 0;
+      throw (KeyError);
     end
   end
   function getnameforcasno(casno::String)
     data_criti=getdatamatrix("fcriti")
     i=findindex(data_criti,casno,4)
-    if i>0 
-      return (data_criti[i,2]) 
-    else 
-      return (nothing,casno * " not exists")
-    end
+    return (data_criti[i,2]) 
   end
   function getnameforformula(formula::String)
     data_criti=getdatamatrix("fcriti")
     i=findindex(data_criti,formula,3)
-    if i>0 
-      return data_criti[i,2] 
-    else
-      return nothing,formula * " not exists"
-    end
+    return data_criti[i,2] 
   end
   function getallnamesforproperty(property::String)
     names=String[]
@@ -70,7 +64,7 @@ module ThermodynamicsTable
     elseif property=="Profile"
       data=getdatamatrix("fcriti")
     else
-      return nothing,"property not found"
+      throw (ArgumentError)
     end
     i=1
     len=size(data)[1]
@@ -111,7 +105,7 @@ module ThermodynamicsTable
 			if i>0
         return (data_criti[i,3],data_criti[i,4],data_criti[i,5])
       else
-        return nothing,name * " not exists"
+        throw (ArgumentError)
       end
 		end
   end

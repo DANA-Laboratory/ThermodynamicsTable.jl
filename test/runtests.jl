@@ -15,3 +15,5 @@ end
 @test length(getallnamesforproperty("CpPoly")) == 61 
 @test length(getallnamesforproperty("CpHyper")) == 341 
 @test length(getallnamesforproperty("Criticals")) == 345 
+@test_throws getallnamesforproperty("criticals") == ArgumentError
+@test_throws getvalueforname("Criticals","Argone") == KeyError
