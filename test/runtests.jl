@@ -12,8 +12,31 @@ end
 @test getnameforcasno("7440-37-1") == "Argon"
 @test getnameforformula("Ar") == "Argon"
 @test getvalueforname("Profile","Argon") == ("Ar","7440-37-1",39.948) 
-@test length(getallnamesforproperty("CpPoly")) == 61 
-@test length(getallnamesforproperty("CpHyper")) == 341 
-@test length(getallnamesforproperty("Criticals")) == 345 
-@test_throws getallnamesforproperty("criticals") == ArgumentError
-@test_throws getvalueforname("Criticals","Argone") == KeyError
+println ("available CpPoly=",length(getallnamesforproperty("CpPoly"))) 
+println ("available CpHyper=",length(getallnamesforproperty("CpHyper"))) 
+println ("available Criticals=",length(getallnamesforproperty("Criticals"))) 
+@test_throws DataType getallnamesforproperty("criticals") == ArgumentError
+@test_throws DataType getvalueforname("Criticals","Argone") == KeyError
+chemicalNames=getallnamesforproperty("Criticals")
+MIN_Tc=typemax(Float64)
+MAX_Tc=0
+MIN_Pc=typemax(Float64)
+MAX_Pc=0
+SUM_Pc=0
+SUM_Tc=0
+i=0
+for chemical in chemicalNames
+  (Tc,Pc,Zc)=(getvalueforname("Criticals",chemical))
+  println (chemical," ",Tc,Pc,Zc)
+  Tc>MAX_Tc && (MAX_Tc=Tc)
+  Tc<MIN_Tc && (MIN_Tc=Tc)
+  Pc<MIN_Pc && (MIN_Pc=Pc) 
+  Pc>MAX_Pc && (MAX_Pc=Pc) 
+  i+=1
+  SUM_Pc+=Pc
+  SUM_Tc+=Tc
+end
+@test i == 345
+AVR_Pc=SUM_Pc/i
+AVR_Tc=SUM_Tc/i
+println ("(AVR_Tc,AVR_Pc,MAX_Tc,MAX_Pc,MIN_Tc,MIN_Pc)==",AVR_Tc,",",AVR_Pc,",",MAX_Tc,",",MAX_Pc,",",MIN_Tc,",",MIN_Pc)
