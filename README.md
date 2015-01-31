@@ -23,7 +23,7 @@ with one of the following values for *property*:
   
   Return value: Chemical critical values
 
-  (Tc *Critical Temprature in Kelvin* ,Pc *Critical Pressure in Pascal*, Zc *Critical Compresibility*) 
+  (Tc *Critical Temprature in Kelvin* ,Pc *Critical Pressure in Pascal*,Af *Acentric Factor*, Zc *Critical Compresibility*) 
   
   Refference: 
   Perry 8ed. TABLE 2-141 Critical Constants and Acentric Factors of Inorganic and Organic Compounds

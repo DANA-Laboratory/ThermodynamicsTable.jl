@@ -95,7 +95,8 @@ module ThermodynamicsTable
       data_criti=getdatamatrix("fcriti")
       i=findindex(data_criti,name)
 			if i>0 
-        return (data_criti[i,6],data_criti[i,7]*1e6,data_criti[i,10])
+        # Tc, Pc, Af, Zc
+        return (data_criti[i,6],data_criti[i,7]*1e6,data_criti[i,10],data_criti[i,9])
       else
         return nothing,name * " not exists"
       end
