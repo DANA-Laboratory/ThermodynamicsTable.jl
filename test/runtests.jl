@@ -22,6 +22,8 @@ MIN_Tc=typemax(Float64)
 MAX_Tc=0
 MIN_Pc=typemax(Float64)
 MAX_Pc=0
+MIN_Zc=typemax(Float64)
+MAX_Zc=0
 SUM_Pc=0
 SUM_Tc=0
 i=0
@@ -31,6 +33,8 @@ for chemical in chemicalNames
   Tc<MIN_Tc && (MIN_Tc=Tc)
   Pc<MIN_Pc && (MIN_Pc=Pc) 
   Pc>MAX_Pc && (MAX_Pc=Pc) 
+  Zc>MAX_Zc && (MAX_Zc=Zc)
+  Zc<MIN_Zc && (MIN_Zc=Zc)
   i+=1
   SUM_Pc+=Pc
   SUM_Tc+=Tc
@@ -38,4 +42,4 @@ end
 @test i == 345
 AVR_Pc=SUM_Pc/i
 AVR_Tc=SUM_Tc/i
-println ("(AVR_Tc,AVR_Pc,MAX_Tc,MAX_Pc,MIN_Tc,MIN_Pc)==",AVR_Tc,",",AVR_Pc,",",MAX_Tc,",",MAX_Pc,",",MIN_Tc,",",MIN_Pc)
+println ("(AVR_Tc,AVR_Pc,MAX_Tc,MAX_Pc,MIN_Tc,MIN_Pc,MIN_Zc,MAX_Zc)==",AVR_Tc,",",AVR_Pc,",",MAX_Tc,",",MAX_Pc,",",MIN_Tc,",",MIN_Pc,",",MIN_Zc,",",MAX_Zc)
