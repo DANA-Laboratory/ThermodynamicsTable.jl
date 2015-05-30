@@ -1,9 +1,14 @@
 module ThermodynamicsTable
   export getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
   thisfiledirname=dirname(@__FILE__())
-  fhyper=nothing
-  fcriti=nothing
-  fpoly=nothing
+  fhyper=nothing #cp hyper fit
+  fcriti=nothing #criticals
+  fpoly=nothing #cp polinomial fit
+  fdens=nothing #densities
+  flvps=nothing #liquids vapor pressure
+  flcp=nothing #liquids heat capacity
+
+  #open table if not loaded
   function getdatamatrix(name::String)
     global fpoly,fhyper,fcriti
     if (name=="fpoly")
@@ -27,7 +32,27 @@ module ThermodynamicsTable
         close(criticals_af)
       end
       return fcriti
-    else
+    elseif (name=="fdens")
+      if (fdens==nothing)
+        densities_af=open(thisfiledirname * "/Tables/perryDensitiesTable2-32.table.table");
+        fdens,hdens=readdlm(densities_af,';',header=true);
+        close(densities_af)
+      end
+      return fdens
+     elseif (name=="flvps")
+      if (flvps==nothing)
+        vaporpressures_af=open(thisfiledirname * "/Tables/perryLiquidsVaporPressure_Table2_8.table");
+        flvps,hlvps=readdlm(vaporpressures_af,';',header=true);
+        close(vaporpressures_af)
+      end
+     elseif (name=="flcp")
+      if (flcp==nothing)
+        liquidscp_af=open(thisfiledirname * "/Tables/perryHeatCapLiquids_Table2_153.table");
+        flcp,hlcp=readdlm(liquidscp_af,';',header=true);
+        close(liquidscp_af)
+      end
+       return flcp
+     else
       throw (ArgumentError)
     end
   end
@@ -63,6 +88,12 @@ module ThermodynamicsTable
       data=getdatamatrix("fcriti")
     elseif property=="Profile"
       data=getdatamatrix("fcriti")
+    elseif property=="LiquidsDensities"
+      data=getdatamatrix("fdens")
+    elseif property=="LiquidsVaporPressure"
+      data=getdatamatrix("flvps")
+    elseif property=="LiquidsCp"
+      data=getdatamatrix("flcp")
     else
       throw (ArgumentError)
     end
@@ -97,6 +128,30 @@ module ThermodynamicsTable
 			if i>0 
         # Tc, Pc, Af, Zc
         return (data_criti[i,6],data_criti[i,7]*1e6,data_criti[i,10],data_criti[i,9])
+      else
+        return nothing,name * " not exists"
+      end
+ 		elseif property=="LiquidsDensities"
+      data_dens=getdatamatrix("fdens")
+      i=findindex(data_dens,name)
+			if i>0 
+        return (data_dens[i,6],data_dens[i,7],data_dens[i,8],data_dens[i,9])
+      else
+        return nothing,name * " not exists"
+      end
+ 		elseif property=="LiquidsVaporPressure"
+      data_lvps=getdatamatrix("flvps")
+      i=findindex(data_,name)
+			if i>0 
+        return (data_lvps[i,5],data_lvps[i,6],data_lvps[i,7],data_lvps[i,8],data_lvps[i,9])
+      else
+        return nothing,name * " not exists"
+      end
+ 		elseif property=="LiquidsCp"
+      data_lcp=getdatamatrix("flcp")
+      i=findindex(data_,name)
+			if i>0 
+        return (data_lcp[i,6],data_lcp[i,7],data_lcp[i,8],data_lcp[i,9],data_lcp[i,10])
       else
         return nothing,name * " not exists"
       end
