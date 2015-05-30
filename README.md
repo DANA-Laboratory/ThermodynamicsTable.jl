@@ -48,6 +48,45 @@ with one of the following values for *property*:
   Refference: 
   Perry 8ed. TABLE 2-155 Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial Cp [J/(kmol.K)]
 
+- **"LiquidsDensities"**
+
+  Return value: Densities of Inorganic and Organic Liquids in (mol/dm3)
+  (C1,C2,C3,C4,Tmin.Tmax)
+
+  Except for o-terphenyl and water, liquid density ρ is calculated by `ρ=C1/(C2^(1+(1-T/C3)^C4))`
+
+  Where ρ is in mol/dm3 and T is in K. The pressure is equal to the vapor pressure for pressures greater than 1 atm and equal to 1 atm when the vapor pressure is less than 1 atm.
+
+  For o-terphenyl and water in the limited temperature ranges , the equation is `ρ=C1+C2*T+C3*T^2+C4*T^3`
+
+  For water over the entire temperature range of 273.16 to 647.096 K, use `ρ=17.863+58.606τ^0.35−95.396τ^(2/3)+213.89τ−141.26τ^(4/3)` where `τ=1−T/647.096`
+
+  Refference: 
+  Perry 8ed. TABLE 2-32 Densities of Inorganic and Organic Liquids (mol/dm3)
+
+- **"LiquidsVaporPressure"**
+
+  Return value: Vapor Pressure of Inorganic and Organic Liquids in Pa
+  (C1,C2,C3,C4,C5,Tmin.Tmax)
+
+  Vapor pressure Ps is calculated by `Ps=exp(C1+C2/T+C3*ln(T)+C4*T^C5)`
+
+  Refference:
+  Perry 8ed. TABLE 2-8 Vapor Pressure of Inorganic and Organic Liquids 
+
+- **"LiquidsCp"**
+
+  Return value: Heat Capacities of Inorganic and Organic Liquids [J/(kmol.K)]
+  (C1,C2,C3,C4,C5,Tmin.Tmax)
+
+  For the 11 substances, ammonia, 1,2-butanediol, 1,3-butanediol, carbon monoxide, 1,1-difluoroethane, ethane, heptane, hydrogen, hydrogen sulfide, methane, and propane, the liquid heat capacity CpL is calculated with Eq.(2) below. For all other compounds, Eq.(1) is used. For benzene, fluorine, and helium, two sets of constants are given for Eq.(1) that cover different temperature ranges, as shown in the table.
+
+  Eq(1)->`CpL=C1+C2*T+C3*T2+C4*T3+C4T4`
+  Eq(2)->`CpL=(C1^2)/t+C2−2*C1*C3*t−C1*C4*t^2−(C3^2*t^3)/3−(C3*C4*t^4)/2−(C4*t^5)/5`
+
+  Refference:
+  Perry 8ed. TABLE 2-153 Heat Capacities of Inorganic and Organic Liquids
+
 `getallnamesforproperty(property::String)`
 
 With *property* one of the aboves, returns all available chemical names

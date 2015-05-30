@@ -136,7 +136,7 @@ module ThermodynamicsTable
       data_dens=getdatamatrix("fdens")
       i=findindex(data_dens,name)
 			if i>0 
-        return (data_dens[i,6],data_dens[i,7],data_dens[i,8],data_dens[i,9])
+        return (data_dens[i,6],data_dens[i,7],data_dens[i,8],data_dens[i,9],data_dens[i,10],data_dens[i,12])
       else
         return nothing,name * " not exists"
       end
@@ -144,7 +144,7 @@ module ThermodynamicsTable
       data_lvps=getdatamatrix("flvps")
       i=findindex(data_,name)
 			if i>0 
-        return (data_lvps[i,5],data_lvps[i,6],data_lvps[i,7],data_lvps[i,8],data_lvps[i,9])
+        return (data_lvps[i,5],data_lvps[i,6],data_lvps[i,7],data_lvps[i,8],data_lvps[i,9],data_lvps[i,10],data_lvps[i,12])
       else
         return nothing,name * " not exists"
       end
@@ -152,7 +152,7 @@ module ThermodynamicsTable
       data_lcp=getdatamatrix("flcp")
       i=findindex(data_,name)
 			if i>0 
-        return (data_lcp[i,6],data_lcp[i,7],data_lcp[i,8],data_lcp[i,9],data_lcp[i,10])
+        return (data_lcp[i,6],data_lcp[i,7],data_lcp[i,8],data_lcp[i,9],data_lcp[i,10],data_lcp[i,11],data_lcp[i,13])
       else
         return nothing,name * " not exists"
       end

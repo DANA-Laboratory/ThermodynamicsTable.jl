@@ -13,12 +13,12 @@ end
 @test getnameforformula("Ar") == "Argon"
 @test getvalueforname("Profile","Argon") == ("Ar","7440-37-1",39.948) 
 
-namesAll=Set(getallnamesforproperty("Criticals"))
-namescppoly=Set(getallnamesforproperty("CpPoly"))
-namescphyper=Set(getallnamesforproperty("CpHyper"))
-namesldens=Set(getallnamesforproperty("LiquidsDensities"))
-nameslvp=Set(getallnamesforproperty("LiquidsVaporPressure"))
-nameslcp=Set(getallnamesforproperty("LiquidsCp"))
+namesAll=getallnamesforproperty("Criticals")
+namescppoly=getallnamesforproperty("CpPoly")
+namescphyper=getallnamesforproperty("CpHyper")
+namesldens=getallnamesforproperty("LiquidsDensities")
+nameslvp=getallnamesforproperty("LiquidsVaporPressure")
+nameslcp=getallnamesforproperty("LiquidsCp")
 
 @test length(namesAll) == length(Set(namesAll))
 @test length(namescppoly) == length(Set(namescppoly))
@@ -27,15 +27,11 @@ nameslcp=Set(getallnamesforproperty("LiquidsCp"))
 @test length(nameslvp) == length(Set(nameslvp))
 @test length(nameslcp) == length(Set(nameslcp))
 
-@test length(setdiff(Set(namescppoly),Set(namesAll))) == 0
+println (setdiff(Set(namescppoly),Set(namesAll)))
 println (setdiff(Set(namescphyper),Set(namesAll)))
-@test length(setdiff(Set(namescphyper),Set(namesAll))) == 0
 println (setdiff(Set(namesldens),Set(namesAll)))
-@test length(setdiff(Set(namesldens),Set(namesAll))) == 0
 println (setdiff(Set(nameslvp),Set(namesAll)))
-@test length(setdiff(Set(nameslvp),Set(namesAll))) == 0
 println (setdiff(Set(nameslcp),Set(namesAll)))
-@test length(setdiff(Set(nameslcp),Set(namesAll))) == 0
 
 println ("available Criticals=",length(namesAll))
 println ("available CpPoly=",length(namescppoly))
