@@ -50,7 +50,7 @@ with one of the following values for *property*:
 
 - **"LiquidsDensities"**
 
-  Return value: Densities of Inorganic and Organic Liquids in (mol/dm3)
+  Return value: Densities of Inorganic and Organic Liquids in mol/dm3
   (C1,C2,C3,C4,Tmin.Tmax)
 
   Except for o-terphenyl and water, liquid density ρ is calculated by `ρ=C1/(C2^(1+(1-T/C3)^C4))`
@@ -62,7 +62,7 @@ with one of the following values for *property*:
   For water over the entire temperature range of 273.16 to 647.096 K, use `ρ=17.863+58.606τ^0.35−95.396τ^(2/3)+213.89τ−141.26τ^(4/3)` where `τ=1−T/647.096`
 
   Refference: 
-  Perry 8ed. TABLE 2-32 Densities of Inorganic and Organic Liquids (mol/dm3)
+  Perry 8ed. TABLE 2-32 Densities of Inorganic and Organic Liquids in mol/dm3
 
 - **"LiquidsVaporPressure"**
 
@@ -76,7 +76,7 @@ with one of the following values for *property*:
 
 - **"LiquidsCp"**
 
-  Return value: Heat Capacities of Inorganic and Organic Liquids [J/(kmol.K)]
+  Return value: Heat Capacities of Inorganic and Organic Liquids in J/(kmol.K)
   (C1,C2,C3,C4,C5,Tmin.Tmax)
 
   For the 11 substances, ammonia, 1,2-butanediol, 1,3-butanediol, carbon monoxide, 1,1-difluoroethane, ethane, heptane, hydrogen, hydrogen sulfide, methane, and propane, the liquid heat capacity CpL is calculated with Eq.(2) below. For all other compounds, Eq.(1) is used. For benzene, fluorine, and helium, two sets of constants are given for Eq.(1) that cover different temperature ranges, as shown in the table.
