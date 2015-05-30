@@ -12,9 +12,38 @@ end
 @test getnameforcasno("7440-37-1") == "Argon"
 @test getnameforformula("Ar") == "Argon"
 @test getvalueforname("Profile","Argon") == ("Ar","7440-37-1",39.948) 
-println ("available CpPoly=",length(getallnamesforproperty("CpPoly"))) 
-println ("available CpHyper=",length(getallnamesforproperty("CpHyper"))) 
-println ("available Criticals=",length(getallnamesforproperty("Criticals"))) 
+
+namesAll=Set(getallnamesforproperty("Criticals"))
+namescppoly=Set(getallnamesforproperty("CpPoly"))
+namescphyper=Set(getallnamesforproperty("CpHyper"))
+namesldens=Set(getallnamesforproperty("LiquidsDensities"))
+nameslvp=Set(getallnamesforproperty("LiquidsVaporPressure"))
+nameslcp=Set(getallnamesforproperty("LiquidsCp"))
+
+@test length(namesAll) == length(Set(namesAll))
+@test length(namescppoly) == length(Set(namescppoly))
+@test length(namescphyper) == length(Set(namescphyper))
+@test length(namesldens) == length(Set(namesldens))
+@test length(nameslvp) == length(Set(nameslvp))
+@test length(nameslcp) == length(Set(nameslcp))
+
+@test length(setdiff(Set(namescppoly),Set(namesAll))) == 0
+println (setdiff(Set(namescphyper),Set(namesAll)))
+@test length(setdiff(Set(namescphyper),Set(namesAll))) == 0
+println (setdiff(Set(namesldens),Set(namesAll)))
+@test length(setdiff(Set(namesldens),Set(namesAll))) == 0
+println (setdiff(Set(nameslvp),Set(namesAll)))
+@test length(setdiff(Set(nameslvp),Set(namesAll))) == 0
+println (setdiff(Set(nameslcp),Set(namesAll)))
+@test length(setdiff(Set(nameslcp),Set(namesAll))) == 0
+
+println ("available Criticals=",length(namesAll))
+println ("available CpPoly=",length(namescppoly))
+println ("available CpHyper=",length(namescphyper))
+println ("available LiquidsDensities=",length(namesldens))
+println ("available LiquidsVaporPressure=",length(nameslvp))
+println ("available LiquidsCp=",length(nameslcp))
+
 @test_throws DataType getallnamesforproperty("criticals") == ArgumentError
 @test_throws DataType getvalueforname("Criticals","Argone") == KeyError
 chemicalNames=getallnamesforproperty("Criticals")

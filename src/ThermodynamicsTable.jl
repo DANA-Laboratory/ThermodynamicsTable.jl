@@ -10,7 +10,7 @@ module ThermodynamicsTable
 
   #open table if not loaded
   function getdatamatrix(name::String)
-    global fpoly,fhyper,fcriti
+    global fpoly,fhyper,fcriti,fdens,flvps,flcp
     if (name=="fpoly")
       if (fpoly==nothing)
         cp_polynomial=open(thisfiledirname * "/Tables/perryHeatCapIdealGas_Table2_155.table");
@@ -34,25 +34,26 @@ module ThermodynamicsTable
       return fcriti
     elseif (name=="fdens")
       if (fdens==nothing)
-        densities_af=open(thisfiledirname * "/Tables/perryDensitiesTable2-32.table.table");
+        densities_af=open(thisfiledirname * "/Tables/perryDensities_Table2_32.table");
         fdens,hdens=readdlm(densities_af,';',header=true);
         close(densities_af)
       end
       return fdens
-     elseif (name=="flvps")
+    elseif (name=="flvps")
       if (flvps==nothing)
         vaporpressures_af=open(thisfiledirname * "/Tables/perryLiquidsVaporPressure_Table2_8.table");
         flvps,hlvps=readdlm(vaporpressures_af,';',header=true);
         close(vaporpressures_af)
       end
-     elseif (name=="flcp")
+      return flvps;
+    elseif (name=="flcp")
       if (flcp==nothing)
         liquidscp_af=open(thisfiledirname * "/Tables/perryHeatCapLiquids_Table2_153.table");
         flcp,hlcp=readdlm(liquidscp_af,';',header=true);
         close(liquidscp_af)
       end
-       return flcp
-     else
+      return flcp
+    else
       throw (ArgumentError)
     end
   end
