@@ -1,13 +1,29 @@
 using ThermodynamicsTable
 using Base.Test
 
-# write your own tests here
 for i in [1:5]
   @test_approx_eq getvalueforname("CpPoly","Argon")[i] (20786,0.0,0.0,0.0,0.0)[i] #argon , perry 8ed. p 2-174
   @test_approx_eq getvalueforname("CpHyper","Air")[i] (0.28958e5,0.0939e5,3.012e3,0.0758e5,1484)[i] #air , perry 8ed. p 2-176
 end
+for i in [1:3]
+  #argon , perry 8ed. p 2-138
+  @test getvalueforname("Profile","Argon")[i] ==  ("Ar","7440-37-1",39.948)[i]
+end
 for i in [1:4]
-  @test_approx_eq getvalueforname("Criticals","Argon")[i] (150.86,4.898e6,0.0,0.291)[i] #argon , perry 8ed. p 2-138
+  #argon , perry 8ed. p 2-138
+  @test_approx_eq getvalueforname("Criticals","Argon")[i] (150.86,4.898e6,0.0,0.291)[i]
+end
+for i in [1:6]
+  #argon , perry 8ed. p 2-98
+  @test_approx_eq getvalueforname("LiquidsDensities","Argon")[i] (3.8469,0.2881,150.86,0.29783,83.78,150.86)[i]
+end
+for i in [1:7]
+  #argon , perry 8ed. p 2-55
+  @test_approx_eq getvalueforname("LiquidsVaporPressure","Argon")[i] (42.127,-1093.1,-4.1425,5.7254e-05,2,83.78,150.86)[i]
+end
+for i in [1:7]
+  #argon , perry 8ed. p 2-165
+  @test getvalueforname("LiquidsCp","Argon")[i] == (134390,-1989.4,11.043,"","",83.78,135.00)[i]
 end
 @test getnameforcasno("7440-37-1") == "Argon"
 @test getnameforformula("Ar") == "Argon"
