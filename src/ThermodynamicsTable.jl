@@ -7,7 +7,7 @@ module ThermodynamicsTable
   fdens=nothing #densities
   flvps=nothing #liquids vapor pressure
   flcp=nothing #liquids heat capacity
-  propertytofilemap=Dict(
+  propertytofilemap=[
     "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
     "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper),
     "Criticals"=>("perryCriticals_Table2_141.table",fcriti),
@@ -15,7 +15,7 @@ module ThermodynamicsTable
     "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
     "LiquidsVaporPressure"=>("perryLiquidsVaporPressure_Table2_8.table",flvps),
     "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp)
-  )
+  ]
   #open table if not loaded private
   function getdatamatrix(property::String)
     global propertytofilemap
