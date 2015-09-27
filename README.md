@@ -3,26 +3,26 @@
 [![Build Status](https://travis-ci.org/DANA-Laboratory/ThermodynamicsTable.jl.svg?branch=master)](https://travis-ci.org/DANA-Laboratory/ThermodynamicsTable.jl)
 
 ##Introduction
-`use ThermodynamicsTable` Adds some thermodynamics tables for calculating **critical values, heat capacity, ...**
-
-Each table loads only once after first call 
-
-Properties can retured using a chemical name
-
-Also names can be found a using *chemical formula* or [CasNo](http://en.wikipedia.org/wiki/List_of_CAS_numbers_by_chemical_compound).
+`ThermodynamicsTable` package adds some Thermodynamics Table for calculating chemical physical properties. Material contants to calculate different properties are stored in seperate text files (tables), the key to retrieve material contants is it's *chemical name*, that itself can be found using it's *chemical formula* or [CasNo](http://en.wikipedia.org/wiki/List_of_CAS_numbers_by_chemical_compound).  
+Each table loads once after first call to it.
+At this time avialable tables are: **Heat Capacity, Density and Vapor Pressure**.
 
 ##Usage
-`getvalueforname(property::String , name::String)`
-with one of the following values for *property*:
+`getvalueforname(property::String , chemicalname::String)`
+Retrieve Tuples of constansts from a Thermodynamics Table for chemical specified by *chemicalname*.
+Here *property* must be one of the following values: 
 - **"Profile"**
 
-  Return value:
-  (formula,casno,molarweight)
+  Profile for chemical specified by *chemicalname*
+
+  Return value: 
+  (formula, casno, molarweight)
 
 - **"Criticals"** 
   
-  Return value: Chemical critical values
-
+  Critical Constants for chemical specified by *chemicalname*
+  
+  Return value: 
   (Tc *Critical Temprature in Kelvin* ,Pc *Critical Pressure in Pascal*,Af *Acentric Factor*, Zc *Critical Compresibility*) 
   
   Refference: 
@@ -30,9 +30,12 @@ with one of the following values for *property*:
 
 - **"CpHyper"**
 
-  Return value: Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Function in J/(kmol.Kelvin)
-  (C1,C2,C3,C4,C5)
+  Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to Hyperbolic Function in J/(kmol.Kelvin) for chemical specified by *chemicalname*
+
+  Return value: 
+  (C1, C2, C3, C4, C5)
   
+  Note:
   Constants in this table can be used in the following equation to calculate the ideal gas heat capacity `Cp=C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2`
 
   Refference:
@@ -40,9 +43,12 @@ with one of the following values for *property*:
   
 - **"CpPoly"**
   
-  Return value: Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial in J/(kmol.Kelvin)
-  (C1,C2,C3,C4,C5)
+  Heat Capacity at Constant Pressure of Inorganic and Organic Compounds in the Ideal Gas State Fit to a Polynomial in J/(kmol.Kelvin) for chemical specified by *chemicalname*
   
+  Return value: 
+  (C1, C2, C3, C4, C5)
+  
+  Note:
   Constants in this table can be used in the following equation to calculate the ideal gas heat capacity `Cp=C1+C2*T+C3*T^2+C4*T^3+C5*T^4`
 
   Refference: 
@@ -50,9 +56,12 @@ with one of the following values for *property*:
 
 - **"LiquidsDensities"**
 
-  Return value: Densities of Inorganic and Organic Liquids in mol/dm3
-  (C1,C2,C3,C4,Tmin,Tmax)
+  Densities of Inorganic and Organic Liquids in mol/dm3 for chemical specified by *chemicalname*
 
+  Return value: 
+  (C1, C2, C3, C4, Tmin, Tmax)
+
+  Note:
   Except for o-terphenyl and water, liquid density ρ is calculated by `ρ=C1/(C2^(1+(1-T/C3)^C4))`
 
   Where ρ is in mol/dm3 and T is in K. The pressure is equal to the vapor pressure for pressures greater than 1 atm and equal to 1 atm when the vapor pressure is less than 1 atm.
@@ -66,19 +75,25 @@ with one of the following values for *property*:
 
 - **"LiquidsVaporPressure"**
 
-  Return value: Vapor Pressure of Inorganic and Organic Liquids in Pa
-  (C1,C2,C3,C4,C5,Tmin,Tmax)
+  Vapor Pressure of Inorganic and Organic Liquids in Pa for chemical specified by *chemicalname*
 
+  Return value: 
+  (C1, C2, C3, C4, C5, Tmin, Tmax)
+
+  Note:
   Vapor pressure Ps is calculated by `Ps=exp(C1+C2/T+C3*ln(T)+C4*T^C5)`
 
   Refference:
-  Perry 8ed. TABLE 2-8 Vapor Pressure of Inorganic and Organic Liquids 
+  Perry 8ed. TABLE 2-8 Vapor Pressure of Inorganic and Organic Liquids for chemical specified by *chemicalname*
 
 - **"LiquidsCp"**
 
-  Return value: Heat Capacities of Inorganic and Organic Liquids in J/(kmol.K)
-  (C1,C2,C3,C4,C5,Tmin,Tmax)
+  Heat Capacities of Inorganic and Organic Liquids in J/(kmol.K)
 
+  Return value: 
+  (C1, C2, C3, C4, C5, Tmin, Tmax)
+
+  Note:
   For the 11 substances, ammonia, 1,2-butanediol, 1,3-butanediol, carbon monoxide, 1,1-difluoroethane, ethane, heptane, hydrogen, hydrogen sulfide, methane, and propane, the liquid heat capacity CpL is calculated with Eq.(2) below. For all other compounds, Eq.(1) is used. For benzene, fluorine, and helium, two sets of constants are given for Eq.(1) that cover different temperature ranges, as shown in the table.
 
   Eq(1)->`CpL=C1+C2*T+C3*T^2+C4*T^3+C4*T^4`
@@ -92,9 +107,9 @@ with one of the following values for *property*:
 
 `getallnamesforproperty(property::String)`
 
-With *property* one of the aboves, returns all available chemical names
+With *property* one of the aboves, retrieve all available chemical names
 
 `getnameforcasno(casno::String)` and `getnameforformula(formula::String)`
 
-Gets *matrial name* for *casno* or *formula*
+Retrieve *matrial name* for *casno* or *formula*
 
