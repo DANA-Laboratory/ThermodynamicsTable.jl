@@ -43,7 +43,7 @@ module ThermodynamicsTable
     data_criti=getdatamatrix("Profile")
     i=findindex(data_criti,casno,4)
     if i==0    
-      throw (KeyError);
+      throw(KeyError);
     end
     return (data_criti[i,2]) 
   end
@@ -51,14 +51,14 @@ module ThermodynamicsTable
     data_criti=getdatamatrix("Profile")
     i=findindex(data_criti,formula,3)
     if i==0    
-      throw (KeyError);
+      throw(KeyError);
     end
     return data_criti[i,2] 
   end
   function getallnamesforproperty(property::String)
     global propertytofilemap
     if !haskey(propertytofilemap,property)
-      throw (ArgumentError)
+      throw(ArgumentError)
     end
     names=String[]
     data=getdatamatrix(property);
@@ -73,12 +73,12 @@ module ThermodynamicsTable
   function getvalueforname(property::String , name::String)
     global propertytofilemap
     if !haskey(propertytofilemap,property)
-      throw (ArgumentError)
+      throw(ArgumentError)
     end
     data=getdatamatrix(property)
     i=findindex(data,name)
     if i==0
-      throw (KeyError);
+      throw(KeyError);
     end
 		if property=="CpPoly"
       return (data[i,6],data[i,7],data[i,8],data[i,13]/1e5,data[i,14]/1e10) 
