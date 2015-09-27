@@ -1,5 +1,5 @@
 module ThermodynamicsTable
-  export getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
+  export getformulaforname, getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
   thisfiledirname=dirname(@__FILE__())
   fhyper=nothing #cp hyper fit
   fcriti=nothing #criticals
@@ -70,6 +70,28 @@ module ThermodynamicsTable
     end
     return names
   end
+  
+  function getformulaforname(property::String , name::String)
+    conststuple::Tuple = getvalueforname(property, name)
+    if property=="CpPoly"
+      (C1, C2, C3, C4, C5) = conststuple
+      return "$C1+$C2*T+$C3*T^2+$C4*T^3+$C5*T^4"
+    elseif property=="CpHyper"
+      (C1, C2, C3, C4, C5) = conststuple
+      return "$C1+$C2*(($C3/T)/sinh($C3/T))^2+$C4*(($C5/T)/cosh($C5/T))^2"
+    elseif property=="LiquidsDensities"
+      (C1, C2, C3, C4, Tmin, Tmax) = conststuple
+      if name=="Water"
+        τ="(1−T/647.096)"
+        return "17.863+58.606$τ^0.35−95.396$τ^(2/3)+213.89$τ−141.26$τ^(4/3)" #Water
+      elseif (name=="o-Terphenyl [note: limited range]" || name=="Water [note: limited range]")
+        return "$C1+$C2*T+$C3*T^2+$C4*T^3"
+      else
+        return "$C1/($C2^(1+(1-T/$C3)^$C4))" 
+      end
+    end
+  end
+  
   function getvalueforname(property::String , name::String)
     global propertytofilemap
     if !haskey(propertytofilemap,property)
