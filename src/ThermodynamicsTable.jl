@@ -1,20 +1,20 @@
 module ThermodynamicsTable
   export getformulaforname, getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
   thisfiledirname=dirname(@__FILE__())
-  fhyper=nothing #cp hyper fit
-  fcriti=nothing #criticals
-  fpoly=nothing #cp polinomial fit
-  fdens=nothing #densities
   flvps=nothing #liquids vapor pressure
+  fdens=nothing #densities
+  fcriti=nothing #criticals
   flcp=nothing #liquids heat capacity
+  fpoly=nothing #cp polinomial fit
+  fhyper=nothing #cp hyper fit
   propertytofilemap=[
-    "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
-    "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper),
+    "LiquidsVaporPressure"=>("perryLiquidsVaporPressure_Table2_8.table",flvps),
+    "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
     "Criticals"=>("perryCriticals_Table2_141.table",fcriti),
     "Profile"=>("perryCriticals_Table2_141.table",fcriti),
-    "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
-    "LiquidsVaporPressure"=>("perryLiquidsVaporPressure_Table2_8.table",flvps),
-    "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp)
+    "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp),
+    "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
+    "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper)
   ]
   #open table if not loaded private
   function getdatamatrix(property::String)
@@ -22,7 +22,7 @@ module ThermodynamicsTable
     glob=propertytofilemap[property][2];
     if (glob==nothing)
         file=open(thisfiledirname * "/Tables/"*propertytofilemap[property][1]);
-        glob,head=readdlm(file,';',header=true);
+        glob=readdlm(file,';',header=false);
         close(file)
     end
     return glob
@@ -120,3 +120,4 @@ module ThermodynamicsTable
 		end
   end
 end
+include("CapeOpen.jl")

@@ -1,4 +1,7 @@
 using ThermodynamicsTable
+using ICapeThermoUniversalConstants
+import ECapeExceptions.ECapeInvalidArgument
+import CapeOpen: MaterialObject
 using Base.Test
 
 argoncppoly=getvalueforname("CpPoly","Argon")
@@ -96,3 +99,9 @@ end
 AVR_Pc=SUM_Pc/i
 AVR_Tc=SUM_Tc/i
 println("(AVR_Tc,AVR_Pc,MAX_Tc,MAX_Pc,MIN_Tc,MIN_Pc,MIN_Zc,MAX_Zc)==",AVR_Tc,",",AVR_Pc,",",MAX_Tc,",",MAX_Pc,",",MIN_Tc,",",MIN_Pc,",",MIN_Zc,",",MAX_Zc)
+
+
+println(getuniversalconstantlist())
+@test_throws ECapeInvalidArgument (getuniversalconstant("avogadroConstan"))
+@test getuniversalconstant("avogadroConstant") == 6.0221419947e23
+mo=MaterialObject()
