@@ -1,11 +1,12 @@
 module CapeOpen
-  validPureConstantStringProps=Vector{ASCIIString}([
+  # valid properties
+  constantstrings=Vector{ASCIIString}([
     "casRegistryNumber", # Chemical Abstract Service Registry Number 
     "chemicalFormula", # Chemical formula
     "iupacName", # Complete IUPAC Name 
     "SMILESformula" # SMILES chemical structure formula
   ])
-  validPureConstantFlotProps=Vector{ASCIIString}([
+  constantfloats=Vector{ASCIIString}([
     "acentricFactor", # Pitzer acentric factor
     "associationParameter", # association-parameter (Hayden-O’Connell) 
     "bornRadius", # in m
@@ -45,6 +46,41 @@ module CapeOpen
     "vanderwaalsArea", # van der Waals area in m3/mol
     "vanderwaalsVolume", # van der Waals volume in m3/mol
   ])
+  tempreturedependents=Vector{ASCIIString}([
+    "cpAqueousInfiniteDilution", # Heat capacity of a solute in an infinitely dilute aqueous solution. in J/(mol K) 
+    "dielectricConstant", # The ratio of the capacity of a condenser with a particular substance as dielectric to the capacity of the same condenser with a vacuum for dielectric.
+    "expansivity", # Coefficient of linear expansion for a solid at 1 atm in 1/K
+    "fugacityCoefficientOfVapor", # Fugacity coefficient of vapour on the saturation line
+    "glassTransitionPressure", # Glass transition pressure in Pa
+    "heatCapacityOfLiquid", # Heat capacity (Cp) of liquid on the saturation line in J/(mol K)
+    "heatCapacityOfSolid", # Solid heat capacity (Cp) at 1 atm in J/(mol K) 
+    "heatOfFusion", # Enthalpy change on fusion fot the solid on the melting line in J/mol
+    "heatOfSublimation", # Enthalpy change on evaporation of the solid on the sublimation line in J/mol 
+    "heatOfSolidSolidPhaseTransition", # Enthalpy change on phase transition in J/mol 
+    "heatOfVaporization", # Enthalpy change on evaporation of the liquid on the saturation line in J/mol 
+    "idealGasEnthalpy", # Enthalpy of ideal gas in J/mol 
+    "idealGasEntropy", # Temperature-dependent part of entropy of ideal gas in J/(mol K) 
+    "idealGasHeatCapacity", # Heat capacity (Cp) of ideal gas in J/(mol K) 
+    "meltingPressure", # Pressure on melting line in Pa 
+    "selfDiffusionCoefficientGas", # Self-diffusion coefficient in gas phase at 1 atm in m2/s 
+    "selfDiffusionCoefficientLiquid", # self-diffusion coefficient in liquid phase on saturation line in m2/s 
+    "solidSolidPhaseTransitionPressure", # Pressure at phase transition in Pa
+    "sublimationPressure", # Vapour pressure of solid on the sublimation line in Pa
+    "surfaceTensionSatLiquid", # Surface tension of liquid on the saturation line in N/m 
+    "thermalConductivityOfLiquid", # Thermal conductivity of liquid on saturation line in W/(m K) 
+    "thermalConductivityOfSolid", # Thermal conductivity of solid at 1 atm in W/(m K) 
+    "thermalConductivityOfVapor", # Thermal conductivity of dilute gas in W/(m K) 
+    "vaporPressure", # Vapour pressure of saturated liquid in Pas
+    "virialCoefficient", # Second virial coefficient of gas in m3/mol
+    "viscosityOfLiquid", # Viscosity of liquid on saturation line in Pas
+    "viscosityOfVapor", # Viscosity in dilute gas state in Pas
+    "volumeChangeUponMelting", # Volume change for the solid on the melting line in m3/mol
+    "volumeChangeUponSolidSolidPhaseTransition", # Volume change upon solid-solid phase transition in m3/mol
+    "volumeChangeUponSublimation", # Volume change for the solid on the sublimation line in m3/mol
+    "volumeChangeUponVaporization", # Volume change for the liquid on the saturation line in m3/mol
+    "volumeOfLiquid", # Volume of liquid on saturation line in m3/mol
+    "volumeOfSolid" # Volume of solid at 1 atm in m3/mol
+  ])
   """
     Material Object must:
     * Allow a client to set any basis-dependent Physical Property on any basis.
@@ -56,7 +92,9 @@ module CapeOpen
     MaterialObject()=new(
       Dict{ASCIIString,Dict{ASCIIString,Any}}()
     )    
-    pureConstantStrings::Dict{ASCIIString,Dict{ASCIIString,Any}}
+    constantstrings::Dict{ASCIIString,Dict{ASCIIString,ASCIIString}}
+    constantfloats::Dict{ASCIIString,Dict{ASCIIString,Float64}}
+    tempreturedependents::Dict{ASCIIString,Dict{ASCIIString,Float64}}
   end
 
   type PropertyPackage

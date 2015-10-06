@@ -7,8 +7,8 @@ using Base.Test
 argoncppoly=getvalueforname("CpPoly","Argon")
 aircphyper=getvalueforname("CpHyper","Air")
 
-println(getformulaforname("CpPoly","Argon"))
-println(getformulaforname("CpHyper","Air"))
+println(getexpressionforname("CpPoly","Argon"))
+println(getexpressionforname("CpHyper","Air"))
 
 for i in 1:5
   @test_approx_eq argoncppoly[i] (20786,0.0,0.0,0.0,0.0)[i] #argon , perry 8ed. p 2-174

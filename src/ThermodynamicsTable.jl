@@ -1,22 +1,35 @@
 module ThermodynamicsTable
-  export getformulaforname, getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
+  export getexpressionforname, getvalueforname, getnameforcasno, getnameforformula, getallnamesforproperty
   thisfiledirname=dirname(@__FILE__())
   flvps=nothing #liquids vapor pressure
   fdens=nothing #densities
   fcriti=nothing #criticals
+  fvapheat=nothing #
   flcp=nothing #liquids heat capacity
   fpoly=nothing #cp polinomial fit
   fhyper=nothing #cp hyper fit
+  fform=nothing #
+  fvapvis=nothing #
+  fliqvis=nothing #
+  fvaptherm=nothing #
+  fliqtherm=nothing #
   propertytofilemap=[
     "LiquidsVaporPressure"=>("perryLiquidsVaporPressure_Table2_8.table",flvps),
     "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
     "Criticals"=>("perryCriticals_Table2_141.table",fcriti),
     "Profile"=>("perryCriticals_Table2_141.table",fcriti),
+    "VaporizHeat"=>("perryHeatsofVaporization_Table2-150.table",fvapheat),
     "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp),
     "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
-    "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper)
+    "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper),
+    "FormationEnergy"=>("perryEnergiesOfFormation_Table2-179.table",fform),
+    "VaporViscos"=>("perryVaporViscosity_Table2-312.table",fvapvis),
+    "LiquidViscos"=>("perryLiquidViscosity_Table2-313.table",fliqvis),
+    "VaporThermal"=>("perryVaporThermalConductivity_Table2-314.table",fvaptherm),
+    "LiquidThermal"=>("perryLiqidThermalConductivity_Table2-315.table",fliqtherm)
   ]
-  #open table if not loaded private
+  
+  # open table if not loaded (private)
   function getdatamatrix(property::String)
     global propertytofilemap
     glob=propertytofilemap[property][2];
@@ -27,6 +40,8 @@ module ThermodynamicsTable
     end
     return glob
   end
+  
+  # find first occurance of keyvalue in data, search keycolumnindex (private)
   function findindex(data::Array{Any,2},keyvalue::String,keycolumnindex=2)
     len=size(data)[1]
 		i=1
@@ -39,6 +54,7 @@ module ThermodynamicsTable
       return 0;
     end
   end
+  
   function getnameforcasno(casno::String)
     data_criti=getdatamatrix("Profile")
     i=findindex(data_criti,casno,4)
@@ -47,6 +63,7 @@ module ThermodynamicsTable
     end
     return (data_criti[i,2]) 
   end
+  
   function getnameforformula(formula::String)
     data_criti=getdatamatrix("Profile")
     i=findindex(data_criti,formula,3)
@@ -55,6 +72,7 @@ module ThermodynamicsTable
     end
     return data_criti[i,2] 
   end
+  
   function getallnamesforproperty(property::String)
     global propertytofilemap
     if !haskey(propertytofilemap,property)
@@ -71,7 +89,7 @@ module ThermodynamicsTable
     return names
   end
   
-  function getformulaforname(property::String , name::String)
+  function getexpressionforname(property::String , name::String)
     conststuple::Tuple = getvalueforname(property, name)
     if property=="CpPoly"
       (C1, C2, C3, C4, C5) = conststuple
