@@ -1,7 +1,8 @@
 using ThermodynamicsTable
 using ICapeThermoUniversalConstants
+using ICapeThermoCompounds
 import ECapeExceptions.ECapeInvalidArgument
-import CapeOpen: MaterialObject
+import CapeOpen: MaterialObject, perryanalytic
 using Base.Test
 
 argoncppoly=getvalueforname("CpPoly","Argon")
@@ -105,3 +106,4 @@ println(getuniversalconstantlist())
 @test_throws ECapeInvalidArgument (getuniversalconstant("avogadroConstan"))
 @test getuniversalconstant("avogadroConstant") == 6.0221419947e23
 mo=MaterialObject()
+println(getconstproplist(perryanalytic))

@@ -1,6 +1,6 @@
 module ICapeThermoCompounds
     import CapeOpen.PropertyPackage
-    export getcompoundconstant,getcompoundlist,getconstproplist!,getnumcompounds!,getpdependentproperty!,getpdependentproplist!,gettdependentproperty!,gettdependentproplist!
+    export getcompoundconstant,getcompoundlist,getconstproplist,getnumcompounds!,getpdependentproperty!,getpdependentproplist!,gettdependentproperty!,gettdependentproplist!
     
     """
       Returns the values of constant Physical Properties for the specified Compounds.
@@ -37,9 +37,11 @@ module ICapeThermoCompounds
     
     """
       Returns the list of supported constant Physical Properties.
+      #= [retval][out] =# props::Vector{ASCIIString}
     """
-    function getconstproplist!( 
-        #= [retval][out] =# props::Vector{ASCIIString}) 
+    function getconstproplist( 
+        proppackage::PropertyPackage)
+        return vcat([keys(proppackage.constantstrings)...], [keys(proppackage.constantfloats)...], [keys(proppackage.tempreturedependents)...])
     end
     
     """
@@ -56,7 +58,7 @@ module ICapeThermoCompounds
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# pressure::Float64,
         #= [in] =# compIds::Vector{ASCIIString},
-        #= [out][in] =# propvals::Vector{Float64}) 
+        #= [out][in] =# propvals::Vector{Float64})
     end
     
     """
