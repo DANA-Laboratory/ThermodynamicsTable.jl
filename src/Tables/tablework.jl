@@ -5,7 +5,7 @@
 #EXAMPLE CALL -> makesamecolumn(13,-3,"perryLiquidViscosity_Table2-313.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporViscosity_Table2-312.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporThermalConductivity_Table2-314.table")
-function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::AbstractString)
+function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::String)
   srmin=open(tablename,"r")
   srmout=open(tablename*"_","w")
   count=0
@@ -48,10 +48,30 @@ function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::AbstractStr
 end
 
 function checkalltablesprofile()
-  tables=["perryLiquidsVaporPressure_Table2_8","perryCriticals_Table2_141","perryHeatsofVaporization_Table2","perryHeatCapLiquids_Table2_153","perryHeatCapIdealGas_Table2_155","perryHeatCapIdealGas_Table2_156","perryEnergiesOfFormation_Table2_179","perryVaporViscosity_Table2_312","perryLiquidViscosity_Table2_313","perryVaporThermalConductivity_Table2_314","perryLiqidThermalConductivity_Table2_315"]
+  tables=["perryCriticals_Table2_141","perryLiquidsVaporPressure_Table2_8","perryHeatsofVaporization_Table2_150","perryHeatCapLiquids_Table2_153","perryHeatCapIdealGas_Table2_155","perryHeatCapIdealGas_Table2_156","perryEnergiesOfFormation_Table2_179","perryVaporViscosity_Table2_312","perryLiquidViscosity_Table2_313","perryVaporThermalConductivity_Table2_314","perryLiqidThermalConductivity_Table2_315"]
+  i=1
+  glob=Array(Any,11)
   for (t in tables)
     file=open(t*".table");
-    glob=readdlm(file,';',header=false);
+    glob[i]=readdlm(file,';',header=false);    
+    println(t*" is loaded")
     close(file)
+    i+=1
+  end
+  for (i in 2:11)
+    jj=1
+    j=1
+    while (j < size(glob[i])[1])
+      glob[i][j,1]=int(glob[i][j,1])
+      try
+        while (glob[i][j,[1,2,3,4]]!=glob[1][jj,[1,2,3,4]])
+          jj+=1
+        end
+      catch   err
+        @assert false "$(glob[i][j,[1,2,3,4]]) in $(tables[i])"
+      end
+      j+=1
+    end
+    println(tables[i]*" Done $j elements found")
   end
 end
