@@ -13,7 +13,7 @@ module ICapeThermoUniversalConstants
       speedOfLightInVacuum => m/s 
       standardAccelerationOfGravity => m/s2    
     """
-    universalConstants=Dict{ASCIIString,Float64}("avogadroConstant"=>6.0221419947E23,"boltzmannConstant"=>1.380650324E-23,"idealGasStateReferencePressure"=>101325,"molarGasConstant"=>8.31447215,"speedOfLightInVacuum"=>2.997924581E8,"standardAccelerationOfGravity"=>9.80665)
+    universalConstants=(ASCIIString=>Float64)["avogadroConstant"=>6.0221419947E23,"boltzmannConstant"=>1.380650324E-23,"idealGasStateReferencePressure"=>101325,"molarGasConstant"=>8.31447215,"speedOfLightInVacuum"=>2.997924581E8,"standardAccelerationOfGravity"=>9.80665]
     
     """
       Retrieves the value of a Universal Constant.

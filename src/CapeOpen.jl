@@ -6,12 +6,12 @@ module CapeOpen
       iupacName => Complete IUPAC Name
       SMILESformula => SMILES chemical structure formula
   """
-  constantstrings=Vector{ASCIIString}([
+  constantstrings=ASCIIString[
     "casRegistryNumber", # Chemical Abstract Service Registry Number 
     "chemicalFormula", # Chemical formula
     "iupacName", # Complete IUPAC Name 
     "SMILESformula" # SMILES chemical structure formula
-  ])
+  ]
   
   """
     Constant float properties
@@ -54,7 +54,7 @@ module CapeOpen
       37- vanderwaalsArea => van der Waals area in m3/mol
       38- vanderwaalsVolume => van der Waals volume in m3/mol
   """
-  constantfloats=Vector{ASCIIString}([
+  constantfloats=ASCIIString[
     "acentricFactor", # Pitzer acentric factor
     "associationParameter", # association-parameter (Hayden-O’Connell) 
     "bornRadius", # in m
@@ -93,7 +93,7 @@ module CapeOpen
     "triplePointTemperature", # triple point temperature in K
     "vanderwaalsArea", # van der Waals area in m3/mol
     "vanderwaalsVolume" # van der Waals volume in m3/mol
-  ])
+  ]
   
   """
     Temprature dependent properties
@@ -132,7 +132,7 @@ module CapeOpen
       33- volumeOfSolid => Volume of solid at 1 atm in m3/mol
 
   """
-  tempreturedependents=Vector{ASCIIString}([
+  tempreturedependents=ASCIIString[
     "cpAqueousInfiniteDilution", # Heat capacity of a solute in an infinitely dilute aqueous solution. in J/(mol K) 
     "dielectricConstant", # The ratio of the capacity of a condenser with a particular substance as dielectric to the capacity of the same condenser with a vacuum for dielectric.
     "expansivity", # Coefficient of linear expansion for a solid at 1 atm in 1/K
@@ -166,7 +166,7 @@ module CapeOpen
     "volumeChangeUponVaporization", # Volume change for the liquid on the saturation line in m3/mol
     "volumeOfLiquid", # Volume of liquid on saturation line in m3/mol
     "volumeOfSolid" # Volume of solid at 1 atm in m3/mol
-  ])
+  ]
   
   """
     Material Object must:

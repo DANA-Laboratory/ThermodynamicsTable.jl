@@ -58,7 +58,7 @@ module ICapeThermoMaterial
     function  getpresentphases!( 
         #= [in] =# this::MaterialObject,    
         #= [out][in] =# phaseLabels::Vector{String},
-        #= [out][in] =# phaseStatus!::Enum) 
+        #= [out][in] =# phaseStatus!::Vector{Int}) 
 		end
     
     """
@@ -110,7 +110,7 @@ module ICapeThermoMaterial
     function  setpresentphases( 
         #= [in] =# this::MaterialObject,    
         #= [in] =# phaseLabels::Vector{String} ,
-        #= [in] =# phaseStatus::Enum) 
+        #= [in] =# phaseStatus::Vector{Int}) 
 		end
     
     """

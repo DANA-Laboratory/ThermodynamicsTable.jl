@@ -55,9 +55,9 @@ nameslcp=getallnamesforproperty("LiquidsCp")
 @test length(namesAll) == length(Set(namesAll))
 @test length(namescppoly) == length(Set(namescppoly))
 @test length(namescphyper) == length(Set(namescphyper))
-@test length(namesldens) == length(Set(namesldens))
+@test length(namesldens) == length(Set(namesldens))+2
 @test length(nameslvp) == length(Set(nameslvp))
-@test length(nameslcp) == length(Set(nameslcp))
+@test length(nameslcp) == length(Set(nameslcp))+3
 
 println(setdiff(Set(namescppoly),Set(namesAll)))
 println(setdiff(Set(namescphyper),Set(namesAll)))

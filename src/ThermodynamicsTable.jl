@@ -18,15 +18,15 @@ module ThermodynamicsTable
     "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
     "Criticals"=>("perryCriticals_Table2_141.table",fcriti),
     "Profile"=>("perryCriticals_Table2_141.table",fcriti),
-    "VaporizHeat"=>("perryHeatsofVaporization_Table2-150.table",fvapheat),
+    "VaporizHeat"=>("perryHeatsofVaporization_Table2_150.table",fvapheat),
     "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp),
     "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
     "CpHyper"=>("perryHeatCapIdealGas_Table2_156.table",fhyper),
-    "FormationEnergy"=>("perryEnergiesOfFormation_Table2-179.table",fform),
-    "VaporViscos"=>("perryVaporViscosity_Table2-312.table",fvapvis),
-    "LiquidViscos"=>("perryLiquidViscosity_Table2-313.table",fliqvis),
-    "VaporThermal"=>("perryVaporThermalConductivity_Table2-314.table",fvaptherm),
-    "LiquidThermal"=>("perryLiqidThermalConductivity_Table2-315.table",fliqtherm)
+    "FormationEnergy"=>("perryEnergiesOfFormation_Table2_179.table",fform),
+    "VaporViscos"=>("perryVaporViscosity_Table2_312.table",fvapvis),
+    "LiquidViscos"=>("perryLiquidViscosity_Table2_313.table",fliqvis),
+    "VaporThermal"=>("perryVaporThermalConductivity_Table2_314.table",fvaptherm),
+    "LiquidThermal"=>("perryLiqidThermalConductivity_Table2_315.table",fliqtherm)
   ]
   
   # open table if not loaded (private)
