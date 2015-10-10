@@ -17,7 +17,7 @@ module ThermodynamicsTable
     "LiquidsVaporPressure"=>("perryLiquidsVaporPressure_Table2_8.table",flvps),
     "LiquidsDensities"=>("perryDensities_Table2_32.table",fdens),
     "Criticals"=>("perryCriticals_Table2_141.table",fcriti),
-    "Profile"=>("perryCriticals_Table2_141.table",fcriti),
+    "Profile"=>("perryFormulaComponents.table",fcriti),
     "VaporizHeat"=>("perryHeatsofVaporization_Table2_150.table",fvapheat),
     "LiquidsCp"=>("perryHeatCapLiquids_Table2_153.table",flcp),
     "CpPoly"=>("perryHeatCapIdealGas_Table2_155.table",fpoly),
@@ -41,8 +41,8 @@ module ThermodynamicsTable
     return glob
   end
   
-  # find first occurance of keyvalue in data, search keycolumnindex (private)
-  function findindex(data::Array{Any,2},keyvalue::String,keycolumnindex=2)
+  # find first occurance of compIds first column of data
+  function findindex(data::Array{Any,2},compId::Float64)
     len=size(data)[1]
 		i=1
 		while (i<=len && data[i,keycolumnindex]!=keyvalue) 
@@ -110,31 +110,31 @@ module ThermodynamicsTable
     end
   end
   
-  function getvalueforname(property::String , name::String)
+  function getvalueforname(property::String , compId::Int)
     global propertytofilemap
     if !haskey(propertytofilemap,property)
       throw(ArgumentError)
     end
     data=getdatamatrix(property)
-    i=findindex(data,name)
+    i=findindex(data,compId)
     if i==0
       throw(KeyError);
     end
 		if property=="CpPoly"
-      return (data[i,6],data[i,7],data[i,8],data[i,13]/1e5,data[i,14]/1e10) 
+      return (data[i,2],data[i,3],data[i,4],data[i,9]/1e5,data[i,10]/1e10) 
 		elseif property=="CpHyper"
-      return (data[i,6]*1e5,data[i,7]*1e5,data[i,8]*1e3,data[i,9]*1e5,data[i,10])
+      return (data[i,2]*1e5,data[i,3]*1e5,data[i,4]*1e3,data[i,5]*1e5,data[i,6])
 		elseif property=="Criticals"
         # Tc, Pc, Af, Zc
-        return (data[i,6],data[i,7]*1e6,data[i,10],data[i,9])
+        return (data[i,3],data[i,4]*1e6,data[i,7],data[i,6])
  		elseif property=="LiquidsDensities"
-        return (data[i,6],data[i,7],data[i,8],data[i,9],data[i,10],data[i,12])
+        return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,8])
  		elseif property=="LiquidsVaporPressure"
-        return (data[i,5],data[i,6],data[i,7],data[i,8],data[i,9],data[i,10],data[i,12])
+        return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,7],data[i,9])
  		elseif property=="LiquidsCp"
-        return (data[i,6],data[i,7],data[i,8],data[i,9],data[i,10],data[i,11],data[i,13])
+        return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,7],data[i,9])
     elseif property=="Profile"
-        return (data[i,3],data[i,4],data[i,5])
+        return (data[i,1],data[i,2],data[i,3],data[i,4])
 		end
   end
 end
