@@ -1,10 +1,12 @@
 module CapeOpen
+  export constantstrings,constantfloats,tempreturedependents,pressuredependents
+  export MaterialObject,PropertyPackage
   """
     Constant string properties
-      casRegistryNumber => Chemical Abstract Service Registry Number
-      chemicalFormula => Chemical formula
-      iupacName => Complete IUPAC Name
-      SMILESformula => SMILES chemical structure formula
+      1- casRegistryNumber => Chemical Abstract Service Registry Number
+      2- chemicalFormula => Chemical formula
+      3- iupacName => Complete IUPAC Name
+      4- SMILESformula => SMILES chemical structure formula
   """
   constantstrings=ASCIIString[
     "casRegistryNumber", # Chemical Abstract Service Registry Number 
@@ -167,6 +169,19 @@ module CapeOpen
     "volumeOfLiquid", # Volume of liquid on saturation line in m3/mol
     "volumeOfSolid" # Volume of solid at 1 atm in m3/mol
   ]
+  """
+    Pressure dependent properties
+      1- boilingPointTemperature => Temperature at liquid-vapour transition in K
+      2- glassTransitionTemperature => Glass transition temperature in K
+      3- meltingTemperature => Temperature on melting line in K
+      4- solidSolidPhaseTransitionTemperature => Temperature at phase transition in K
+  """
+  pressuredependents=ASCIIString[
+    "boilingPointTemperature", # Temperature at liquid-vapour transition in K
+    "glassTransitionTemperature", # Glass transition temperature in K
+    "meltingTemperature", # Temperature on melting line in K
+    "solidSolidPhaseTransitionTemperature"  # Temperature at phase transition in K
+  ]
   
   """
     Material Object must:
@@ -176,31 +191,14 @@ module CapeOpen
     * Ensure that quantities set in one basis are consistent with quantities set in another basis, or delegate that function as necessary. Where the basis conversion on a quantity is not  feasible, the Material Object must only store the quantity in the basis with which it was set most recently
   """
   type MaterialObject 
-    MaterialObject()=new(
-      Dict{ASCIIString,Dict{ASCIIString,Any}}()
-    )    
-    constantstrings::Dict{ASCIIString,Dict{ASCIIString,ASCIIString}}
-    constantfloats::Dict{ASCIIString,Dict{ASCIIString,Float64}}
-    tempreturedependents::Dict{ASCIIString,Dict{ASCIIString,Float64}}
   end
 
   type PropertyPackage
-    constantstrings::Dict{ASCIIString,ASCIIString}
-    constantfloats::Dict{ASCIIString,Float64}
-    tempreturedependents::Dict{ASCIIString,Float64}
+    constantstrings::Vector{ASCIIString}
+    constantfloats::Vector{ASCIIString}
+    tempreturedependents::Vector{ASCIIString}
+    pressuredependents::Vector{ASCIIString}
+    property::Dict{ASCIIString,Array{Any,2}}
   end
   
-  perryanalytic=PropertyPackage(
-    [i => "" for i in getindex(constantstrings,1:3)],
-    [i => NaN for i in getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36])],
-    [i => NaN for i in getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32])]
-  )
-  
 end
-
-include("ECapeExceptions.jl")
-include("ICapeThermoCompounds.jl")
-include("ICapeThermoMaterial.jl")
-include("ICapeThermoPhases.jl")
-include("ICapeThermoPropertyRoutine.jl")
-include("ICapeThermoUniversalConstants.jl")
