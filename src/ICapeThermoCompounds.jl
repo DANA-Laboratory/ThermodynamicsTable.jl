@@ -26,12 +26,14 @@ module ICapeThermoCompounds
     """    
     function getcompoundlist(
         proppackage::PropertyPackage) 
+        
         compIds=Vector{ASCIIString}()
         formulae=Vector{ASCIIString}()
         names=Vector{ASCIIString}()
         boilTemps=Vector{Float64}()
         molwts=Vector{Float64}()
         casnos=Vector{ASCIIString}()
+        
         return compIds,formulae,names,boilTemps,molwts,casnos
     end
     

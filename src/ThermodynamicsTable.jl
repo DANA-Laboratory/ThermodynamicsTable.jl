@@ -42,18 +42,7 @@ module ThermodynamicsTable
   end
   
   # find first occurance of compIds first column of data
-  function findindex(data::Array{Any,2},compId::Float64)
-    len=size(data)[1]
-		i=1
-		while (i<=len && data[i,keycolumnindex]!=keyvalue) 
-		 i+=1;
-		end
-		if (i<=len)
-      return i
-    else
-      return 0;
-    end
-  end
+  findindex(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
   
   function getnameforcasno(casno::String)
     data_criti=getdatamatrix("Profile")
