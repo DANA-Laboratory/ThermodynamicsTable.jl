@@ -9,7 +9,7 @@
   which supports the use of Property Calculators.
 """
 module PhysicalPropertyCalculator
-
+  export vp, ldwater, ldlimited, ld, hv, cppoly, cphyper, vv, lv, vtc, ltc
   # Vapor pressure in Pa.
   function vp(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) 
     return exp(c1 + c2/t + c3*ln(t) + c4*t^c5)

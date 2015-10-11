@@ -1,7 +1,8 @@
 module ICapeThermoCompounds
-    import CapeOpen.PropertyPackage
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
     export getcompoundconstant,getpdependentproperty,gettdependentproperty
+    using  PhysicalPropertyCalculator
+    import CapeOpen.PropertyPackage
     """
       Returns the list of supported constant Physical Properties.
       #= [retval][out] =# props::Vector{ASCIIString}
@@ -42,7 +43,7 @@ module ICapeThermoCompounds
     function getnumcompounds(
         proppackage::PropertyPackage)
         num::Int32
-        num = size(proppackage.property["CompondList"])[1]
+        num = size(proppackage.compondlist)[1]
         return  num
     end
 
@@ -66,11 +67,11 @@ module ICapeThermoCompounds
         molwts::Vector{Float64}
         casnos::Vector{ASCIIString}
 
-        compIds=proppackage.property["CompondList"][:,1]
-        formulae=proppackage.property["CompondList"][:,3]
-        names=proppackage.property["CompondList"][:,2]
-        casnos=proppackage.property["CompondList"][:,4]
-        molwts=proppackage.property["CompondList"][:,5]
+        compIds=proppackage.compondlist[:,1]
+        formulae=proppackage.compondlist[:,3]
+        names=proppackage.compondlist[:,2]
+        casnos=proppackage.compondlist[:,4]
+        molwts=proppackage.compondlist[:,5]
         boilTemps=[NaN for i=1:length(compIds)]
 
         return compIds,formulae,names,boilTemps,molwts,casnos
@@ -84,6 +85,8 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        
+        
         
         propvals::Vector{Any}
         

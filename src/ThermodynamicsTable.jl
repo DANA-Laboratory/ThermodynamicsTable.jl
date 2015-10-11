@@ -1,4 +1,5 @@
 include("CapeOpen.jl")
+include("PhysicalPropertyCalculator.jl")
 module ThermodynamicsTable
 
   using CapeOpen, Compat
@@ -16,9 +17,9 @@ module ThermodynamicsTable
 
   findindex(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
 
-  function PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,propertytofilemap) 
+  function PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap) 
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
-    CapeOpen.PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,propertytofilemap) 
+    CapeOpen.PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap) 
   end
 
   perryanalytic=PropertyPackage(
@@ -26,8 +27,8 @@ module ThermodynamicsTable
     getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36]),
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
     [],
+    getdatamatrix("perryFormulaComponents.table"),
     @compat Dict(
-      "CompondList"=>"perryFormulaComponents.table",
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
       "LiquidsDensities"=>"perryDensities_Table2_32.table",
       "Criticals"=>"perryCriticals_Table2_141.table",

@@ -195,6 +195,7 @@ module CapeOpen
   type MaterialObject 
   end
 
+  typealias PropertyMap Dict{ASCIIString,Tuple{Array,Function}}
   """
     Property Package – a software component that is both a Physical Property Calculator and
     an Equilibrium Calculator for Materials containing a specific set of Compounds
@@ -210,7 +211,8 @@ module CapeOpen
     constantfloats::Vector{ASCIIString}
     tempreturedependents::Vector{ASCIIString}
     pressuredependents::Vector{ASCIIString}
-    property::Dict{ASCIIString,Array{Any,2}}
+    compondlist::Array{Any,2}
+    property::Dict{ASCIIString,Array{Float64,2}}
   end 
   
 end
