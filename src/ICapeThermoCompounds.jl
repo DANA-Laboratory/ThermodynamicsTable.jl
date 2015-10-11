@@ -1,7 +1,7 @@
 module ICapeThermoCompounds
     import CapeOpen.PropertyPackage
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
-
+    export getcompoundconstant,getpdependentproperty,gettdependentproperty
     """
       Returns the list of supported constant Physical Properties.
       #= [retval][out] =# props::Vector{ASCIIString}
@@ -76,7 +76,6 @@ module ICapeThermoCompounds
         return compIds,formulae,names,boilTemps,molwts,casnos
     end
 
-
     """
       Returns the values of constant Physical Properties for the specified Compounds.
       #= [retval][out] =# propvals::Vector{Any}
@@ -84,29 +83,47 @@ module ICapeThermoCompounds
     function getcompoundconstant(
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
-        #= [in] =# compIds::Vector{ASCIIString}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        
+        propvals::Vector{Any}
+        
         propvals=Vector{Any}()
+        
         return propvals
     end
 
     """
       Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
+      #= [out][in] =# propvals::Vector{Float64}
     """
-    function getpdependentproperty!(
+    function getpdependentproperty(
+        proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# pressure::Float64,
-        #= [in] =# compIds::Vector{ASCIIString},
-        #= [out][in] =# propvals::Vector{Float64})
+        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        
+        propvals::Vector{Float64}
+        
+        propvals=Vector{Float64}()
+        
+        return propvals
     end
 
     """
       Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
+      #= [out][in] =# propvals::Vector{Float64})
     """
-    function gettdependentproperty!(
+    function gettdependentproperty(
+        proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# temperature::Float64,
-        #= [in] =# compIds::Vector{ASCIIString},
-        #= [out][in] =# propvals::Vector{Float64})
+        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        
+        propvals::Vector{Float64}
+        
+        propvals=Vector{Float64}()
+        
+        return propvals
     end
 
 end

@@ -1,7 +1,7 @@
 include("CapeOpen.jl")
 module ThermodynamicsTable
 
-  using CapeOpen
+  using CapeOpen, Compat
 
   export perryanalytic
   
@@ -26,7 +26,7 @@ module ThermodynamicsTable
     getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36]),
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
     [],
-    [
+    @compat Dict(
       "CompondList"=>"perryFormulaComponents.table",
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
       "LiquidsDensities"=>"perryDensities_Table2_32.table",
@@ -40,8 +40,54 @@ module ThermodynamicsTable
       "LiquidViscos"=>"perryLiquidViscosity_Table2_313.table",
       "VaporThermal"=>"perryVaporThermalConductivity_Table2_314.table",
       "LiquidThermal"=>"perryLiqidThermalConductivity_Table2_315.table"
-    ]
+    )
   )
+  
+  function vp(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) # Vapor pressure in Pa.
+    return exp(c1 + c2/t + c3*ln(t) + c4*t^c5)
+  end
+  
+  function ldwater(t::Float64) # For water over the entire temperature range of 273.16 to 647.096 K.
+    τ=1-(t/647.096)
+    return 17.863+58.606*τ^0.35 - 95.396*τ^(2/3)+213.89*τ- 141.26*τ^(4/3)
+  end
+
+  function ldlimited(c1::Float64,c2::Float64,c3::Float64,c4::Float64,t::Float64) #  o-terphenyl and water
+    return c1+c2*t+c3*t^2+c4*t^3
+  end
+  
+  function ld(c1::Float64,c2::Float64,c3::Float64,c4::Float64,t::Float64) # The others, The pressure is equal to the vapor pressure for pressures greater than 1 atm and equal to 1 atm when the vapor pressure is less than 1 atm. 
+    return c1/(c2^(1+(1-t/c3)^c4))
+  end
+
+  function hv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, tr::Float64) # Tr = T/Tc. Heat of vaporization in J/kmol
+    return c1*(1 -tr)^(c2+c3*tr+c4*tr^2+c5*tr^3)
+  end
+  
+  function cppoly(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
+    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
+  end
+
+  function cphyper(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
+    return c1+c2*((c3/t)/sinh(c3/t))^2+c4*((c5/t)/cosh(c5/t))^2
+  end
+
+  function vv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) #   Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
+    return c1*(t^c2)/(1+c3/t+c4/(t^2))
+  end
+  
+  function lv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
+    return exp(c1*c2/t*c3*ln(t)*c4*t^c5)
+  end
+   
+  function vtc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, t::Float64) #  Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
+    return c1*(t^c2)/(1+c3/t+c4/(t^2))
+  end
+  
+  function ltc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
+    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
+  end
+
 end
 
 include("ECapeExceptions.jl")
@@ -92,19 +138,19 @@ include("ICapeThermoUniversalConstants.jl")
       conststuple::Tuple = getvalueforname(property, name)
       if property=="CpPoly"
         (C1, C2, C3, C4, C5) = conststuple
-        return "$C1+$C2*T+$C3*T^2+$C4*T^3+$C5*T^4"
+        return "C1+C2*T+C3*T^2+C4*T^3+C5*T^4"
       elseif property=="CpHyper"
         (C1, C2, C3, C4, C5) = conststuple
-        return "$C1+$C2*(($C3/T)/sinh($C3/T))^2+$C4*(($C5/T)/cosh($C5/T))^2"
+        return "C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2"
       elseif property=="LiquidsDensities"
         (C1, C2, C3, C4, Tmin, Tmax) = conststuple
         if name=="Water"
-          τ="(1−T/647.096)"
-          return "17.863+58.606$τ^0.35−95.396$τ^(2/3)+213.89$τ−141.26$τ^(4/3)" #Water
+          τ="(1-T/647.096)"
+          return "17.863+58.606τ^0.35-95.396τ^(2/3)+213.89τ-141.26τ^(4/3)" #Water
         elseif (name=="o-Terphenyl [note: limited range]" || name=="Water [note: limited range]")
-          return "$C1+$C2*T+$C3*T^2+$C4*T^3"
+          return "C1+C2*T+C3*T^2+C4*T^3"
         else
-          return "$C1/($C2^(1+(1-T/$C3)^$C4))" 
+          return "C1/(C2^(1+(1-T/C3)^C4))" 
         end
       end
     end
