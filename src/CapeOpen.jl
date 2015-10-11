@@ -1,6 +1,6 @@
 module CapeOpen
-  export constantstrings,constantfloats,tempreturedependents,pressuredependents
-  export MaterialObject,PropertyPackage
+  export constantstrings, constantfloats, tempreturedependents, pressuredependents
+  export MaterialObject,PropertyPackage, PhysicalPropertyCalculator
   """
     Constant string properties
       1- casRegistryNumber => Chemical Abstract Service Registry Number
@@ -184,6 +184,8 @@ module CapeOpen
   ]
   
   """
+    Material Object refers to the software object that implements the
+    representation of a Material.
     Material Object must:
     * Allow a client to set any basis-dependent Physical Property on any basis.
     * Allow a client to get any basis-dependent Physical Property using the basis with which it was stored.
@@ -193,12 +195,22 @@ module CapeOpen
   type MaterialObject 
   end
 
+  """
+    Property Package – a software component that is both a Physical Property Calculator and
+    an Equilibrium Calculator for Materials containing a specific set of Compounds
+    occurring in a specific number of physical states. A Property Package will make use of
+    certain models to perform these calculations. A Property Package can be configured to
+    make use of external Physical Property Calculators and/or Equilibrium Calculators.
+    Alternatively, it can provide the functionality of these two components internally without
+    making use of external components. Configuring the Compounds, Phases, models and
+    external components used in a Property Package is outside the scope of this CAPEOPEN interface specification.
+  """
   type PropertyPackage
     constantstrings::Vector{ASCIIString}
     constantfloats::Vector{ASCIIString}
     tempreturedependents::Vector{ASCIIString}
     pressuredependents::Vector{ASCIIString}
     property::Dict{ASCIIString,Array{Any,2}}
-  end
+  end 
   
 end

@@ -42,51 +42,6 @@ module ThermodynamicsTable
       "LiquidThermal"=>"perryLiqidThermalConductivity_Table2_315.table"
     )
   )
-  
-  function vp(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) # Vapor pressure in Pa.
-    return exp(c1 + c2/t + c3*ln(t) + c4*t^c5)
-  end
-  
-  function ldwater(t::Float64) # For water over the entire temperature range of 273.16 to 647.096 K.
-    τ=1-(t/647.096)
-    return 17.863+58.606*τ^0.35 - 95.396*τ^(2/3)+213.89*τ- 141.26*τ^(4/3)
-  end
-
-  function ldlimited(c1::Float64,c2::Float64,c3::Float64,c4::Float64,t::Float64) #  o-terphenyl and water
-    return c1+c2*t+c3*t^2+c4*t^3
-  end
-  
-  function ld(c1::Float64,c2::Float64,c3::Float64,c4::Float64,t::Float64) # The others, The pressure is equal to the vapor pressure for pressures greater than 1 atm and equal to 1 atm when the vapor pressure is less than 1 atm. 
-    return c1/(c2^(1+(1-t/c3)^c4))
-  end
-
-  function hv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, tr::Float64) # Tr = T/Tc. Heat of vaporization in J/kmol
-    return c1*(1 -tr)^(c2+c3*tr+c4*tr^2+c5*tr^3)
-  end
-  
-  function cppoly(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
-  end
-
-  function cphyper(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1+c2*((c3/t)/sinh(c3/t))^2+c4*((c5/t)/cosh(c5/t))^2
-  end
-
-  function vv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) #   Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
-    return c1*(t^c2)/(1+c3/t+c4/(t^2))
-  end
-  
-  function lv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
-    return exp(c1*c2/t*c3*ln(t)*c4*t^c5)
-  end
-   
-  function vtc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, t::Float64) #  Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
-    return c1*(t^c2)/(1+c3/t+c4/(t^2))
-  end
-  
-  function ltc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
-    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
-  end
 
 end
 
