@@ -10,7 +10,7 @@ module ICapeThermoPropertyRoutine
       the argument list.
     """
     function calcandgetlnphi!( 
-        #= [in] =# phaseLabel::String,
+        #= [in] =# phaseLabel::AbstractString,
         #= [in] =# temperature::Float64,
         #= [in] =# pressure::Float64,
         #= [in] =# moleNumbers::Vector{Float64},
@@ -27,8 +27,8 @@ module ICapeThermoPropertyRoutine
       Material Object. CalcSinglePhaseProp does not perform phase Equilibrium Calculations.
     """
     function calcsinglephaseprop( 
-        #= [in] =# props::Vector{String},
-        #= [in] =# phaseLabel::String)
+        #= [in] =# props::Vector{AbstractString},
+        #= [in] =# phaseLabel::AbstractString)
 		end
        
     """
@@ -37,16 +37,16 @@ module ICapeThermoPropertyRoutine
       It does not perform Equilibrium Calculations.
     """
     function calctwophaseprop( 
-        #= [in] =# props::Vector{String} ,
-        #= [in] =# phaseLabels::Vector{String} )
+        #= [in] =# props::Vector{AbstractString} ,
+        #= [in] =# phaseLabels::Vector{AbstractString} )
 		end
        
     """
       Checks whether it is possible to calculate a property with the CalcSinglePhaseProp method for a given Phase.
     """
     function checksinglephasepropspec!( 
-        #= [in] =# property::String,
-        #= [in] =# phaseLabel::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabel::AbstractString,
         #= [retval][out] =# valid::Bool)
 		end
        
@@ -54,8 +54,8 @@ module ICapeThermoPropertyRoutine
       Checks whether it is possible to calculate a property with the CalcTwoPhaseProp method for a given set of Phases.
     """
     function checktwophasepropspec!( 
-        #= [in] =# property::String,
-        #= [in] =# phaseLabels::Vector{String},
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabels::Vector{AbstractString},
         #= [retval][out] =# valid::Bool)
 		end
        
@@ -63,14 +63,14 @@ module ICapeThermoPropertyRoutine
       Returns the list of supported non-constant single-phase Physical Properties.
     """
     function getsinglephaseproplist!( 
-        #= [retval][out] =# props::Vector{String})
+        #= [retval][out] =# props::Vector{AbstractString})
 		end
        
     """
       Returns the list of supported non-constant two-phase properties.
     """
     function gettwophaseproplist!( 
-        #= [retval][out] =# props::Vector{String})
+        #= [retval][out] =# props::Vector{AbstractString})
 		end
         
 end

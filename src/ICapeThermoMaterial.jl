@@ -37,8 +37,8 @@ module ICapeThermoMaterial
     """
     function  getoverallprop!( 
         #= [in] =# this::MaterialObject,
-        #= [in] =# property::String,
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# basis::AbstractString,
         #= [out][in] =# results::Vector{Float64}) 
 		end
     
@@ -57,7 +57,7 @@ module ICapeThermoMaterial
     """
     function  getpresentphases!( 
         #= [in] =# this::MaterialObject,    
-        #= [out][in] =# phaseLabels::Vector{String},
+        #= [out][in] =# phaseLabels::Vector{AbstractString},
         #= [out][in] =# phaseStatus!::Vector{Int}) 
 		end
     
@@ -66,9 +66,9 @@ module ICapeThermoMaterial
     """
     function  getsinglephaseprop!( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# property::String,
-        #= [in] =# phaseLabel::String,
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabel::AbstractString,
+        #= [in] =# basis::AbstractString,
         #= [out][in] =# results::Vector{Float64}) 
 		end
     
@@ -77,7 +77,7 @@ module ICapeThermoMaterial
     """
     function  gettpfraction!( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# phaseLabel::String,
+        #= [in] =# phaseLabel::AbstractString,
         #= [out][in] =# temperature!::Float64,
         #= [out][in] =# pressure!::Float64,
         #= [out][in] =# composition!::Vector{Float64}) 
@@ -88,9 +88,9 @@ module ICapeThermoMaterial
     """
     function  gettwophaseprop!( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# property::String,
-        #= [in] =# phaseLabels::Vector{String},
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabels::Vector{AbstractString},
+        #= [in] =# basis::AbstractString,
         #= [out][in] =# results::Vector{Float64}) 
 		end
     
@@ -99,8 +99,8 @@ module ICapeThermoMaterial
     """
     function  setoverallprop( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# property::String,
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# basis::AbstractString,
         #= [in] =# values::Vector{Float64}) 
 		end
     
@@ -109,7 +109,7 @@ module ICapeThermoMaterial
     """
     function  setpresentphases( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# phaseLabels::Vector{String} ,
+        #= [in] =# phaseLabels::Vector{AbstractString} ,
         #= [in] =# phaseStatus::Vector{Int}) 
 		end
     
@@ -118,9 +118,9 @@ module ICapeThermoMaterial
     """
     function  setsinglephaseprop( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# property::String,
-        #= [in] =# phaseLabel::String,
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabel::AbstractString,
+        #= [in] =# basis::AbstractString,
         #= [in] =# values::Vector{Float64}) 
 		end
     
@@ -129,9 +129,9 @@ module ICapeThermoMaterial
     """
     function  settwophaseprop( 
         #= [in] =# this::MaterialObject,    
-        #= [in] =# property::String,
-        #= [in] =# phaseLabels::Vector{String},
-        #= [in] =# basis::String,
+        #= [in] =# property::AbstractString,
+        #= [in] =# phaseLabels::Vector{AbstractString},
+        #= [in] =# basis::AbstractString,
         #= [in] =# values::Vector{Float64}) 
 		end
     

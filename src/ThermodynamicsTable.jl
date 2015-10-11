@@ -5,10 +5,10 @@ module ThermodynamicsTable
   using CapeOpen, Compat
 
   export perryanalytic
-  
+
   thisfiledirname=dirname(@__FILE__())
 
-  function getdatamatrix(path::String)
+  function getdatamatrix(path::AbstractString)
     file=open(thisfiledirname * "/Tables/"*path);
     matrix=readdlm(file,';',header=false);
     close(file)
@@ -17,16 +17,16 @@ module ThermodynamicsTable
 
   findindex(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
 
-  function PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap) 
+  function PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
-    CapeOpen.PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap) 
+    CapeOpen.PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap)
   end
 
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
     getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36]),
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
-    [],
+    ASCIIString[],
     getdatamatrix("perryFormulaComponents.table"),
     @compat Dict(
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
@@ -54,26 +54,26 @@ include("ICapeThermoPropertyRoutine.jl")
 include("ICapeThermoUniversalConstants.jl")
 
 
-#=  
+#=
 """
     function getnameforcasno(casno::String)
       data_criti=getdatamatrix("Profile")
       i=findindex(data_criti,casno,4)
-      if i==0    
+      if i==0
         throw(KeyError);
       end
-      return (data_criti[i,2]) 
+      return (data_criti[i,2])
     end
-    
+
     function getnameforformula(formula::String)
       data_criti=getdatamatrix("Profile")
       i=findindex(data_criti,formula,3)
-      if i==0    
+      if i==0
         throw(KeyError);
       end
-      return data_criti[i,2] 
+      return data_criti[i,2]
     end
-    
+
     function getallnamesforproperty(property::String)
       global propertytofilemap
       if !haskey(propertytofilemap,property)
@@ -89,7 +89,7 @@ include("ICapeThermoUniversalConstants.jl")
       end
       return names
     end
-    
+
     function getexpressionforname(property::String , name::String)
       conststuple::Tuple = getvalueforname(property, name)
       if property=="CpPoly"
@@ -106,11 +106,11 @@ include("ICapeThermoUniversalConstants.jl")
         elseif (name=="o-Terphenyl [note: limited range]" || name=="Water [note: limited range]")
           return "C1+C2*T+C3*T^2+C4*T^3"
         else
-          return "C1/(C2^(1+(1-T/C3)^C4))" 
+          return "C1/(C2^(1+(1-T/C3)^C4))"
         end
       end
     end
-    
+
     function getvalueforname(property::String , compId::Int)
       global propertytofilemap
       if !haskey(propertytofilemap,property)
@@ -122,7 +122,7 @@ include("ICapeThermoUniversalConstants.jl")
         throw(KeyError);
       end
       if property=="CpPoly"
-        return (data[i,2],data[i,3],data[i,4],data[i,9]/1e5,data[i,10]/1e10) 
+        return (data[i,2],data[i,3],data[i,4],data[i,9]/1e5,data[i,10]/1e10)
       elseif property=="CpHyper"
         return (data[i,2]*1e5,data[i,3]*1e5,data[i,4]*1e3,data[i,5]*1e5,data[i,6])
       elseif property=="Criticals"
@@ -138,6 +138,6 @@ include("ICapeThermoUniversalConstants.jl")
           return (data[i,1],data[i,2],data[i,3],data[i,4])
       end
     end
-  
+
 """
 =#

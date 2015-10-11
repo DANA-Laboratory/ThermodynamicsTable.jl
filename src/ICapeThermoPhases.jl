@@ -15,8 +15,8 @@ module ICapeThermoPhases
       Returns information on an attribute associated with a Phase for the purpose of understanding what lies behind a Phase label.
     """    
     function getphaseinfo!( 
-        #= [in] =# phaseLabel::Vector{String},
-        #= [in] =# phaseAttribute::Vector{String},
+        #= [in] =# phaseLabel::Vector{AbstractString},
+        #= [in] =# phaseAttribute::Vector{AbstractString},
         #= [retval][out] =# value::Any)
 		end
 
@@ -24,9 +24,9 @@ module ICapeThermoPhases
       Returns Phase labels and other important descriptive information for all the Phases supported.
     """    
     function getphaselist!( 
-        #= [out][in] =# phaseLabels!::Vector{String},
-        #= [out][in] =# stateOfAggregation!::Vector{String},
-        #= [out][in] =# keyCompoundId!::Vector{String})
+        #= [out][in] =# phaseLabels!::Vector{AbstractString},
+        #= [out][in] =# stateOfAggregation!::Vector{AbstractString},
+        #= [out][in] =# keyCompoundId!::Vector{AbstractString})
 		end
         
 end
