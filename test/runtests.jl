@@ -13,3 +13,4 @@ println(getuniversalconstantlist())
 @test length(gettdependentproplist(perryanalytic)) == 12
 @test length(getpdependentproplist(perryanalytic)) == 0
 @test getnumcompounds(perryanalytic) == 345
+compIds,formulae,names,boilTemps,molwts,casnos = getcompoundlist(perryanalytic)
