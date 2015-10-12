@@ -17,8 +17,8 @@ module PhysicalPropertyCalculator
   
   # For water over the entire temperature range of 273.16 to 647.096 K.
   function ldwater(t::Float64) 
-    ?=1-(t/647.096)
-    return 17.863+58.606*?^0.35 - 95.396*?^(2/3)+213.89*?- 141.26*?^(4/3)
+    ta=1-(t/647.096)
+    return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
   end
   
   #  o-terphenyl and water

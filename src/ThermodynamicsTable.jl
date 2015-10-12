@@ -2,7 +2,7 @@ include("CapeOpen.jl")
 include("PhysicalPropertyCalculator.jl")
 module ThermodynamicsTable
 
-  using CapeOpen, Compat
+  using CapeOpen
 
   export perryanalytic
 
@@ -28,7 +28,7 @@ module ThermodynamicsTable
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
     ASCIIString[],
     getdatamatrix("perryFormulaComponents.table"),
-    @compat Dict(
+    Dict(
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
       "LiquidsDensities"=>"perryDensities_Table2_32.table",
       "Criticals"=>"perryCriticals_Table2_141.table",

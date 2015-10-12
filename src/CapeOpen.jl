@@ -3,7 +3,6 @@ module CapeOpen
   export constantstrings, constantfloats, tempreturedependents, pressuredependents
   export MaterialObject,PropertyPackage, PhysicalPropertyCalculator
 
-  using Compat
 
   """
     Constant string properties
@@ -199,7 +198,7 @@ module CapeOpen
   type MaterialObject
   end
 
-  typealias PropertyMap @compat Dict{ASCIIString,Tuple{Array,Function}}
+  typealias PropertyMap Dict{ASCIIString,Tuple{Array,Function}}
 
   """
     Property Package – a software component that is both a Physical Property Calculator and
