@@ -16,17 +16,40 @@ module ThermodynamicsTable
   end
 
   findindex(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
+  
+  propmap(stvec,t,f,tu)=[cs=>(t[ind],f[ind],tu[ind]) for (ind,cs) in enumerate(stvec)]
 
-  function PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap)
+  function PropertyPackage(constantstrings,t1,f1,tu1,constantfloats,t2,f2,tu2,tempreturedependents,t3,f3,tu3,pressuredependents,t4,f4,tu4,compondlist,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
-    CapeOpen.PropertyPackage(constantstrings,constantfloats,tempreturedependents,pressuredependents,compondlist,propertytofilemap)
+    println("here")
+    println(typeof(propmap(constantstrings,t1,f1,tu1)))
+    CapeOpen.PropertyPackage(
+      propmap(constantstrings,t1,f1,tu1),
+      propmap(constantfloats,t2,f2,tu2),
+      propmap(tempreturedependents,t3,f3,tu3),
+      propmap(pressuredependents,t4,f4,tu4),
+      compondlist,
+      propertytofilemap
+    )
   end
 
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
+    ["perryFormulaComponents.table" for i=1:3],
+    [getindex for i=1:3],
+    [(1,), (2,), (3,)],
     getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36]),
+    [],
+    [],
+    [],
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
+    [],
+    [],
+    [],
     ASCIIString[],
+    [],
+    [],
+    [],
     getdatamatrix("perryFormulaComponents.table"),
     Dict(
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",

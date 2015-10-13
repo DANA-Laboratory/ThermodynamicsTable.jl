@@ -198,7 +198,7 @@ module CapeOpen
   type MaterialObject
   end
 
-  typealias PropertyMap Dict{ASCIIString,Tuple{Array,Function}}
+  typealias PropertyMap Dict{ASCIIString,Tuple{ASCIIString,Function,Tuple}}
 
   """
     Property Package – a software component that is both a Physical Property Calculator and
@@ -211,10 +211,10 @@ module CapeOpen
     external components used in a Property Package is outside the scope of this CAPEOPEN interface specification.
   """
   type PropertyPackage
-    constantstrings::Vector{ASCIIString}
-    constantfloats::Vector{ASCIIString}
-    tempreturedependents::Vector{ASCIIString}
-    pressuredependents::Vector{ASCIIString}
+    constantstrings::PropertyMap
+    constantfloats::PropertyMap
+    tempreturedependents::PropertyMap
+    pressuredependents::PropertyMap
     compondlist::Array{Any,2}
     property::Dict{ASCIIString,Array{Float64,2}}
   end

@@ -85,13 +85,14 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        
-        
-        
         propvals::Vector{Any}
-        
         propvals=Vector{Any}()
-        
+        for prop in props
+          table,func=constants(proppackage)[prop]
+          for compId in compIds
+            propvals.push!(func(findindex(table, compId)))
+          end
+        end
         return propvals
     end
 
