@@ -32,8 +32,11 @@ module PhysicalPropertyCalculator
   end
 
   # Tr = T/Tc. Heat of vaporization in J/kmol
-  function hv(c::Vector{Float64}, tr::Float64) 
-    return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2+c[5]*tr^3)
+  function hv(c::Vector{Float64}, t::Float64)
+    # perry 2_150 have not presented c5 although it's a part of formula
+    # here c5 is critical temperature    
+    tr=t/c[5]
+    return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2)
   end
   
   function cppoly(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)

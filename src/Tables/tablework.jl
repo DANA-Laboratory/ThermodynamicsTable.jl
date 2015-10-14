@@ -159,8 +159,8 @@ function readwritematchbp()
   end
   close(file)
 end
-function hv(c::Vector{Float64}, tr::Float64) 
-  return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2+c[5]*tr^3)
+function hv(c::Array{Any,2}, tr::Float64) 
+  return c[1]*1e7*((1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2))
 end
 function readbpwriteheatofvaporizationatbp()
   file=open("perryFormulaCompounds"*".table","r");
@@ -175,10 +175,10 @@ function readbpwriteheatofvaporizationatbp()
   file=open("HoVatBP_"*".table","w");
   i=1
   println(size(hev))
-  while(i<size(cr)[1])
+  while(i<=size(cr)[1])
     tcri=cr[i,3]
     bopo=bp[i,6]
-    hovbp=hv([hev[i,2:6]...],bopo/tcri)
+    hovbp=hv(hev[i,3:6],bopo/tcri)
     write(file,string(hev[i,1])*";"*string(tcri)*";"*string(hovbp)*";"*string(cr[i,2]))
     write(file,'\n')
     i+=1
