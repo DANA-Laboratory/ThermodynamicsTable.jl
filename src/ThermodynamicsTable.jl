@@ -15,13 +15,12 @@ module ThermodynamicsTable
     return matrix
   end
 
-  findindex(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
-  
+  getcompond(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
+
   propmap(stvec,t,f,tu)=[cs=>(t[ind],f[ind],tu[ind]) for (ind,cs) in enumerate(stvec)]
 
   function PropertyPackage(constantstrings,t1,f1,tu1,constantfloats,t2,f2,tu2,tempreturedependents,t3,f3,tu3,pressuredependents,t4,f4,tu4,compondlist,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
-    println("here")
     println(typeof(propmap(constantstrings,t1,f1,tu1)))
     CapeOpen.PropertyPackage(
       propmap(constantstrings,t1,f1,tu1),
@@ -37,12 +36,16 @@ module ThermodynamicsTable
     getindex(constantstrings,1:3),
     ["perryFormulaComponents.table" for i=1:3],
     [getindex for i=1:3],
-    [(1,), (2,), (3,)],
-    getindex(constantfloats,[5,6,7,8,9,15,16,17,18,20,21,24,25,28,29,31,32,35,36]),
+    [(2,), (3,), (4,)],
+    getcompond(constantfloats,[5,6,7,8,9,15,16,17,18,
+                               20,21,24,25,28,29,31,
+                               32,35,36]),
+    ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
+     "Criticals", "LiquidsVaporPressure", "CpHyper", "LiquidsCp", "FormationEnergy", "FormationEnergy", "FormationEnergy"
+     "FormationEnergy", "Criticals", "Criticals"],
     [],
     [],
-    [],
-    getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
+    getcompond(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
     [],
     [],
     [],
