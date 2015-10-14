@@ -43,7 +43,7 @@ module ICapeThermoCompounds
     function getnumcompounds(
         proppackage::PropertyPackage)
         num::Int32
-        num = size(proppackage.compondlist)[1]
+        num = size(proppackage.property["Compounds"])[1]
         return  num
     end
 
@@ -67,12 +67,14 @@ module ICapeThermoCompounds
         molwts::Vector{Float64}
         casnos::Vector{ASCIIString}
 
-        compIds=proppackage.compondlist[:,1]
-        formulae=proppackage.compondlist[:,3]
-        names=proppackage.compondlist[:,2]
-        casnos=proppackage.compondlist[:,4]
-        molwts=proppackage.compondlist[:,5]
-        boilTemps=[NaN for i=1:length(compIds)]
+        compondlist=proppackage.property["Compounds"]
+        
+        compIds=compondlist[:,1]
+        formulae=compondlist[:,3]
+        names=compondlist[:,2]
+        casnos=compondlist[:,4]
+        molwts=compondlist[:,5]
+        boilTemps=compondlist[:,6]
 
         return compIds,formulae,names,boilTemps,molwts,casnos
     end

@@ -5,7 +5,8 @@
 #EXAMPLE CALL -> makesamecolumn(13,-3,"perryLiquidViscosity_Table2-313.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporViscosity_Table2-312.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporThermalConductivity_Table2-314.table")
-function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::String)
+using Roots
+function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::AbstractString)
   srmin=open(tablename,"r")
   srmout=open(tablename*"_","w")
   count=0
@@ -75,3 +76,113 @@ function checkalltablesprofile()
     println(tables[i]*" Done $j elements found")
   end
 end
+c=Vector{Float64}(5)
+function boilingpoint()
+  global c
+  global vps
+  tables=["perryFormulaCompounds","perryLiquidsVaporPressure_Table2_8"]
+  file=open(tables[2]*".table","r");
+  vps=readdlm(file,';',header=false);
+  close(file)
+  file=open(tables[1]*"_.table","w");
+  for (i=1:size(vps)[1])
+    c=vps[i,2:6]
+    bp=fzeros(vp,vps[i,7],vps[i,9])
+    if (length(bp)==0)
+      bp=NaN
+    else
+      if (length(bp)==1)
+        bp=bp[1]
+      end
+    end
+    write(file,string(bp))
+    write(file,'\n')
+  end
+  close(file)
+end
+function vp(t::Float64) 
+  global c
+  return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])-101352
+end
+function checkYAWS()
+  file=open("YAWS_Table"*".table","r");
+  yws=readdlm(file,';',header=false);
+  close(file);
+  println(size(yws))
+  typevals=nothing
+  for (i=1:size(yws)[1])
+    (yws[i,end]!="") && println(yws[i,1])
+  end
+end
+function checkYAWS2()
+  file=open("YAWS2_Table"*".table","r");
+  yws=readdlm(file,';',header=false);
+  close(file);
+  println(size(yws))
+  typevals=nothing
+  for (i=1:size(yws)[1])
+    (yws[i,end]!="") && println(yws[i,1])
+  end
+end
+function readwritematchbp()
+  file=open("YAWS2_Table"*".table","r");
+  yws2=readdlm(file,';',header=false);
+  close(file);
+  file=open("YAWS_Table"*".table","r");
+  yws=readdlm(file,';',header=false);
+  close(file);
+  file=open("perryFormulaCompounds"*".table","r");
+  prry=readdlm(file,';',header=false);
+  close(file);
+  file=open("bpYAWS_.table","w");
+  for (j in 1:size(prry)[1])
+    i=1
+    while(i<size(yws)[1] && yws[i,5]!=prry[j,4])
+      i+=1
+    end
+    if (i < size(yws)[1] && yws[i,5]==prry[j,4])
+      write(file,string(prry[j,1])*";"*prry[j,4]*";"*string(yws[i,7]))
+      write(file,'\n')
+    else #search next chapter
+      ii=1
+      while(ii<size(yws2)[1] && yws2[ii,4]!=prry[j,4])
+        ii+=1
+      end
+      if (ii < size(yws2)[1] && yws2[ii,4]==prry[j,4])
+        write(file,string(prry[j,1])*";"*prry[j,4]*";"*string(yws2[ii,8]))
+        write(file,'\n')
+      else
+        write(file,'\n')
+        println(prry[j,:])
+      end
+    end
+  end
+  close(file)
+end
+function hv(c::Vector{Float64}, tr::Float64) 
+  return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2+c[5]*tr^3)
+end
+function readbpwriteheatofvaporizationatbp()
+  file=open("perryFormulaCompounds"*".table","r");
+  bp=readdlm(file,';',header=false);
+  close(file)
+  file=open("perryHeatsofVaporization_Table2_150"*".table","r");
+  hev=readdlm(file,';',header=false);
+  close(file)
+  file=open("perryCriticals_Table2_141"*".table","r");
+  cr=readdlm(file,';',header=false);
+  close(file)
+  file=open("HoVatBP_"*".table","w");
+  i=1
+  println(size(hev))
+  while(i<size(cr)[1])
+    tcri=cr[i,3]
+    bopo=bp[i,6]
+    hovbp=hv([hev[i,2:6]...],bopo/tcri)
+    write(file,string(hev[i,1])*";"*string(tcri)*";"*string(hovbp)*";"*string(cr[i,2]))
+    write(file,'\n')
+    i+=1
+  end
+  close(file)
+end
+

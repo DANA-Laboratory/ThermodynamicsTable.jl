@@ -19,7 +19,7 @@ module ThermodynamicsTable
 
   propmap(stvec,t,f,tu)=[cs=>(t[ind],f[ind],tu[ind]) for (ind,cs) in enumerate(stvec)]
 
-  function PropertyPackage(constantstrings,t1,f1,tu1,constantfloats,t2,f2,tu2,tempreturedependents,t3,f3,tu3,pressuredependents,t4,f4,tu4,compondlist,propertytofilemap)
+  function PropertyPackage(constantstrings,t1,f1,tu1,constantfloats,t2,f2,tu2,tempreturedependents,t3,f3,tu3,pressuredependents,t4,f4,tu4,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
     println(typeof(propmap(constantstrings,t1,f1,tu1)))
     CapeOpen.PropertyPackage(
@@ -27,24 +27,23 @@ module ThermodynamicsTable
       propmap(constantfloats,t2,f2,tu2),
       propmap(tempreturedependents,t3,f3,tu3),
       propmap(pressuredependents,t4,f4,tu4),
-      compondlist,
       propertytofilemap
     )
   end
 
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
-    ["perryFormulaComponents.table" for i=1:3],
+    ["Compounds" for i=1:3],
     [getindex for i=1:3],
     [(2,), (3,), (4,)],
     getcompond(constantfloats,[5,6,7,8,9,15,16,17,18,
                                20,21,24,25,28,29,31,
                                32,35,36]),
     ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
-     "Criticals", "LiquidsVaporPressure", "CpHyper", "LiquidsCp", "FormationEnergy", "FormationEnergy", "FormationEnergy"
+     "Criticals", "", "CpHyper", "LiquidsCp", "FormationEnergy", "FormationEnergy", "FormationEnergy",
      "FormationEnergy", "Criticals", "Criticals"],
-    [],
-    [],
+    [getindex, getindex, getindex, getindex, getindex],
+    [(6,), (5,), (4,), (3,), (5,), ],
     getcompond(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
     [],
     [],
@@ -53,8 +52,8 @@ module ThermodynamicsTable
     [],
     [],
     [],
-    getdatamatrix("perryFormulaComponents.table"),
     Dict(
+      "Compounds"=>"perryFormulaCompounds.table",
       "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
       "LiquidsDensities"=>"perryDensities_Table2_32.table",
       "Criticals"=>"perryCriticals_Table2_141.table",

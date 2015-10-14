@@ -11,8 +11,8 @@
 module PhysicalPropertyCalculator
   export vp, ldwater, ldlimited, ld, hv, cppoly, cphyper, vv, lv, vtc, ltc
   # Vapor pressure in Pa.
-  function vp(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) 
-    return exp(c1 + c2/t + c3*ln(t) + c4*t^c5)
+  function vp(c::Vector{Float64}, t::Float64) 
+    return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])
   end
   
   # For water over the entire temperature range of 273.16 to 647.096 K.
@@ -32,8 +32,8 @@ module PhysicalPropertyCalculator
   end
 
   # Tr = T/Tc. Heat of vaporization in J/kmol
-  function hv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, tr::Float64) 
-    return c1*(1 -tr)^(c2+c3*tr+c4*tr^2+c5*tr^3)
+  function hv(c::Vector{Float64}, tr::Float64) 
+    return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2+c[5]*tr^3)
   end
   
   function cppoly(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
@@ -51,7 +51,7 @@ module PhysicalPropertyCalculator
   
   #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
   function lv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64) 
-    return exp(c1*c2/t*c3*ln(t)*c4*t^c5)
+    return exp(c1*c2/t*c3*log(t)*c4*t^c5)
   end
    
   # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.

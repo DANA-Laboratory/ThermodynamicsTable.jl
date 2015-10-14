@@ -215,8 +215,7 @@ module CapeOpen
     constantfloats::PropertyMap
     tempreturedependents::PropertyMap
     pressuredependents::PropertyMap
-    compondlist::Array{Any,2}
-    property::Dict{ASCIIString,Array{Float64,2}}
+    property::Dict{ASCIIString,Array{Union{AbstractString,Float64},2}}
   end
 
 end
