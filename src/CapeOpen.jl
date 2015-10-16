@@ -1,7 +1,7 @@
 module CapeOpen
 
   export constantstrings, constantfloats, tempreturedependents, pressuredependents
-  export MaterialObject,PropertyPackage, PhysicalPropertyCalculator
+  export MaterialObject, PropertyPackage, PhysicalPropertyCalculator
 
 
   """

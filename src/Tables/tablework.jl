@@ -18,7 +18,7 @@ function makesamecolumn(musttobe::Int,addaftercolumn::Int,tablename::AbstractStr
   while (!eof(srmin))
     c=read(srmin,Char)
     lastline*=string(c)
-    if c=='\n' 
+    if c=='\n'
       if (count<musttobe && count>7)
         seek(srmin,pos)
         semitoadd=musttobe-count
@@ -54,7 +54,7 @@ function checkalltablesprofile()
   glob=Array(Any,11)
   for (t in tables)
     file=open(t*".table");
-    glob[i]=readdlm(file,';',header=false);    
+    glob[i]=readdlm(file,';',header=false);
     println(t*" is loaded")
     close(file)
     i+=1
@@ -86,8 +86,8 @@ function boilingpoint()
   close(file)
   file=open(tables[1]*"_.table","w");
   for (i=1:size(vps)[1])
-    c=vps[i,2:6]
-    bp=fzeros(vp,vps[i,7],vps[i,9])
+    c=vps[i,3:7]
+    bp=fzeros(vp,vps[i,8],vps[i,10])
     if (length(bp)==0)
       bp=NaN
     else
@@ -100,9 +100,9 @@ function boilingpoint()
   end
   close(file)
 end
-function vp(t::Float64) 
+function vp(t::Float64)
   global c
-  return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])-101352
+  return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])-101325
 end
 function checkYAWS()
   file=open("YAWS_Table"*".table","r");
@@ -159,7 +159,7 @@ function readwritematchbp()
   end
   close(file)
 end
-function hv(c::Array{Any,2}, tr::Float64) 
+function hv(c::Array{Any,2}, tr::Float64)
   return c[1]*1e7*((1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2))
 end
 function readbpwriteheatofvaporizationatbp()
