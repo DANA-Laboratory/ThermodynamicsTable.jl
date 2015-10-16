@@ -185,4 +185,31 @@ function readbpwriteheatofvaporizationatbp()
   end
   close(file)
 end
+function liquidDensityAt25C()
+  file=open("perryDensities_Table2_32"*".table","r");
+  ld=readdlm(file,';',header=false);
+  close(file)
+  i=1
+  while(i<=size(ld)[1])
+    c=ld[i,:]
+    lid(c[3:end], 273.15 + 25, round(Int,c[1]))
+    i+=1;
+  end
+end
 
+#Liquid dencity
+function lid(c::Vector{Float64}, t::Float64, compId::Int)
+  if (t>c[5] && t<c[7])
+    if (compId==342 || compId==318)
+      return c[1]+c[2]*t+c[3]*t^2+c[4]*t^3 # o-terphenyl and water limited range
+    end
+    if (compId==342) # For water over the entire temperature range of 273.16 to 647.096 K.
+      ta=1-(t/647.096)
+      return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
+    end
+    return c[1]/(c[2]^(1+(1-t/c[3])^c[4]))  # The others
+  else
+    println(compId)
+    return NaN
+  end
+end
