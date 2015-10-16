@@ -179,7 +179,7 @@ function readbpwriteheatofvaporizationatbp()
     tcri=cr[i,3]
     bopo=bp[i,6]
     hovbp=hv(hev[i,3:6],bopo/tcri)
-    write(file,string(hev[i,1])*";"*string(tcri)*";"*string(hovbp)*";"*string(cr[i,2]))
+    write(file,";"*string(hovbp))
     write(file,'\n')
     i+=1
   end
