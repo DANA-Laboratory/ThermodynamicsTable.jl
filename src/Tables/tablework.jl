@@ -185,6 +185,11 @@ function readbpwriteheatofvaporizationatbp()
   end
   close(file)
 end
+function rcompareto(a::Float64,b::Float64,nodigits::Int)
+  (nodigits==0) && (return isapprox(a,b))
+  nod = trunc(Int,log(10,b)+1)
+  return isapprox(a,round(b*10.0^(-1*nod),5)*10^nod)
+end
 function liquidDensityAt25C()
   file=open("perryDensities_Table2_32"*".table","r");
   ld=readdlm(file,';',header=false);
@@ -193,11 +198,23 @@ function liquidDensityAt25C()
   i=1
   while(i<=size(ld)[1])
     c=ld[i,:]
-    resu=lid(c[3:end], 273.15 + 25, round(Int,c[1]*10))
-    if (resu<c[10] || resu>c[8])
-      resu="$resu-$(c[10])-$(c[8])"
+    resu=lid(c[3:end-1], 273.15 + 25, round(Int,c[1]*10))
+    resuattmax=lid(c[3:end-1], c[9], round(Int,c[1]*10))
+    resuattmin=lid(c[3:end-1], c[7], round(Int,c[1]*10))
+    emin=NaN;
+    emax=NaN;
+    if !(isnan(resu))
+      if (resu<c[10] || resu>c[8])
+        resu="Error"
+      end
     end
-    write(file,string(c[1])*";"*string(resu)*string("\n"))
+    write(file,"$(c[7]);$resuattmin;$(c[9]);$resuattmax;$resu\n")
+    if(!rcompareto(c[8],resuattmin,0))
+      println("incorrect attmin from ref: $resuattmin $(c[8])")
+    end
+    if(!rcompareto(c[10],resuattmax,0))
+      println("incorrect attmax from ref: $resuattmax $(c[10])")
+    end
     i+=1;
   end
   close(file)
@@ -205,7 +222,7 @@ end
 
 #Liquid dencity
 function lid(c::Vector{Float64}, t::Float64, compId::Int)
-  if (t>c[5] && t<c[7])
+  if (t>=c[5] && t<=c[7])
     if (compId==3422 || compId==3182)
       println("$compId-$t-$(c[5])-$(c[6])-$(c[7])-$(c[8])")
       println(c)
