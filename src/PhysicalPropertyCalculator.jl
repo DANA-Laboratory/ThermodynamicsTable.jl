@@ -8,62 +8,111 @@
   perform. A CAPE-OPEN Property Calculator can only be used with a Property Package
   which supports the use of Property Calculators.
 """
+type TempPropData
+  prop::ASCIIString
+  data::Vector{Float64}
+  t::Float64
+  tc::Float64
+  compId::Int
+  eqno::Int
+end
+
 module PhysicalPropertyCalculator
-  export vp, ldwater, ldlimited, ld, hv, cppoly, cphyper, vv, lv, vtc, ltc
-  # Vapor pressure in Pa.
-  function vp(c::Vector{Float64}, t::Float64)
-    return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])
+
+  export calculate
+  
+  """
+    casRegistryNumber, # Chemical Abstract Service Registry Number
+    chemicalFormula, # Chemical formula
+    iupacName, # Complete IUPAC Name
+    
+    5-  criticalCompressibilityFactor => critical compressibility factor Z
+    6-  criticalDensity => critical density in mol/m3
+    7-  criticalPressure => critical pressure in Pa
+    8-  criticalTemperature => critical temperature in K
+    9-  criticalVolume => critical volume in m3/mol
+    15- heatOfVaporizationAtNormalBoilingPoint => enthalpy change on vaporization at normal boiling point (101325 Pa) in J/mol
+    16- idealGasGibbsFreeEnergyOfFormationAt25C => in J/mol
+    17- liquidDensityAt25C => liquid density at 25 ºC in mol/m3
+    18- liquidVolumeAt25C => liquid volume at 25 ºC in m3/mol
+    20- molecularWeight => relative molar mass
+    21- normalBoilingPoint => boiling point temperature at 101325 Pa in K
+    24- standardEntropyGas => Standard entropy of gas in J/mol
+    28- standardFormationEnthalpyGas => standard enthalpy change on formation of gas in J/mol
+    31- standardFormationGibbsEnergyGas => standard Gibbs energy change on formation of gas in J/mol
+  """
+  function calculate(data::Vector{Float64}, prop::ASCIIString)
+    prop=="casRegistryNumber" && (return data[2])
+    prop=="chemicalFormula" && (return data[3])
+    prop=="iupacName" && (return data[4])
+    prop=="criticalCompressibilityFactor" && (return data[6])
+    prop=="criticalDensity" && (return data[5])
+    prop=="criticalPressure" && (return data[4])
+    prop=="criticalTemperature" && (return data[3])
+    prop=="criticalVolume" && (return data[5])
+    prop=="heatOfVaporizationAtNormalBoilingPoint" && (return data[11])
+    prop=="idealGasGibbsFreeEnergyOfFormationAt25C" && (return data[4])
+    prop=="liquidDensityAt25C" && (return data[11])
+    prop=="liquidVolumeAt25C" && (return data[11])
+    prop=="molecularWeight" && (return data[2])
+    prop=="normalBoilingPoint" && (return data[6])
+    prop=="standardEntropyGas" && (return data[5])
+    prop=="standardFormationEnthalpyGas" && (return data[3])
+    prop=="standardFormationGibbsEnergyGas" && (return data[4])
   end
 
-  #Liquid dencity
-  function ld(c::Vector{Float64}, t::Float64, compId::Int)
-    if (compId==3440 || compId=3190)
-      if (t>c[5] && t<c[7])
-        return c[1]+c[2]*t+c[3]*t^2+c[4]*t^3 # o-terphenyl and water limited range
+  function calculate(d::TempPropData)
+    tr::Float64
+    ta::Float64
+    if (d.prop=="heatCapacityOfLiquid")
+      if (d.eqno!=2)
+        return d.c[1] + d.c[2]*d.t + d.c[3]*d.t^2 + d.c[4]*d.t^3 + d.c[4]*d.t^4
+      else
+        tr=1-t/tc
+        return (d.c[1]^2)/tr+d.c[2]-2*d.c[1]*d.c[3]*tr-d.c[1]*d.c[4]*tr^2-(d.c[3]^2*tr^3)/3-(d.c[3]*d.c[4]^4)/2-(d.c[4]^2*tr^5)/5
       end
-      if (compId==3440) # For water over the entire temperature range of 273.16 to 647.096 K.
-        ta=1-(t/647.096)
-        return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
+    elseif (d.prop=="heatOfVaporization")
+      # Tr = T/Tc. Heat of vaporization in J/kmol
+      # perry 2_150 have not presented c5 although it was a part of formula
+      tr=t/tc
+      return d.c[1]*1e7*(1-d.tr)^(d.c[2]+d.c[3]*d.tr+d.c[4]*d.tr^2)
+    elseif (d.prop=="idealGasEnthalpy")
+    elseif (d.prop=="idealGasEntropy")
+    elseif (d.prop=="idealGasHeatCapacity")
+      if (d.eqno==1)
+        return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
+      elseif (d.eqno==2)
+        return d.c[1]+d.c[2]*((d.c[3]/d.t)/sinh(d.c[3]/d.t))^2+d.c[4]*((d.c[5]/d.t)/cosh(d.c[5]/d.t))^2
       end
-    else
-      return c[1]/(c[2]^(1+(1-t/c[3])^c[4]))  # The others
+    elseif (d.prop=="thermalConductivityOfLiquid") 
+      # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
+      return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
+    elseif (d.prop=="thermalConductivityOfVapor")
+      # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
+      return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
+    elseif (d.prop=="vaporPressure")
+      # Vapor pressure in Pa.
+      return exp(d.c[1]+d.c[2]/d.t+d.c[3]*log(d.t)+d.c[4]*d.t^d.c[5])
+    elseif (d.prop=="viscosityOfLiquid")
+      #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
+      return exp(d.c[1]*d.c[2]/d.t*d.c[3]*log(d.t)*d.c[4]*d.t^d.c[5])
+    elseif (d.prop=="viscosityOfVapor")
+      # Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
+      return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
+    elseif (d.prop=="volumeOfLiquid")
+      #Liquid dencity 
+      if (d.t>=d.c[5] && d.t<=d.c[7])
+        if (d.eqno==2)
+          return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
+        end
+        if (d.eqno==3) # For water over the entire temperature range of 273.16 to 647.096 K.
+          ta=1-(d.t/647.096)
+          return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
+        end
+        return d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
+      else
+        return NaN
+      end
     end
   end
-
-  # Tr = T/Tc. Heat of vaporization in J/kmol
-  function hv(c::Vector{Float64}, t::Float64)
-    # perry 2_150 have not presented c5 although it's a part of formula
-    # here c5 is critical temperature
-    tr=t/c[5]
-    return c[1]*1e7*(1 -tr)^(c[2]+c[3]*tr+c[4]*tr^2)
-  end
-
-  function cppoly(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
-  end
-
-  function cphyper(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1+c2*((c3/t)/sinh(c3/t))^2+c4*((c5/t)/cosh(c5/t))^2
-  end
-
-  # Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
-  function vv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1*(t^c2)/(1+c3/t+c4/(t^2))
-  end
-
-  #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
-  function lv(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return exp(c1*c2/t*c3*log(t)*c4*t^c5)
-  end
-
-  # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
-  function vtc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, t::Float64)
-    return c1*(t^c2)/(1+c3/t+c4/(t^2))
-  end
-
-  # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
-  function ltc(c1::Float64, c2::Float64, c3::Float64, c4::Float64, c5::Float64, t::Float64)
-    return c1+c2*t+c3*t^2+c4*t^3+c5*t^4
-  end
-
 end

@@ -43,7 +43,7 @@ module ICapeThermoCompounds
     function getnumcompounds(
         proppackage::PropertyPackage)
         num::Int32
-        num = size(proppackage.property["Compounds"])[1]
+        num = size(proppackage.propertytable["Compounds"])[1]
         return  num
     end
 
@@ -87,12 +87,11 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        propvals::Vector{Any}
-        propvals=Vector{Any}()
+        propvals::Vector{Float64}
+        propvals=Vector{Float64}()
         for prop in props
-          table,func,args=get(proppackage.constantstrings,prop,get(proppackage.constantfloats,prop,(nothing,nothing,nothing)))
           for compId in compIds
-            propvals.push!(func(getcompond(table, compId),args...))
+            propvals.push!(calculate(prop,getconstpropdata(proppackage,prop,compId)))
           end
         end
         return propvals
@@ -107,11 +106,8 @@ module ICapeThermoCompounds
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# pressure::Float64,
         #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-
         propvals::Vector{Float64}
-
         propvals=Vector{Float64}()
-
         return propvals
     end
 
@@ -124,11 +120,13 @@ module ICapeThermoCompounds
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# temperature::Float64,
         #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-
         propvals::Vector{Float64}
-
         propvals=Vector{Float64}()
-
+        for prop in props
+          for compId in compIds
+            propvals.push!(calculate(prop,gettemppropdata(proppackage,prop,compId)))
+          end
+        end
         return propvals
     end
 

@@ -4,7 +4,7 @@ module ThermodynamicsTable
 
   using CapeOpen
 
-  export perryanalytic
+  export perryanalytic,getconstpropdata,gettemppropdata
 
   thisfiledirname=dirname(@__FILE__())
 
@@ -15,18 +15,43 @@ module ThermodynamicsTable
     return matrix
   end
 
+  function getconstpropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
+    data::Array{Float64,2}
+    data=proppackage.propertytable[proppackage.tempreturedependents[prop]]
+    return data[findfirst(data[:,1],compId),1]
+  end
+  
+  function getdataeqno(data::Array{Float,2}, prop::ASCIIString)
+    (prop=="volumeOfLiquid" || prop=="heatCapacityOfLiquid" || prop=="idealGasHeatCapacity") && (retrun data[i,3:end-1],data[i,end])
+    return data[i,3:end],0
+  end
+   
+  function gettemppropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
+    data::Array{Float64,2}
+    ret::Vector{TempPropData}
+    ret=Vector{TempPropData}()
+    data=proppackage.propertytable[proppackage.tempreturedependents[prop]]
+    datarange=getdataeqno(data,prop)
+    for i in data[:,1]
+      if i==compId
+        tpd=TempPropData(prop,datarange[1],NaN,NaN,data[i,1],datarange[2])
+        push!(ret,tpd)
+      end
+    end
+    return ret
+  end
   getcompond(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
 
-  propmap(stvec,t,f,tu)=[cs=>(t[ind],f[ind],tu[ind]) for (ind,cs) in enumerate(stvec)]
+  propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
 
-  function PropertyPackage(constantstrings,t1,f1,tu1,constantfloats,t2,f2,tu2,tempreturedependents,t3,f3,tu3,pressuredependents,t4,f4,tu4,propertytofilemap)
+  function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
     println(typeof(propmap(constantstrings,t1,f1,tu1)))
     CapeOpen.PropertyPackage(
-      propmap(constantstrings,t1,f1,tu1),
-      propmap(constantfloats,t2,f2,tu2),
-      propmap(tempreturedependents,t3,f3,tu3),
-      propmap(pressuredependents,t4,f4,tu4),
+      propmap(constantstrings,t1),
+      propmap(constantfloats,t2),
+      propmap(tempreturedependents,t3),
+      propmap(pressuredependents,t4),
       propertytofilemap
     )
   end
@@ -34,27 +59,17 @@ module ThermodynamicsTable
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
     ["Compounds" for i=1:3],
-    [getindex for i=1:3],
-    [(2,), (3,), (4,)],
-    getcompond(constantfloats,[5,6,7,8,9,15,16,17,18,
-                               20,21,24,25,28,29,31,
-                               32,35,36]),
+    getindex(constantfloats,[ 5,6,7,8,9,15,16,17,18,
+                                20,21,24,28,31]),         
     ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
-     "Criticals", "", "CpHyper", "LiquidsCp", "FormationEnergy", "FormationEnergy", "FormationEnergy",
-     "FormationEnergy", "Criticals", "Criticals"],
-    [getindex, getindex, getindex, getindex, getindex, getindex, getindex,],
-    [(6,),     (5,),     (4,),     (3,),     (5,),     (11,),    (4,),],
-    getcompond(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,31,32]),
-    [],
-    [],
-    [],
+     "Compounds", "Compounds", "FormationEnergy", "FormationEnergy", "FormationEnergy"],
+    getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
+    ["LiquidsCp", "VaporizHeat", "CpHyper", "CpHyper", "CpHyper", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
     ASCIIString[],
-    [],
-    [],
     [],
     Dict(
       "Compounds"=>"perryFormulaCompounds.table",
-      "LiquidsVaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
+      "VaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
       "LiquidsDensities"=>"perryDensities_Table2_32.table",
       "Criticals"=>"perryCriticals_Table2_141.table",
       "VaporizHeat"=>"perryHeatsofVaporization_Table2_150.table",
@@ -77,92 +92,3 @@ include("ICapeThermoMaterial.jl")
 include("ICapeThermoPhases.jl")
 include("ICapeThermoPropertyRoutine.jl")
 include("ICapeThermoUniversalConstants.jl")
-
-
-#=
-"""
-    function getnameforcasno(casno::String)
-      data_criti=getdatamatrix("Profile")
-      i=findindex(data_criti,casno,4)
-      if i==0
-        throw(KeyError);
-      end
-      return (data_criti[i,2])
-    end
-
-    function getnameforformula(formula::String)
-      data_criti=getdatamatrix("Profile")
-      i=findindex(data_criti,formula,3)
-      if i==0
-        throw(KeyError);
-      end
-      return data_criti[i,2]
-    end
-
-    function getallnamesforproperty(property::String)
-      global propertytofilemap
-      if !haskey(propertytofilemap,property)
-        throw(ArgumentError)
-      end
-      names=String[]
-      data=getdatamatrix(property);
-      i=1
-      len=size(data)[1]
-      while i<=len
-        push!(names,data[i,2])
-        i+=1
-      end
-      return names
-    end
-
-    function getexpressionforname(property::String , name::String)
-      conststuple::Tuple = getvalueforname(property, name)
-      if property=="CpPoly"
-        (C1, C2, C3, C4, C5) = conststuple
-        return "C1+C2*T+C3*T^2+C4*T^3+C5*T^4"
-      elseif property=="CpHyper"
-        (C1, C2, C3, C4, C5) = conststuple
-        return "C1+C2*((C3/T)/sinh(C3/T))^2+C4*((C5/T)/cosh(C5/T))^2"
-      elseif property=="LiquidsDensities"
-        (C1, C2, C3, C4, Tmin, Tmax) = conststuple
-        if name=="Water"
-          τ="(1-T/647.096)"
-          return "17.863+58.606τ^0.35-95.396τ^(2/3)+213.89τ-141.26τ^(4/3)" #Water
-        elseif (name=="o-Terphenyl [note: limited range]" || name=="Water [note: limited range]")
-          return "C1+C2*T+C3*T^2+C4*T^3"
-        else
-          return "C1/(C2^(1+(1-T/C3)^C4))"
-        end
-      end
-    end
-
-    function getvalueforname(property::String , compId::Int)
-      global propertytofilemap
-      if !haskey(propertytofilemap,property)
-        throw(ArgumentError)
-      end
-      data=getdatamatrix(property)
-      i=findindex(data,compId)
-      if i==0
-        throw(KeyError);
-      end
-      if property=="CpPoly"
-        return (data[i,2],data[i,3],data[i,4],data[i,9]/1e5,data[i,10]/1e10)
-      elseif property=="CpHyper"
-        return (data[i,2]*1e5,data[i,3]*1e5,data[i,4]*1e3,data[i,5]*1e5,data[i,6])
-      elseif property=="Criticals"
-          # Tc, Pc, Af, Zc
-          return (data[i,3],data[i,4]*1e6,data[i,7],data[i,6])
-      elseif property=="LiquidsDensities"
-          return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,8])
-      elseif property=="LiquidsVaporPressure"
-          return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,7],data[i,9])
-      elseif property=="LiquidsCp"
-          return (data[i,2],data[i,3],data[i,4],data[i,5],data[i,6],data[i,7],data[i,9])
-      elseif property=="Profile"
-          return (data[i,1],data[i,2],data[i,3],data[i,4])
-      end
-    end
-
-"""
-=#

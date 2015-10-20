@@ -178,6 +178,7 @@ function readbpwriteheatofvaporizationatbp()
   while(i<=size(cr)[1])
     tcri=cr[i,3]
     bopo=bp[i,6]
+    (bopo>hev[i,9] || bopo<hev[i,7]) && (println(hev[i,1],' ',bopo,' ',hev[i,7],' ',hev[i,9]))
     hovbp=hv(hev[i,3:6],bopo/tcri)
     write(file,";"*string(hovbp))
     write(file,'\n')
@@ -236,4 +237,23 @@ function lid(c::Vector{Float64}, t::Float64, compId::Int)
   else
     return NaN
   end
+end
+
+#Heat of vaporization at normal point
+function heatofvaporizationatnp()
+  file=open("perryHeatsofVaporization_Table2_150"*".table","r");
+  hev=readdlm(file,';',header=false);
+  close(file)
+  file=open("HoVatBP_"*".table","w");
+  i=1
+  while(i<=size(hev)[1])
+    hovnp=NaN
+    if(298.15<hev[i,9] && 298.15>hev[i,7])
+      hovnp=hv(hev[i,3:6],298.15/hev[i,9])
+    end
+    write(file,";"*string(hovnp))
+    write(file,'\n')
+    i+=1
+  end
+  close(file)
 end
