@@ -22,7 +22,7 @@ module ThermodynamicsTable
   end
   
   function getdataeqno(data::Array{Float,2}, prop::ASCIIString)
-    (prop=="volumeOfLiquid" || prop=="heatCapacityOfLiquid" || prop=="idealGasHeatCapacity") && (retrun data[i,3:end-1],data[i,end])
+    (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) && (retrun data[i,3:end-1],data[i,end])
     return data[i,3:end],0
   end
    
@@ -34,13 +34,12 @@ module ThermodynamicsTable
     datarange=getdataeqno(data,prop)
     for i in data[:,1]
       if i==compId
-        tpd=TempPropData(prop,datarange[1],NaN,NaN,data[i,1],datarange[2])
+        tpd=TempPropData(prop,datarange[1],NaN,NaN,data[i,1],data[i,2],datarange[2])
         push!(ret,tpd)
       end
     end
     return ret
   end
-  getcompond(data::Array{Float64,2},compId::Float64) = findfirst(data[:,1],compId)
 
   propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
 
@@ -64,7 +63,7 @@ module ThermodynamicsTable
     ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
      "Compounds", "Compounds", "FormationEnergy", "FormationEnergy", "FormationEnergy"],
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
-    ["LiquidsCp", "VaporizHeat", "CpHyper", "CpHyper", "CpHyper", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
+    ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
     ASCIIString[],
     [],
     Dict(
@@ -74,8 +73,7 @@ module ThermodynamicsTable
       "Criticals"=>"perryCriticals_Table2_141.table",
       "VaporizHeat"=>"perryHeatsofVaporization_Table2_150.table",
       "LiquidsCp"=>"perryHeatCapLiquids_Table2_153.table",
-      "CpPoly"=>"perryHeatCapIdealGas_Table2_155.table",
-      "CpHyper"=>"perryHeatCapIdealGas_Table2_156.table",
+      "Cp"=>"perryHeatCapIdealGas_Table156_155.table",
       "FormationEnergy"=>"perryEnergiesOfFormation_Table2_179.table",
       "VaporViscos"=>"perryVaporViscosity_Table2_312.table",
       "LiquidViscos"=>"perryLiquidViscosity_Table2_313.table",

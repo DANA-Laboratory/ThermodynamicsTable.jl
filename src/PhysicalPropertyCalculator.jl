@@ -14,6 +14,7 @@ type TempPropData
   t::Float64
   tc::Float64
   compId::Int
+  molweight::Float64
   eqno::Int
 end
 
