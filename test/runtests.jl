@@ -3,9 +3,9 @@ using ICapeThermoUniversalConstants
 using ICapeThermoCompounds
 import ECapeExceptions.ECapeInvalidArgument
 import CapeOpen: MaterialObject, PropertyPackage
-import ThermodynamicsTable.perryanalytic
 using Base.Test
 
+perryanalytic = ThermodynamicsTable.perryanalytic
 
 println(getuniversalconstantlist())
 @test_throws ECapeInvalidArgument (getuniversalconstant("avogadroConstan"))

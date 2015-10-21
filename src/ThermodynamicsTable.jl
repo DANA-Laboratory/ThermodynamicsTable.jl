@@ -1,12 +1,14 @@
 include("CapeOpen.jl")
 include("PhysicalPropertyCalculator.jl")
+
 module ThermodynamicsTable
 
   using CapeOpen
 
   thisfiledirname=dirname(@__FILE__())
-
+  
   function getdatamatrix(path::AbstractString)
+    global floattables,compondtable
     file=open(thisfiledirname * "/Tables/"*path);
     matrix=readdlm(file,';',header=false);
     close(file)
@@ -15,11 +17,18 @@ module ThermodynamicsTable
 
   function getconstpropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
     data::Array{Union{AbstractString,Float64,Int},2}
+    if (prop=="standardEntropyGas") 
+      println(proppackage===perryanalytic)
+      data=perryanalytic.propertytable[proppackage.constantfloats[prop]]
+      println(data[1])
+      data=proppackage.propertytable[proppackage.constantfloats[prop]]
+      println(data[1])
+    end
     if haskey(proppackage.constantstrings, prop) 
       data=proppackage.propertytable[proppackage.constantstrings[prop]]
     elseif haskey(proppackage.constantfloats, prop) 
       data=proppackage.propertytable[proppackage.constantfloats[prop]]
-    end
+    end 
     return data[findfirst(data[:,1],compId),:]
   end
   
