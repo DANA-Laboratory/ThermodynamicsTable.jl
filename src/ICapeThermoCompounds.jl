@@ -130,4 +130,34 @@ module ICapeThermoCompounds
         return propvals
     end
 
+#***********************************************
+  function getconstpropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
+    data::Array{Union{AbstractString,Float64,Int},2}
+    if haskey(proppackage.constantstrings, prop) 
+      data=proppackage.propertytable[proppackage.constantstrings[prop]]
+    elseif haskey(proppackage.constantfloats, prop) 
+      data=proppackage.propertytable[proppackage.constantfloats[prop]]
+    end 
+    return data[findfirst(data[:,1],compId),:]
+  end
+  
+  function getdataeqno(data::Array{Float64,2}, prop::ASCIIString)
+    (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) && (return data[i,3:end-1],data[i,end])
+    return data[i,3:end],0
+  end
+   
+  function gettemppropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
+    data::Array{Float64,2}
+    ret::Vector{TempPropData}
+    ret=Vector{TempPropData}()
+    data=proppackage.propertytable[proppackage.tempreturedependents[prop]]
+    datarange=getdataeqno(data,prop)
+    for i in data[:,1]
+      if i==compId
+        tpd=TempPropData(prop,datarange[1],NaN,NaN,data[i,1],data[i,2],datarange[2])
+        push!(ret,tpd)
+      end
+    end
+    return ret
+  end
 end

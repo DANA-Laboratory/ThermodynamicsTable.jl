@@ -1,5 +1,5 @@
 module CapeOpen
-
+  using ThermodynamicsTable
   export constantstrings, constantfloats, tempreturedependents, pressuredependents
   export MaterialObject, PropertyPackage, PhysicalPropertyCalculator
 
@@ -199,7 +199,8 @@ module CapeOpen
   end
 
   typealias PropertyMap Dict{ASCIIString,ASCIIString}
-
+  propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
+  getdatamatrix=ThermodynamicsTable.getdatamatrix
   """
     Property Package – a software component that is both a Physical Property Calculator and
     an Equilibrium Calculator for Materials containing a specific set of Compounds
@@ -211,11 +212,46 @@ module CapeOpen
     external components used in a Property Package is outside the scope of this CAPEOPEN interface specification.
   """
   type PropertyPackage
+    function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytofilemap)
+      propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
+      new(
+        propmap(constantstrings,t1),
+        propmap(constantfloats,t2),
+        propmap(tempreturedependents,t3),
+        propmap(pressuredependents,t4),
+        propertytofilemap
+      )
+    end
     constantstrings::PropertyMap
     constantfloats::PropertyMap
     tempreturedependents::PropertyMap
     pressuredependents::PropertyMap
     propertytable::Dict{ASCIIString,Array{Union{AbstractString,Float64,Int},2}}
   end
-
+  perryanalytic=PropertyPackage(
+    getindex(constantstrings,1:3),
+    ["Compounds" for i=1:3],
+    getindex(constantfloats,[ 5,6,7,8,9,15,16,17,18,
+                                20,21,24,28,31]),         
+    ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
+     "Compounds", "Compounds", "FormationEnergy", "FormationEnergy", "FormationEnergy"],
+    getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
+    ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
+    ASCIIString[],
+    [],
+    Dict(
+      "Compounds"=>"perryFormulaCompounds.table",
+      "VaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
+      "LiquidsDensities"=>"perryDensities_Table2_32.table",
+      "Criticals"=>"perryCriticals_Table2_141.table",
+      "VaporizHeat"=>"perryHeatsofVaporization_Table2_150.table",
+      "LiquidsCp"=>"perryHeatCapLiquids_Table2_153.table",
+      "Cp"=>"perryHeatCapIdealGas_Tables156_155.table",
+      "FormationEnergy"=>"perryEnergiesOfFormation_Table2_179.table",
+      "VaporViscos"=>"perryVaporViscosity_Table2_312.table",
+      "LiquidViscos"=>"perryLiquidViscosity_Table2_313.table",
+      "VaporThermal"=>"perryVaporThermalConductivity_Table2_314.table",
+      "LiquidThermal"=>"perryLiqidThermalConductivity_Table2_315.table"
+    )
+  )
 end

@@ -5,7 +5,7 @@ import ECapeExceptions.ECapeInvalidArgument
 import CapeOpen: MaterialObject, PropertyPackage
 using Base.Test
 
-perryanalytic = ThermodynamicsTable.perryanalytic
+perryanalytic = CapeOpen.perryanalytic
 
 println(getuniversalconstantlist())
 @test_throws ECapeInvalidArgument (getuniversalconstant("avogadroConstan"))
