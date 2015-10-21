@@ -8,19 +8,19 @@
   perform. A CAPE-OPEN Property Calculator can only be used with a Property Package
   which supports the use of Property Calculators.
 """
-type TempPropData
-  prop::ASCIIString
-  data::Vector{Float64}
-  t::Float64
-  tc::Float64
-  compId::Int
-  molweight::Float64
-  eqno::Int
-end
-
 module PhysicalPropertyCalculator
 
-  export calculate
+  export TempPropData, calculate
+
+  type TempPropData
+    prop::ASCIIString
+    data::Vector{Float64}
+    t::Float64
+    tc::Float64
+    compId::Int
+    molweight::Float64
+    eqno::Int
+  end
   
   """
     casRegistryNumber, # Chemical Abstract Service Registry Number
@@ -42,7 +42,7 @@ module PhysicalPropertyCalculator
     28- standardFormationEnthalpyGas => standard enthalpy change on formation of gas in J/mol
     31- standardFormationGibbsEnergyGas => standard Gibbs energy change on formation of gas in J/mol
   """
-  function calculate(data::Vector{Float64}, prop::ASCIIString)
+  function calculate(prop::ASCIIString, data::Array{Union{AbstractString,Float64,Int},2})
     prop=="casRegistryNumber" && (return data[2])
     prop=="chemicalFormula" && (return data[3])
     prop=="iupacName" && (return data[4])

@@ -2,7 +2,7 @@ module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
     export getcompoundconstant,getpdependentproperty,gettdependentproperty
     using  PhysicalPropertyCalculator
-    import CapeOpen.PropertyPackage
+    import CapeOpen.PropertyPackage, ThermodynamicsTable.getconstpropdata, ThermodynamicsTable.gettemppropdata
     """
       Returns the list of supported constant Physical Properties.
       #= [retval][out] =# props::Vector{ASCIIString}
@@ -10,7 +10,7 @@ module ICapeThermoCompounds
     function getconstproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = vcat(proppackage.constantstrings, proppackage.constantfloats)
+        props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
         return props
     end
 
@@ -21,7 +21,7 @@ module ICapeThermoCompounds
     function gettdependentproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = proppackage.tempreturedependents
+        props = [keys(proppackage.tempreturedependents)...]
         return props
     end
 
@@ -32,7 +32,7 @@ module ICapeThermoCompounds
     function getpdependentproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = proppackage.pressuredependents
+        props = [keys(proppackage.pressuredependents)...]
         return props
     end
 
@@ -60,16 +60,16 @@ module ICapeThermoCompounds
     function getcompoundlist(
         proppackage::PropertyPackage)
 
-        compIds::Vector{Float64}
+        compIds::Vector{Int}
         formulae::Vector{ASCIIString}
         names::Vector{ASCIIString}
         boilTemps::Vector{Float64}
         molwts::Vector{Float64}
         casnos::Vector{ASCIIString}
 
-        compondlist=proppackage.property["Compounds"]
-        
+        compondlist=proppackage.propertytable["Compounds"]
         compIds=compondlist[:,1]
+        a=compondlist[:,3]
         formulae=compondlist[:,3]
         names=compondlist[:,2]
         casnos=compondlist[:,4]
@@ -86,12 +86,12 @@ module ICapeThermoCompounds
     function getcompoundconstant(
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
-        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        propvals::Vector{Float64}
-        propvals=Vector{Float64}()
+        #= [in] =# compIds::Vector{Int}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        propvals::Vector{Union{AbstractString,Float64}}
+        propvals=Vector{Union{AbstractString,Float64}}()
         for prop in props
-          for compId in compIds
-            propvals.push!(calculate(prop,getconstpropdata(proppackage,prop,compId)))
+          for compId in compIds            
+            push!(propvals, calculate(prop,getconstpropdata(proppackage,prop,compId)))
           end
         end
         return propvals
@@ -124,7 +124,7 @@ module ICapeThermoCompounds
         propvals=Vector{Float64}()
         for prop in props
           for compId in compIds
-            propvals.push!(calculate(prop,gettemppropdata(proppackage,prop,compId)))
+            push!(propvals, calculate(prop,gettemppropdata(proppackage,prop,compId)))
           end
         end
         return propvals

@@ -4,8 +4,6 @@ module ThermodynamicsTable
 
   using CapeOpen
 
-  export perryanalytic,getconstpropdata,gettemppropdata
-
   thisfiledirname=dirname(@__FILE__())
 
   function getdatamatrix(path::AbstractString)
@@ -16,13 +14,17 @@ module ThermodynamicsTable
   end
 
   function getconstpropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::Int)
-    data::Array{Float64,2}
-    data=proppackage.propertytable[proppackage.tempreturedependents[prop]]
-    return data[findfirst(data[:,1],compId),1]
+    data::Array{Union{AbstractString,Float64,Int},2}
+    if haskey(proppackage.constantstrings, prop) 
+      data=proppackage.propertytable[proppackage.constantstrings[prop]]
+    elseif haskey(proppackage.constantfloats, prop) 
+      data=proppackage.propertytable[proppackage.constantfloats[prop]]
+    end
+    return data[findfirst(data[:,1],compId),:]
   end
   
-  function getdataeqno(data::Array{Float,2}, prop::ASCIIString)
-    (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) && (retrun data[i,3:end-1],data[i,end])
+  function getdataeqno(data::Array{Float64,2}, prop::ASCIIString)
+    (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) && (return data[i,3:end-1],data[i,end])
     return data[i,3:end],0
   end
    
@@ -45,7 +47,6 @@ module ThermodynamicsTable
 
   function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytofilemap)
     propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
-    println(typeof(propmap(constantstrings,t1,f1,tu1)))
     CapeOpen.PropertyPackage(
       propmap(constantstrings,t1),
       propmap(constantfloats,t2),
@@ -73,7 +74,7 @@ module ThermodynamicsTable
       "Criticals"=>"perryCriticals_Table2_141.table",
       "VaporizHeat"=>"perryHeatsofVaporization_Table2_150.table",
       "LiquidsCp"=>"perryHeatCapLiquids_Table2_153.table",
-      "Cp"=>"perryHeatCapIdealGas_Table156_155.table",
+      "Cp"=>"perryHeatCapIdealGas_Tables156_155.table",
       "FormationEnergy"=>"perryEnergiesOfFormation_Table2_179.table",
       "VaporViscos"=>"perryVaporViscosity_Table2_312.table",
       "LiquidViscos"=>"perryLiquidViscosity_Table2_313.table",
