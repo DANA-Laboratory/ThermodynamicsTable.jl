@@ -5,10 +5,11 @@
 #EXAMPLE CALL -> makesamecolumn(13,-3,"perryLiquidViscosity_Table2-313.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporViscosity_Table2-312.table")
 #EXAMPLE CALL -> makesamecolumn(12,-3,"perryVaporThermalConductivity_Table2-314.table")
+
 m1=0
 m2=0
 m3=0
-function canconvert(ty::Type,matrix::Array,s,w)
+function canconvert(ty::Type,matrix::Array,s,sizearray)
   global m1,m2,m3
   j=1
   si=Int(0)
@@ -21,7 +22,7 @@ function canconvert(ty::Type,matrix::Array,s,w)
     catch
       return matrix[j,:],false
     end
-    if (w)
+    if (sizearray!=nothing)
       m1>0 && (r2=rpad(r[2],m1,' '))
       m2>0 && (r3=rpad(r[3],m2,' '))
       m3>0 && (r4=rpad(r[4],m3,' '))
@@ -29,18 +30,20 @@ function canconvert(ty::Type,matrix::Array,s,w)
       si+=writetup(s,r)
     else
       b=[(r[i]==matrix[j,i] || isnan(r[i])) for i in 1:length(r)]
-      sum(b)!=length(r) && return matrix[j,:],false
+      if(sum(b)!=length(r))
+        println(matrix[j,:])
+        println(r)
+        return false,matrix[j,:]
+      end
     end
   end
-  w && return si,j
+  (sizearray!=nothing) && push!(sizearray,(si,j))
   return true 
 end
 
 function writetup(s,t::Tuple)
   i=0
-  for ti in t
-    i+=write(s,ti)
-  end
+  i+=write(s,t...)
   return i;
 end
 
@@ -54,21 +57,21 @@ function testcanconvert()
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:6]]...}
   println("perryCriticals_Table2_141.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
   
   file=open("perryDensities_Table2_32.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10];UInt8]...}
   println("perryDensities_Table2_32.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryEnergiesOfFormation_Table2_179.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:5]]...}
   println("perryEnergiesOfFormation_Table2_179.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryFormulaCompounds.table","r")
   matrix=readdlm(file,';',header=false)
@@ -76,64 +79,66 @@ function testcanconvert()
   m1=(maximum(Int[length(i) for i in matrix[:,2]]))
   m2=(maximum(Int[length(i) for i in matrix[:,3]]))
   m3=(maximum(Int[length(i) for i in matrix[:,4]]))
+  println(m1,' ',m2,' ',m3)
   ty=Tuple{[UInt16,ASCIIString,ASCIIString,ASCIIString,Float64,Float64]...}
   println("perryFormulaCompounds.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
+  
   m1=0;m2=0;m3=0;
   file=open("perryHeatCapIdealGas_Tables156_155.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10];UInt8]...}
   println("perryHeatCapIdealGas_Tables156_155.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryHeatCapLiquids_Table2_153.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10];UInt8]...}
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryHeatsofVaporization_Table2_150.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10]]...}
   println("perryHeatsofVaporization_Table2_150.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryLiqidThermalConductivity_Table2_315.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10]]...}
   println("perryLiqidThermalConductivity_Table2_315.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryLiquidsVaporPressure_Table2_8.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10]]...}
   println("perryLiquidsVaporPressure_Table2_8.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryLiquidViscosity_Table2_313.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:10]]...}
   println("perryLiquidViscosity_Table2_313.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryVaporThermalConductivity_Table2_314.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:9]]...}
   println("perryVaporThermalConductivity_Table2_314.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
 
   file=open("perryVaporViscosity_Table2_312.table","r")
   matrix=readdlm(file,';',header=false)
   close(file)
   ty=Tuple{[UInt16;[Float64 for i=1:9]]...}
   println("perryVaporViscosity_Table2_312.table")
-  (canconvert(ty,matrix,database,false)) && push!(si,canconvert(ty,matrix,database,true))
+  (canconvert(ty,matrix,database,nothing)) && canconvert(ty,matrix,database,si)
   
   close(database)
   for s in si

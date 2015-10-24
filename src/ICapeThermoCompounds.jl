@@ -2,7 +2,7 @@ module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
     export getcompoundconstant,getpdependentproperty,gettdependentproperty
     using  PhysicalPropertyCalculator
-    import CapeOpen.PropertyPackage, ThermodynamicsTable.getconstpropdata, ThermodynamicsTable.gettemppropdata
+    import CapeOpen.PropertyPackage
     """
       Returns the list of supported constant Physical Properties.
       #= [retval][out] =# props::Vector{ASCIIString}
