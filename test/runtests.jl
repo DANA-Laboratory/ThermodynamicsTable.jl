@@ -3,7 +3,7 @@ using ThermodynamicsTable
 
 using ICapeThermoUniversalConstants
 using ICapeThermoCompounds
-import ECapeExceptions.ECapeInvalidArgument
+using ECapeExceptions
 import CapeOpen: MaterialObject, PropertyPackage
 
 perryanalytic = CapeOpen.perryanalytic

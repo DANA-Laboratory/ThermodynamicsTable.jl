@@ -1,10 +1,9 @@
 module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
     export getcompoundconstant,getpdependentproperty,gettdependentproperty
-    using  PhysicalPropertyCalculator
-    using  ThermodynamicsTable
+    using  ThermodynamicsTable,PhysicalPropertyCalculator,ECapeExceptions
     import CapeOpen.PropertyPackage
-    
+    import PhysicalPropertyCalculator.TempPropData
     """
       Returns the list of supported constant Physical Properties.
       #= [retval][out] =# props::Vector{ASCIIString}
@@ -137,14 +136,18 @@ module ICapeThermoCompounds
           
             temppropdata::TempPropData
             
-            temppropdata=gettemppropdata(proppackage,prop,compId)
+            temppropdata=TempPropData(proppackage,prop,compId)
             temppropdata.t=temperature
 
             try
               push!(propvals, calculate(temppropdata))
             catch err
-              dump(temppropdata)
-              throw(err)
+              if isa(err,ECapeOutOfBounds)
+                push!(propvals, NaN)
+              else
+                dump(temppropdata)
+                throw(err)
+              end
             end
           end
         end
@@ -164,21 +167,25 @@ module ICapeThermoCompounds
     return readbinarydatabase(compId,table)
   end
    
-  function gettemppropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16)
+  function TempPropData(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16)
     table::ASCIIString
-    datarange::UInt8
     floatdata::Vector{Float64}
-    ret::Vector{TempPropData}
-    ret=Vector{TempPropData}()
+    temppropdata::TempPropData
     table=proppackage.tempreturedependents[prop]
     data=readbinarydatabase(compId,table)
     floatdata=data[1]
+    temppropdata=TempPropData(prop,floatdata[2:end],compId,floatdata[1])
     if (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) 
-      datarange=data[2]
-    else
-      datarange=round(UInt8,0)
+      temppropdata.eqno=data[2]
     end
-    tc=getcompoundconstant(proppackage,["criticalTemperature"],[compId])
-    return TempPropData(prop,floatdata[2:end],NaN,tc[1],compId,floatdata[1],datarange)
+    if (prop in["heatCapacityOfLiquid","heatOfVaporization"])
+      temppropdata.tc=calculate(prop,getconstpropdata(proppackage,"criticalTemperature",compId))
+    end
+    if (prop in ["heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","viscosityOfLiquid"])
+      temppropdata.test=temppropdata.c[6:9]
+    elseif (prop in ["heatCapacityOfLiquid","thermalConductivityOfVapor","viscosityOfVapor","volumeOfLiquid"])
+      temppropdata.test=temppropdata.c[5:8]
+    end
+    return temppropdata
   end
 end

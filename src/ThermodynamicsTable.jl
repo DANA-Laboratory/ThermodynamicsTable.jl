@@ -57,8 +57,8 @@ module ThermodynamicsTable
 end
 
 include("CapeOpen.jl")
-include("PhysicalPropertyCalculator.jl")
 include("ECapeExceptions.jl")
+include("PhysicalPropertyCalculator.jl")
 include("ICapeThermoCompounds.jl")
 include("ICapeThermoMaterial.jl")
 include("ICapeThermoPhases.jl")
