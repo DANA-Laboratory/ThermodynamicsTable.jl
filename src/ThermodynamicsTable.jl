@@ -1,9 +1,12 @@
 thisfiledirname=dirname(@__FILE__())
-binaryfile=open(thisfiledirname * "/binary.table","r");
+binaryfile=open(thisfiledirname * "/Tables/binary.table","r");
 
 module ThermodynamicsTable
 
-  global binaryfile,thisfiledirname
+  export readbinarydatabase, gettablesize
+  
+  binaryfile=Main.binaryfile
+  thisfiledirname=Main.thisfiledirname
   
   function getdatamatrix(path::AbstractString)
     global floattables,compondtable
@@ -28,8 +31,11 @@ module ThermodynamicsTable
          "VaporViscos"=>     ([17250+28801+14490+23115+33366+28884+4*28290+25530,345,74], Vector{Float64}(9))
   )
 
+  function gettablesize(table::ASCIIString)
+    return ty[table][1][2]
+  end
+  
   function readbinarydatabase(id::UInt16, table::ASCIIString)
-
     v=ty[table]
     seek(binaryfile,v[1][1])
     skipsize=v[1][3]-sizeof(UInt16)
@@ -47,15 +53,8 @@ module ThermodynamicsTable
     end
     return id,v[2:end]
   end
-  
-end
 
-finalizer(ThermodynamicsTable,()->
-  try
-    close(binaryfile)
-  catch
-  end
-)
+end
 
 include("CapeOpen.jl")
 include("PhysicalPropertyCalculator.jl")

@@ -42,24 +42,28 @@ module PhysicalPropertyCalculator
     28- standardFormationEnthalpyGas => standard enthalpy change on formation of gas in J/mol
     31- standardFormationGibbsEnergyGas => standard Gibbs energy change on formation of gas in J/mol
   """
-  function calculate(prop::ASCIIString, data::Array{Union{AbstractString,Float64,Int},2})
-    prop=="casRegistryNumber" && (return data[2])
-    prop=="chemicalFormula" && (return data[3])
-    prop=="iupacName" && (return data[4])
-    prop=="criticalCompressibilityFactor" && (return data[6])
-    prop=="criticalDensity" && (return data[5])
-    prop=="criticalPressure" && (return data[4])
-    prop=="criticalTemperature" && (return data[3])
-    prop=="criticalVolume" && (return data[5])
-    prop=="heatOfVaporizationAtNormalBoilingPoint" && (return data[11])
-    prop=="idealGasGibbsFreeEnergyOfFormationAt25C" && (return data[4])
-    prop=="liquidDensityAt25C" && (return data[11])
-    prop=="liquidVolumeAt25C" && (return data[11])
-    prop=="molecularWeight" && (return data[2])
-    prop=="normalBoilingPoint" && (return data[6])
-    prop=="standardEntropyGas" && (return data[5])
-    prop=="standardFormationEnthalpyGas" && (return data[3])
-    prop=="standardFormationGibbsEnergyGas" && (return data[4])
+  function calculate(prop::ASCIIString, data::Tuple)
+    floats::Vector{Float64}
+    
+    prop=="casRegistryNumber" && (return ASCIIString(data[1]))
+    prop=="chemicalFormula" && (return ASCIIString(data[2]))
+    prop=="iupacName" && (return ASCIIString(data[3]))
+    
+    floats=data[1]
+    prop=="criticalCompressibilityFactor" && (return floats[5])
+    prop=="criticalDensity" && (return floats[4])
+    prop=="criticalPressure" && (return floats[3])
+    prop=="criticalTemperature" && (return floats[2])
+    prop=="criticalVolume" && (return floats[4])
+    prop=="heatOfVaporizationAtNormalBoilingPoint" && (return floats[10])
+    prop=="idealGasGibbsFreeEnergyOfFormationAt25C" && (return floats[3])
+    prop=="liquidDensityAt25C" && (return floats[10])
+    prop=="liquidVolumeAt25C" && (return floats[10])
+    prop=="molecularWeight" && (return floats[1])
+    prop=="normalBoilingPoint" && (return floats[5])
+    prop=="standardEntropyGas" && (return floats[4])
+    prop=="standardFormationEnthalpyGas" && (return floats[2])
+    prop=="standardFormationGibbsEnergyGas" && (return floats[3])
   end
 
   function calculate(d::TempPropData)

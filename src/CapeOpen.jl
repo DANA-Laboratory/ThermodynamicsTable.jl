@@ -212,21 +212,20 @@ module CapeOpen
     external components used in a Property Package is outside the scope of this CAPEOPEN interface specification.
   """
   type PropertyPackage
-    function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytofilemap)
-      propertytofilemap = [key => getdatamatrix(propertytofilemap[key]) for key in keys(propertytofilemap)]
+    function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytable)
       new(
         propmap(constantstrings,t1),
         propmap(constantfloats,t2),
         propmap(tempreturedependents,t3),
         propmap(pressuredependents,t4),
-        propertytofilemap
+        propertytable
       )
     end
     constantstrings::PropertyMap
     constantfloats::PropertyMap
     tempreturedependents::PropertyMap
     pressuredependents::PropertyMap
-    propertytable::Dict{ASCIIString,Array{Union{AbstractString,Float64,Int},2}}
+    propertytable::Vector{ASCIIString}
   end
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
@@ -238,20 +237,20 @@ module CapeOpen
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
     ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
     ASCIIString[],
-    [],
-    Dict(
-      "Compounds"=>"perryFormulaCompounds.table",
-      "VaporPressure"=>"perryLiquidsVaporPressure_Table2_8.table",
-      "LiquidsDensities"=>"perryDensities_Table2_32.table",
-      "Criticals"=>"perryCriticals_Table2_141.table",
-      "VaporizHeat"=>"perryHeatsofVaporization_Table2_150.table",
-      "LiquidsCp"=>"perryHeatCapLiquids_Table2_153.table",
-      "Cp"=>"perryHeatCapIdealGas_Tables156_155.table",
-      "FormationEnergy"=>"perryEnergiesOfFormation_Table2_179.table",
-      "VaporViscos"=>"perryVaporViscosity_Table2_312.table",
-      "LiquidViscos"=>"perryLiquidViscosity_Table2_313.table",
-      "VaporThermal"=>"perryVaporThermalConductivity_Table2_314.table",
-      "LiquidThermal"=>"perryLiqidThermalConductivity_Table2_315.table"
-    )
-  )
+    [],                  
+    ASCIIString[                
+      "Compounds"        ,
+      "VaporPressure"    ,
+      "LiquidsDensities" ,
+      "Criticals"        ,
+      "VaporizHeat"      ,
+      "LiquidsCp"        ,
+      "Cp"               ,
+      "FormationEnergy"  ,
+      "VaporViscos"      ,
+      "LiquidViscos"     ,
+      "VaporThermal"     ,
+      "LiquidThermal"    
+    ]                    
+  )                      
 end

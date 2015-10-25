@@ -1,9 +1,10 @@
+using Base.Test
 using ThermodynamicsTable
+
 using ICapeThermoUniversalConstants
 using ICapeThermoCompounds
 import ECapeExceptions.ECapeInvalidArgument
 import CapeOpen: MaterialObject, PropertyPackage
-using Base.Test
 
 perryanalytic = CapeOpen.perryanalytic
 
