@@ -75,16 +75,15 @@ module ICapeThermoCompounds
         boilTemps=Vector{Float64}(size)
         molwts=Vector{Float64}(size)
         casnos=Vector{ASCIIString}(size)
-        
-        for id = 1%UInt16:size%UInt16
-          compIds[id],data=readbinarydatabase(id,"Compounds")
-          formulae[id]=data[2]
-          names[id]=data[1]
-          casnos[id]=data[3]
+        for id = 1:size
+          compIds[id]=round(UInt16,id)
+          data=readbinarydatabase(compIds[id],"Compounds")
+          formulae[id]=copy(data[2])
+          names[id]=copy(data[1])
+          casnos[id]=copy(data[3])
           molwts[id]=data[4]
           boilTemps[id]=data[5]
         end
-
         return compIds,formulae,names,boilTemps,molwts,casnos
     end
 
@@ -100,7 +99,7 @@ module ICapeThermoCompounds
         propvals=Vector{Union{ASCIIString,Float64}}()     
         for prop in props
           for compId in compIds            
-            id,data=getconstpropdata(proppackage,prop,compId)
+            data=getconstpropdata(proppackage,prop,compId)
             push!(propvals, calculate(prop,data))
           end
         end
@@ -129,12 +128,24 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# temperature::Float64,
-        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        #= [in] =# compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         propvals::Vector{Float64}
         propvals=Vector{Float64}()
+        
         for prop in props
           for compId in compIds
-            push!(propvals, calculate(prop,gettemppropdata(proppackage,prop,compId)))
+          
+            temppropdata::TempPropData
+            
+            temppropdata=gettemppropdata(proppackage,prop,compId)
+            temppropdata.t=temperature
+
+            try
+              push!(propvals, calculate(temppropdata))
+            catch err
+              dump(temppropdata)
+              throw(err)
+            end
           end
         end
         return propvals
@@ -152,26 +163,22 @@ module ICapeThermoCompounds
     end 
     return readbinarydatabase(compId,table)
   end
-  
-  function getdataeqno(data::Array{Float64,2}, prop::ASCIIString)
-    (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) && (return data[i,3:end-1],data[i,end])
-    return data[i,2:end],0
-  end
    
   function gettemppropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16)
     table::ASCIIString
-    data::Vector{Float64}
+    datarange::UInt8
+    floatdata::Vector{Float64}
     ret::Vector{TempPropData}
     ret=Vector{TempPropData}()
-    table=proppackage.propertytable[proppackage.tempreturedependents[prop]]
-    compId,data=readbinarydatabase(table,compId)
-    datarange=getdataeqno(data,prop)
-    for i in data[:,1]
-      if i==compId
-        tpd=TempPropData(prop,datarange[1],NaN,NaN,data[i,1],data[i,2],datarange[2])
-        push!(ret,tpd)
-      end
+    table=proppackage.tempreturedependents[prop]
+    data=readbinarydatabase(compId,table)
+    floatdata=data[1]
+    if (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) 
+      datarange=data[2]
+    else
+      datarange=round(UInt8,0)
     end
-    return ret
+    tc=getcompoundconstant(proppackage,["criticalTemperature"],[compId])
+    return TempPropData(prop,floatdata[2:end],NaN,tc[1],compId,floatdata[1],datarange)
   end
 end

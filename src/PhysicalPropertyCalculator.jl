@@ -9,17 +9,17 @@
   which supports the use of Property Calculators.
 """
 module PhysicalPropertyCalculator
-
+  using ECapeExceptions
   export TempPropData, calculate
 
   type TempPropData
     prop::ASCIIString
-    data::Vector{Float64}
+    c::Vector{Float64}
     t::Float64
     tc::Float64
-    compId::Int
+    compId::UInt16
     molweight::Float64
-    eqno::Int
+    eqno::UInt8
   end
   
   """
@@ -42,7 +42,7 @@ module PhysicalPropertyCalculator
     28- standardFormationEnthalpyGas => standard enthalpy change on formation of gas in J/mol
     31- standardFormationGibbsEnergyGas => standard Gibbs energy change on formation of gas in J/mol
   """
-  function calculate(prop::ASCIIString, data::Tuple)
+  function calculate(prop::ASCIIString, data::Array)
     floats::Vector{Float64}
     
     prop=="casRegistryNumber" && (return ASCIIString(data[1]))
@@ -70,54 +70,61 @@ module PhysicalPropertyCalculator
     tr::Float64
     ta::Float64
     if (d.prop=="heatCapacityOfLiquid")
+      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds)
       if (d.eqno!=2)
-        return d.c[1] + d.c[2]*d.t + d.c[3]*d.t^2 + d.c[4]*d.t^3 + d.c[4]*d.t^4
+        return d.c[1] + d.c[2]*d.t + d.c[3]*d.t^2 + d.c[4]*d.t^3 + d.c[5]*d.t^4  #???? check perry
       else
-        tr=1-t/tc
+        tr=1-d.t/d.tc
         return (d.c[1]^2)/tr+d.c[2]-2*d.c[1]*d.c[3]*tr-d.c[1]*d.c[4]*tr^2-(d.c[3]^2*tr^3)/3-(d.c[3]*d.c[4]^4)/2-(d.c[4]^2*tr^5)/5
       end
     elseif (d.prop=="heatOfVaporization")
       # Tr = T/Tc. Heat of vaporization in J/kmol
       # perry 2_150 have not presented c5 although it was a part of formula
-      tr=t/tc
-      return d.c[1]*1e7*(1-d.tr)^(d.c[2]+d.c[3]*d.tr+d.c[4]*d.tr^2)
+      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds)
+      tr=d.t/d.tc
+      return d.c[1]*1e7*(1-tr)^(d.c[2]+d.c[3]*tr+d.c[4]*tr^2)
     elseif (d.prop=="idealGasEnthalpy")
-    elseif (d.prop=="idealGasEntropy")
+      return NaN
+    elseif (d.prop=="idealGasEntropy") 
+      return NaN
     elseif (d.prop=="idealGasHeatCapacity")
+      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds)
       if (d.eqno==1)
         return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
       elseif (d.eqno==2)
         return d.c[1]+d.c[2]*((d.c[3]/d.t)/sinh(d.c[3]/d.t))^2+d.c[4]*((d.c[5]/d.t)/cosh(d.c[5]/d.t))^2
       end
-    elseif (d.prop=="thermalConductivityOfLiquid") 
+    elseif (d.prop=="thermalConductivityOfLiquid")
+      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds)
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
       return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
     elseif (d.prop=="thermalConductivityOfVapor")
+      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds)
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="vaporPressure")
+      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds)
       # Vapor pressure in Pa.
       return exp(d.c[1]+d.c[2]/d.t+d.c[3]*log(d.t)+d.c[4]*d.t^d.c[5])
     elseif (d.prop=="viscosityOfLiquid")
+      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds)
       #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
       return exp(d.c[1]*d.c[2]/d.t*d.c[3]*log(d.t)*d.c[4]*d.t^d.c[5])
     elseif (d.prop=="viscosityOfVapor")
+      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds)
       # Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="volumeOfLiquid")
       #Liquid dencity 
-      if (d.t>=d.c[5] && d.t<=d.c[7])
-        if (d.eqno==2)
-          return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
-        end
-        if (d.eqno==3) # For water over the entire temperature range of 273.16 to 647.096 K.
-          ta=1-(d.t/647.096)
-          return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
-        end
-        return d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
-      else
-        return NaN
+      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds)
+      if (d.eqno==2)
+        return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
       end
+      if (d.eqno==3) # For water over the entire temperature range of 273.16 to 647.096 K.
+        ta=1-(d.t/647.096)
+        return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
+      end
+      return d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
     end
   end
 end
