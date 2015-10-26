@@ -74,54 +74,55 @@ module PhysicalPropertyCalculator
   function calculate(d::TempPropData)
     tr::Float64
     ta::Float64
+    if (d.prop=="idealGasEnthalpy")
+      return NaN
+    elseif (d.prop=="idealGasEntropy") 
+      return NaN
+    end
+    (d.t<d.test[1] || d.t>d.test[3]) && throw(ECapeOutOfBounds())
     if (d.prop=="heatCapacityOfLiquid")
-      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds())
       if (d.eqno!=2)
         return d.c[1] + d.c[2]*d.t + d.c[3]*d.t^2 + d.c[4]*d.t^3 + d.c[5]*d.t^4  #???? check perry
       else
         tr=1-d.t/d.tc
-        return (d.c[1]^2)/tr+d.c[2]-2*d.c[1]*d.c[3]*tr-d.c[1]*d.c[4]*tr^2-(d.c[3]^2*tr^3)/3-(d.c[3]*d.c[4]^4)/2-(d.c[4]^2*tr^5)/5
+        return (d.c[1]^2)/tr+d.c[2]-2*d.c[1]*d.c[3]*tr-d.c[1]*d.c[4]*tr^2-(d.c[3]^2*tr^3)/3-(d.c[3]*d.c[4]*tr^4)/2-(d.c[4]^2*tr^5)/5
       end
     elseif (d.prop=="heatOfVaporization")
       # Tr = T/Tc. Heat of vaporization in J/kmol
       # perry 2_150 have not presented c5 although it was a part of formula
-      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds())
       tr=d.t/d.tc
       return d.c[1]*1e7*(1-tr)^(d.c[2]+d.c[3]*tr+d.c[4]*tr^2)
-    elseif (d.prop=="idealGasEnthalpy")
-      return NaN
-    elseif (d.prop=="idealGasEntropy") 
-      return NaN
     elseif (d.prop=="idealGasHeatCapacity")
-      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds())
       if (d.eqno==1)
-        return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
+        return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*1e-5*d.t^3+d.c[5]*1e-10*d.t^4
       elseif (d.eqno==2)
-        return d.c[1]+d.c[2]*((d.c[3]/d.t)/sinh(d.c[3]/d.t))^2+d.c[4]*((d.c[5]/d.t)/cosh(d.c[5]/d.t))^2
+        c1::Float64
+        c2::Float64
+        c3::Float64
+        c4::Float64
+        c1=d.c[1]*1e5
+        c2=d.c[2]*1e5
+        c3=d.c[3]*1e3
+        c4=d.c[4]*1e5
+        return c1+c2*((c3/d.t)/sinh(c3/d.t))^2+c4*((d.c[5]/d.t)/cosh(d.c[5]/d.t))^2
       end
     elseif (d.prop=="thermalConductivityOfLiquid")
-      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds())
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
       return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
     elseif (d.prop=="thermalConductivityOfVapor")
-      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds())
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is lower.
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="vaporPressure")
-      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds())
       # Vapor pressure in Pa.
       return exp(d.c[1]+d.c[2]/d.t+d.c[3]*log(d.t)+d.c[4]*d.t^d.c[5])
     elseif (d.prop=="viscosityOfLiquid")
-      (d.t<d.c[6] || d.t>d.c[8]) && throw(ECapeOutOfBounds())
       #  Viscosities are at either 1 atm or the vapor pressure, whichever is higher.
-      return exp(d.c[1]*d.c[2]/d.t*d.c[3]*log(d.t)*d.c[4]*d.t^d.c[5])
+      return exp(d.c[1]+d.c[2]/d.t+d.c[3]*log(d.t)+d.c[4]*d.t^d.c[5])
     elseif (d.prop=="viscosityOfVapor")
-      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds())
       # Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="volumeOfLiquid")
       #Liquid dencity 
-      (d.t<d.c[5] || d.t>d.c[7]) && throw(ECapeOutOfBounds())
       if (d.eqno==2)
         return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
       end

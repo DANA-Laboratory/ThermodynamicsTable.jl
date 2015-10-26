@@ -181,9 +181,9 @@ module ICapeThermoCompounds
     if (prop in["heatCapacityOfLiquid","heatOfVaporization"])
       temppropdata.tc=calculate(prop,getconstpropdata(proppackage,"criticalTemperature",compId))
     end
-    if (prop in ["heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","viscosityOfLiquid"])
+    if (prop in ["heatCapacityOfLiquid","heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","viscosityOfLiquid"])
       temppropdata.test=temppropdata.c[6:9]
-    elseif (prop in ["heatCapacityOfLiquid","thermalConductivityOfVapor","viscosityOfVapor","volumeOfLiquid"])
+    elseif (prop in ["thermalConductivityOfVapor","viscosityOfVapor","volumeOfLiquid"])
       temppropdata.test=temppropdata.c[5:8]
     end
     return temppropdata
