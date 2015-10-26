@@ -185,6 +185,8 @@ module ICapeThermoCompounds
       temppropdata.test=temppropdata.c[6:9]
     elseif (prop in ["thermalConductivityOfVapor","viscosityOfVapor","volumeOfLiquid"])
       temppropdata.test=temppropdata.c[5:8]
+    elseif (prop in ["idealGasEnthalpy", "idealGasEntropy"])
+      temppropdata.test=[temppropdata.c[6],NaN,temppropdata.c[8],NaN]
     end
     return temppropdata
   end
