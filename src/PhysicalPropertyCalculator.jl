@@ -74,11 +74,6 @@ module PhysicalPropertyCalculator
   function calculate(d::TempPropData)
     tr::Float64
     ta::Float64
-    if (d.prop=="idealGasEnthalpy")
-      return NaN
-    elseif (d.prop=="idealGasEntropy") 
-      return NaN
-    end
     (d.t<d.test[1] || d.t>d.test[3]) && throw(ECapeOutOfBounds())
     if (d.prop=="heatCapacityOfLiquid")
       if (d.eqno!=2)
@@ -106,6 +101,19 @@ module PhysicalPropertyCalculator
         c4=d.c[4]*1e5
         return c1+c2*((c3/d.t)/sinh(c3/d.t))^2+c4*((d.c[5]/d.t)/cosh(d.c[5]/d.t))^2
       end
+    elseif (d.prop=="idealGasEnthalpy")
+      if(d.eqno==1)
+        return d.c[1]*d.t+1/2*d.c[2]*d.t^2+1/3*d.c[3]*d.t^3+1/4*d.c[4]*d.t^4+1/5*d.c[5]*d.t^5 # Integ of Cp Poly
+      elseif(d.eqno==2)
+        return d.c[1]*d.t+d.c[2]*d.c[3]*coth(d.c[3]/d.t)-d.c[4]*d.c[5]*tanh(d.c[5]/d.t) # Integ of Cp Hyper
+      end
+    elseif (d.prop=="idealGasEntropy") 
+      if(d.eqno==1)
+        ICpOnTDT=d.c[2]*d.t+(d.c[3]*d.t^2)/2+(d.c[4]*d.t^3)/3+(d.c[5]*d.t^4)/4+d.c[1]*log(d.t) # Integral of Cp/T Poly
+      elseif(d.eqno==2)
+        ICpOnTDT=(d.c[2]*d.c[3]*coth(d.c[3]/d.t)+d.c[1]*d.t*log(d.t)+d.c[4]*d.t*log(cosh(d.c[5]/d.t))-d.c[2]*d.t*log(sinh(d.c[3]/d.t))-d.c[4]*d.c[5]*tanh(d.c[5]/d.t))/d.t # Integral of Cp/T Hyper
+      end
+      return ICpOnTDT-log(p)
     elseif (d.prop=="thermalConductivityOfLiquid")
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
       return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4
