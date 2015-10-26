@@ -32,35 +32,45 @@ allconstants = getcompoundconstant(perryanalytic,constproplist,compIds)
 
 gettdependentproperty(perryanalytic,tdependentproplist,300.,compIds)
 j=1
+
 for prop in tdependentproplist
   fac=1.1
   if (prop=="idealGasHeatCapacity" || prop=="heatCapacityOfLiquid")
     fac=1e-5;
   end
+  maxrow=0%UInt8
+  (prop in ["idealGasHeatCapacity", "volumeOfLiquid", "heatCapacityOfLiquid"]) && (maxrow=1%UInt8)
   for compId in compIds
-    temppropdata::TempPropData
-    temppropdata=TempPropData(perryanalytic,prop,compId)
-    for i in [1,3]
+    for (rowdata=0%UInt8:maxrow)
+      temppropdata=nothing
       try
-        r::Float64
-        if(isdefined(temppropdata,:test))
-          temppropdata.t=temppropdata.test[i]
-          r=calculate(temppropdata)*fac
-          err=abs((r-temppropdata.test[i+1])/r)
-          if err>0.01
-            if (err>0.1) 
-              println("$j ERRRRRRRRRRRRRRRRRRORRRRRRRRRRRRRR")
-              println("$r!=$(temppropdata.test[i+1]), $err")
-              dump(temppropdata)
-              j+=1
+        temppropdata=TempPropData(perryanalytic,prop,compId,rowdata)
+      catch err
+        break
+      end
+      rowdata==1%UInt8 && println(" ************ $compId ************ $prop ************ ")
+      for i in [1,3]
+        try
+          r::Float64
+          if(isdefined(temppropdata,:test))
+            temppropdata.t=temppropdata.test[i]
+            r=calculate(temppropdata)*fac
+            err=abs((r-temppropdata.test[i+1])/r)
+            if err>0.01
+              if (err>0.1) 
+                println("$j EEEEEERRRRRRRRRRRORRRRRRRRRRRRRR")
+                println("$r!=$(temppropdata.test[i+1]), $err")
+                dump(temppropdata)
+                j+=1
+              end
             end
           end
-        end
-      catch err
-        if isa(err,ECapeOutOfBounds)
-          NaN
-        else
-          throw(err)
+        catch err
+          if isa(err,ECapeOutOfBounds)
+            NaN
+          else
+            throw(err)
+          end
         end
       end
     end

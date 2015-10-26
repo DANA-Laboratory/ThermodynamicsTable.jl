@@ -36,8 +36,8 @@ module ThermodynamicsTable
   function gettablesize(table::ASCIIString)
     return ty[table][1][2]
   end
-  
-  function readbinarydatabase(id::UInt16, table::ASCIIString)
+  #for LiquidsDensities, Cp, LiquidsCp props Max of two data row per prop may exists
+  function readbinarydatabase(id::UInt16, table::ASCIIString, skipdata::UInt8=0%UInt8)
     if haskey(ty,table) 
       v=ty[table]
     else
@@ -49,6 +49,10 @@ module ThermodynamicsTable
     while(id!=(read(binaryfile,UInt16)) && j<=v[1][2])
       skip(binaryfile,skipsize)
       j+=1
+    end
+    if(skipdata>0 && j+skipdata<=v[1][2]) 
+      skip(binaryfile,skipdata*skipsize)
+      id!=(read(binaryfile,UInt16)) && throw(ECapeInvalidArgument())
     end
     if(j<=v[1][2])
       for jj in 2:length(v)
@@ -62,41 +66,6 @@ module ThermodynamicsTable
     end
     throw(ECapeInvalidArgument())
   end
-
-  function readbinarydatabase(id::UInt16, table::ASCIIString, more::Bool)
-    ret::Vector{Vector{Union{Vector{Float64},UInt8}}}
-    cond::Bool
-    ret=Vector{Vector{Union{Vector{Float64},UInt8}}}()
-    if haskey(ty,table) 
-      v=ty[table]
-    else
-      throw(ECapeInvalidArgument())
-    end
-    seek(binaryfile,v[1][1])
-    skipsize=v[1][3]-sizeof(UInt16)
-    j=1
-    cond=false
-    while(id!=(read(binaryfile,UInt16)) && j<=v[1][2])
-      skip(binaryfile,skipsize)
-      j+=1
-    end
-    cond=(j<=v[1][2])
-    while(cond)
-      for jj in 2:length(v)
-        if isa(v[jj],Array)
-          read!(binaryfile,v[jj])
-        else
-          v[jj]=read(binaryfile,typeof(v[jj]))
-        end
-      end
-      j+=1
-      cond = (j<=v[1][2] && id==(read(binaryfile,UInt16)))
-      (!cond) && return(ret)
-      push!(ret,v[2:end])
-    end
-    throw(ECapeInvalidArgument())
-  end  
-
 end
 
 include("CapeOpen.jl")

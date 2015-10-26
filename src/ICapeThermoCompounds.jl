@@ -76,7 +76,7 @@ module ICapeThermoCompounds
         casnos=Vector{ASCIIString}(size)
         for id = 1:size
           compIds[id]=round(UInt16,id)
-          data=readbinarydatabase(compIds[id],"Compounds")
+          data=readbinarydatabase(compIds[id],"Compounds",0%UInt8)
           formulae[id]=copy(data[2])
           names[id]=copy(data[1])
           casnos[id]=copy(data[3])
@@ -164,15 +164,15 @@ module ICapeThermoCompounds
     elseif haskey(proppackage.constantfloats, prop) 
       table=proppackage.constantfloats[prop]
     end 
-    return readbinarydatabase(compId,table)
+    return readbinarydatabase(compId,table,0%UInt8)
   end
    
-  function TempPropData(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16)
+  function TempPropData(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16, skipdata::UInt8=0%UInt8)
     table::ASCIIString
     floatdata::Vector{Float64}
     temppropdata::TempPropData
     table=proppackage.tempreturedependents[prop]
-    data=readbinarydatabase(compId,table)
+    data=readbinarydatabase(compId,table,skipdata)
     floatdata=data[1]
     temppropdata=TempPropData(prop,floatdata[2:end],compId,floatdata[1])
     if (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"]) 
