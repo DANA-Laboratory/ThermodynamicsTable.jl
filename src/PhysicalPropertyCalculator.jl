@@ -111,11 +111,10 @@ module PhysicalPropertyCalculator
       end
     elseif (d.prop=="idealGasEntropy") 
       if(d.eqno==1)
-        ICpOnTDT=d.c[2]*d.t+(d.c[3]*d.t^2)/2+(d.c[4]*d.t^3)/3+(d.c[5]*d.t^4)/4+d.c[1]*log(d.t) # Integral of Cp/T Poly
+        return d.c[2]*d.t+(d.c[3]*d.t^2)/2+(d.c[4]*d.t^3)/3+(d.c[5]*d.t^4)/4+d.c[1]*log(d.t) # Integral of Cp/T Poly
       elseif(d.eqno==2)
-        ICpOnTDT=(d.c[2]*d.c[3]*coth(d.c[3]/d.t)+d.c[1]*d.t*log(d.t)+d.c[4]*d.t*log(cosh(d.c[5]/d.t))-d.c[2]*d.t*log(sinh(d.c[3]/d.t))-d.c[4]*d.c[5]*tanh(d.c[5]/d.t))/d.t # Integral of Cp/T Hyper
+        return (d.c[2]*d.c[3]*coth(d.c[3]/d.t)+d.c[1]*d.t*log(d.t)+d.c[4]*d.t*log(cosh(d.c[5]/d.t))-d.c[2]*d.t*log(sinh(d.c[3]/d.t))-d.c[4]*d.c[5]*tanh(d.c[5]/d.t))/d.t # Integral of Cp/T Hyper
       end
-      return ICpOnTDT-log(p)
     elseif (d.prop=="thermalConductivityOfLiquid")
       # Thermal conductivites are at either 1 atm or the vapor pressure, whichever is higher.
       return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3+d.c[5]*d.t^4

@@ -1,5 +1,5 @@
 module ECapeExceptions
-    export ECapeOutOfBounds,ECapeInvalidArgument,ECapeThrmPropertyNotAvailable,ECapeLimitedImpl,ECapeNoImpl
+    export ECapeOutOfBounds,ECapeInvalidArgument,ECapeThrmPropertyNotAvailable,ECapeLimitedImpl,ECapeNoImpl,ECapeUnknown
     
     type ECapeBoundaries <: Exception end
     type ECapeRoot <: Exception end
