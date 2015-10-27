@@ -13,7 +13,7 @@ gettdependentproplist()
 """
 module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
-    export getcompoundconstant!,getpdependentproperty,gettdependentproperty
+    export getcompoundconstant!,getpdependentproperty!,gettdependentproperty!
     using  ThermodynamicsTable,PhysicalPropertyCalculator,ECapeExceptions
     import CapeOpen.PropertyPackage
     import PhysicalPropertyCalculator.TempPropData
@@ -140,7 +140,8 @@ module ICapeThermoCompounds
       Description
         Returns the values of constant Physical Properties for the specified Compounds.
       Arguments
-        [in] props::Vector{ASCIIString},
+        [in] proppackage::PropertyPackage
+        [in] props::Vector{ASCIIString}
         [in] compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         [in out] propvals::Vector{Any}
       Exceptions
@@ -153,90 +154,167 @@ module ICapeThermoCompounds
         The GetConstPropList method can be used in order to check which constant Physical Properties are available.
         If the number of requested Physical Properties is P and the number of Compounds is C, the propvals array will contain C*P variants. 
         The first C variants will be the values for the first requested Physical Property (one for each Compound) followed by C values of constants for the second Physical Property, and so on. 
+        Physical Properties are returned in a fixed set of units as specified in section 7.5.2.
         If the compIds argument is set to 0%UInt16 this is a request to return property values for all compounds in the component that implements the ICapeThermoCompounds interface with the compound order the same as that returned by the GetCompoundList method.
         If any Physical Property is not available for one or more Compounds, then "UNDEFINED",Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
     """
     function getcompoundconstant!(
-        proppackage::PropertyPackage,
-        props::Vector{ASCIIString},
-        compIds::Vector{UInt16},
-        propvals::Vector{Union{ASCIIString,Float64}})
-        thrownotavailable::Bool=false
-        (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
-        allprops=getconstproplist(proppackage)
-        try
-          for prop in props
-            !(prop in allprops) && throw(ECapeInvalidArgument())
-            for compId in compIds            
-              (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
-              data=getconstpropdata(proppackage,prop,compId)
-              propval=calculate(prop,data)
-              push!(propvals, propval)
-              isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
-            end
-          end
-        catch err
-          if isa(err,ECapeThrmPropertyNotAvailable)
-            thrownotavailable=true
-          elseif isa(err,ECapeInvalidArgument)
-            throw(err)
-          elseif isa(err,ECapeLimitedImpl)
-            throw(err)
-          else
-            throw(ECapeUnknown())
-          end
-        end
-        thrownotavailable && throw(ECapeThrmPropertyNotAvailable()) 
-        return propvals 
-    end
-
-    """
-      Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
-      #= [out][in] =# propvals::Vector{Float64}
-    """
-    function getpdependentproperty(
-        proppackage::PropertyPackage,
-        #= [in] =# props::Vector{ASCIIString},
-        #= [in] =# pressure::Float64,
-        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        propvals::Vector{Float64}
-        propvals=Vector{Float64}()
-        return propvals
-    end
-
-    """
-      Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
-      #= [out][in] =# propvals::Vector{Float64})
-    """
-    function gettdependentproperty(
-        proppackage::PropertyPackage,
-        #= [in] =# props::Vector{ASCIIString},
-        #= [in] =# temperature::Float64,
-        #= [in] =# compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        propvals::Vector{Float64}
-        propvals=Vector{Float64}()
-        
+      proppackage::PropertyPackage,
+      props::Vector{ASCIIString},
+      compIds::Vector{UInt16},
+      propvals::Vector{Union{ASCIIString,Float64}})
+      thrownotavailable::Bool=false
+      (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
+      allprops=getconstproplist(proppackage)
+      try
         for prop in props
-          for compId in compIds
-          
-            temppropdata::TempPropData
-            
-            temppropdata=TempPropData(proppackage,prop,compId)
-            temppropdata.t=temperature
-
-            try
-              push!(propvals, calculate(temppropdata))
-            catch err
-              if isa(err,ECapeOutOfBounds)
-                push!(propvals, NaN)
-              else
-                dump(temppropdata)
-                throw(err)
-              end
-            end
+          !(prop in allprops) && throw(ECapeInvalidArgument())
+          for compId in compIds            
+            (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+            data=getconstpropdata(proppackage,prop,compId)
+            propval=calculate(prop,data)
+            push!(propvals, propval)
+            isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
         end
-        return propvals
+      catch err
+        if isa(err,ECapeThrmPropertyNotAvailable)
+          thrownotavailable=true
+        elseif isa(err,ECapeInvalidArgument)
+          throw(err)
+        elseif isa(err,ECapeLimitedImpl)
+          throw(err)
+        else
+          throw(ECapeUnknown())
+        end
+      end
+      thrownotavailable && throw(ECapeThrmPropertyNotAvailable()) 
+      return propvals 
+    end
+
+    """
+      Description
+        Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [in] props::Vector{ASCIIString}
+        [in] pressure::Float64
+        [in] compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        [in out] propvals::Vector{Any}
+      Exceptions
+        ECapeThrmPropertyNotAvailable – at least one item in the properties list is not available for a particular compound.
+        ECapeLimitedImpl – One or more Physical Properties are not supported by the component that implements this interface. 
+        This exception should also be raised if any element of the props argument is not recognised.
+        ECapeInvalidArgument – To be used when an invalid argument value is passed, for example UNDEFINED for argument props.
+        ECapeOutOfBounds – The value of the temperature is outside of the range of values accepted by the Property Package.
+        ECapeUnknown – The error to be raised when other error(s), specified for the operation, are not suitable.
+      Note
+        The GetTDependentPropList method can be used in order to check which Physical Properties are available.
+        If the number of requested Physical Properties is P and the number of Compounds is C, the propvals array will contain C*P values. 
+        The first C will be the values for the first requested Physical Property followed by C values for the second Physical Property, and so on.
+        Properties are returned in a fixed set of units as specified in section 7.5.3.
+        If the compIds argument is set to 0%UInt16 this is a request to return property values for all compounds in the component that implements the ICapeThermoCompounds interface with the compound order the same as that returned by the GetCompoundList method. 
+        If any Physical Property is not available for one or more Compounds, then "UNDEFINED",Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
+    """
+    function getpdependentproperty!(
+      proppackage::PropertyPackage,
+      props::Vector{ASCIIString},
+      pressure::Float64,
+      compIds::Vector{Float64},
+      propvals::Vector{Float64})
+      thrownotavailable::Bool=false
+      (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
+      allprops=getpdependentproplist(proppackage)
+      try
+        for prop in props
+          !(prop in allprops) && throw(ECapeInvalidArgument())
+          for compId in compIds
+            (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+            temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
+            (pressure<0) && throw(ECapeOutOfBounds())
+            propval::Float64=calculate(prop,data,pressure)
+            push!(propvals, propval)
+            isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
+          end
+      catch err
+        if isa(err,ECapeThrmPropertyNotAvailable)
+          thrownotavailable=true
+        elseif isa(err,ECapeOutOfBounds)
+          thrownotavailable=true
+          push!(propvals, NaN)
+        elseif isa(err,ECapeInvalidArgument)
+          throw(err)
+        elseif isa(err,ECapeLimitedImpl)
+          throw(err)
+        else
+          throw(ECapeUnknown())
+        end
+      end
+      thrownotavailable && throw(ECapeThrmPropertyNotAvailable()) 
+      return propvals 
+    end
+
+    """
+      Description
+        Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [in] props::Vector{ASCIIString}
+        [in] temperature::Float64
+        [in] compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        [in out] propvals::Vector{Any}
+      Exceptions
+        ECapeThrmPropertyNotAvailable – at least one item in the properties list is not available for a particular compound.
+        ECapeLimitedImpl – One or more Physical Properties are not supported by the component that implements this interface. 
+        This exception should also be raised if any element of the props argument is not recognised.
+        ECapeInvalidArgument – To be used when an invalid argument value is passed, for example UNDEFINED for argument props.
+        ECapeOutOfBounds – The value of the temperature is outside of the range of values accepted by the Property Package.
+        ECapeUnknown – The error to be raised when other error(s), specified for the operation, are not suitable.
+      Note
+        The GetTDependentPropList method can be used in order to check which Physical Properties are available.
+        If the number of requested Physical Properties is P and the number of Compounds is C, the propvals array will contain C*P values. 
+        The first C will be the values for the first requested Physical Property followed by C values for the second Physical Property, and so on.
+        Properties are returned in a fixed set of units as specified in section 7.5.3.
+        If the compIds argument is set to 0%UInt16 this is a request to return property values for all compounds in the component that implements the ICapeThermoCompounds interface with the compound order the same as that returned by the GetCompoundList method. 
+        If any Physical Property is not available for one or more Compounds, then "UNDEFINED",Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
+    """
+    function gettdependentproperty!(
+      proppackage::PropertyPackage,
+      props::Vector{ASCIIString},
+      temperature::Float64,
+      compIds::Vector{UInt16},
+      propvals::Vector{Float64})
+      thrownotavailable::Bool=false
+      (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
+      allprops=gettdependentproplist(proppackage)
+      try
+        for prop in props
+          !(prop in allprops) && throw(ECapeInvalidArgument())
+          for compId in compIds
+            (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+            temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
+            (temperature<0 || temperature>6000) && throw(ECapeOutOfBounds())
+            temppropdata.t=temperature
+            propval::Float64=calculate(prop,data)
+            push!(propvals, propval)
+            isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
+          end
+      catch err
+        if isa(err,ECapeThrmPropertyNotAvailable)
+          thrownotavailable=true
+        elseif isa(err,ECapeOutOfBounds)
+          thrownotavailable=true
+          push!(propvals, NaN)
+        elseif isa(err,ECapeInvalidArgument)
+          throw(err)
+        elseif isa(err,ECapeLimitedImpl)
+          throw(err)
+        else
+          throw(ECapeUnknown())
+        end
+      end
+      thrownotavailable && throw(ECapeThrmPropertyNotAvailable()) 
+      return propvals 
     end
 
   #***********************************************
