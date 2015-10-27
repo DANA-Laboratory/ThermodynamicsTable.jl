@@ -236,8 +236,8 @@ module CapeOpen
      "Compounds", "Compounds", "FormationEnergy", "FormationEnergy", "FormationEnergy"],
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
     ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
-    ASCIIString[],
-    [],                  
+    ["boilingPointTemperature"],
+    getindex(pressuredependents,[1]),                  
     ASCIIString[                
       "Compounds"        ,
       "VaporPressure"    ,

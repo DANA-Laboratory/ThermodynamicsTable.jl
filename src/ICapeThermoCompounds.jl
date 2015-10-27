@@ -198,7 +198,7 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# pressure::Float64,
-        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        #= [in] =# compIds::Vector{Float64}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         propvals::Vector{Float64}
         propvals=Vector{Float64}()
         return propvals
@@ -212,7 +212,7 @@ module ICapeThermoCompounds
         proppackage::PropertyPackage,
         #= [in] =# props::Vector{ASCIIString},
         #= [in] =# temperature::Float64,
-        #= [in] =# compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        #= [in] =# compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         propvals::Vector{Float64}
         propvals=Vector{Float64}()
         

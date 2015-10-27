@@ -141,5 +141,19 @@ module PhysicalPropertyCalculator
       end
       return d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
     end
+    throw(ECapeThrmPropertyNotAvailable())
   end
+  
+  function calculate(d::TempPropData, p::Float64)
+    (p<d.test[2] || p>d.test[4]) && throw(ECapeOutOfBounds())
+    if (d.prop=="boilingPointTemperature")
+      bp=fzeros(t->vp(d.c,p,t),d.test[2],d.test[4])
+      (length(bp)==1) && return bp[1]
+    end
+    throw(ECapeThrmPropertyNotAvailable())
+  end
+  function vp(c::Vector{Float64}, p::Float64, t::Float64)
+    return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])-p
+  end  
+
 end
