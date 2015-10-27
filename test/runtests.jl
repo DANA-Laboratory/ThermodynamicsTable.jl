@@ -27,7 +27,8 @@ pdependentproplist=getpdependentproplist(perryanalytic)
 
 compIds,formulae,names,boilTemps,molwts,casnos = getcompoundlist(perryanalytic)
 
-allconstants = getcompoundconstant(perryanalytic,constproplist,compIds)
+allconstants = propvals::Vector{Union{ASCIIString,Float64}}()
+getcompoundconstant!(perryanalytic,constproplist,compIds,allconstants)
 @test length(allconstants) == length(constproplist)*length(compIds)
 
 gettdependentproperty(perryanalytic,tdependentproplist,300.,compIds)

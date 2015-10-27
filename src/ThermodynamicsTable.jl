@@ -64,7 +64,7 @@ module ThermodynamicsTable
       end
       return v[2:end]
     end
-    throw(ECapeInvalidArgument())
+    throw(ECapeLimitedImpl())
   end
 end
 

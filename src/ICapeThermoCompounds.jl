@@ -1,108 +1,193 @@
+"""
+Methods implemented by components that need to describe the Compounds that occur or can occur in a Material.
+
+getcompoundlist()
+getcompoundconstant!()
+getconstproplist()
+getnumcompounds()
+getpdependentproperty()
+getpdependentproplist()
+gettdependentproperty()
+gettdependentproplist()
+
+"""
 module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
-    export getcompoundconstant,getpdependentproperty,gettdependentproperty
+    export getcompoundconstant!,getpdependentproperty,gettdependentproperty
     using  ThermodynamicsTable,PhysicalPropertyCalculator,ECapeExceptions
     import CapeOpen.PropertyPackage
     import PhysicalPropertyCalculator.TempPropData
     """
-      Returns the list of supported constant Physical Properties.
-      #= [retval][out] =# props::Vector{ASCIIString}
+      Description
+        Returns the list of supported constant Physical Properties.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [retval] props::Vector{ASCIIString}
+      Exceptions
+        ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function getconstproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
-        return props
+        try
+          props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
+          return props
+        catch
+          throw(ECapeUnknown())
+        end
     end
 
     """
-      Returns the list of supported temperature-dependent Physical Properties.
-      #= [retval][out] =# props::Vector{ASCIIString})
+      Description
+        Returns the list of supported temperature-dependent Physical Properties.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [retval]props::Vector{ASCIIString}
+      Exceptions
+        ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function gettdependentproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = [keys(proppackage.tempreturedependents)...]
-        return props
+        try
+          props = [keys(proppackage.tempreturedependents)...]
+          return props
+        catch
+          throw(ECapeUnknown())
+        end
     end
 
     """
-      Returns the list of supported pressure-dependent properties.
-      #= [retval][out] =# props::Vector{ASCIIString})
+      Description
+        Returns the list of supported pressure-dependent properties.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [retval]props::Vector{ASCIIString}
+      Exceptions
+        ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function getpdependentproplist(
         proppackage::PropertyPackage)
         props::Vector{ASCIIString}
-        props = [keys(proppackage.pressuredependents)...]
-        return props
+        try
+          props = [keys(proppackage.pressuredependents)...]
+          return props
+        catch
+          throw(ECapeUnknown())
+        end
     end
 
     """
-      Returns the number of Compounds supported.
-      #= [retval][out] =# num::Int32
+      Description
+        Returns the number of Compounds supported.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [retval] num::Int32
+      Exceptions
+        ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function getnumcompounds(
         proppackage::PropertyPackage)
-        return  gettablesize("Compounds")
+        try
+          return  gettablesize("Compounds")
+        catch
+          throw(ECapeUnknown())
+        end
     end
 
     """
-      Returns the list of all Compounds. This includes the Compound identifiers recognised and extra
-      information that can be used to further identify the Compounds.
-        #= [retval][out] =# compIds::Vector{ASCIIString} List of Compound identifiers.
-        #= [retval][out] =# formulae::Vector{ASCIIString} List of Compound formulae.
-        #= [retval][out] =# names::Vector{ASCIIString} List of Compound names.
-        #= [retval][out] =# boilTemps::Vector{Float64} List of boiling point temperatures.
-        #= [retval][out] =# molwts::Vector{Float64} List of molecular weights.
-        #= [retval][out] =# casnos::Vector{ASCIIString}) List of Chemical Abstract Service (CAS) Registry numbers.
+      Description
+        Returns the list of all Compounds. This includes the Compound identifiers recognised and extra information that can be used to further identify the Compounds.
+      Arguments
+        [in] proppackage::PropertyPackage
+        [retval] compIds::Vector{ASCIIString} List of Compound identifiers.
+        [retval] formulae::Vector{ASCIIString} List of Compound formulae.
+        [retval] names::Vector{ASCIIString} List of Compound names.
+        [retval] boilTemps::Vector{Float64} List of boiling point temperatures.
+        [retval] molwts::Vector{Float64} List of molecular weights.
+        [retval] casnos::Vector{ASCIIString}) List of Chemical Abstract Service (CAS) Registry numbers.
+      Exceptions
+        ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
+      Note
+        If any item cannot be returned then the value should be set to "UNDEFINED",0%Int16,Float64(NaN) for different types.
     """
     function getcompoundlist(
         proppackage::PropertyPackage)
-
-        compIds::Vector{UInt16}
-        formulae::Vector{ASCIIString}
-        names::Vector{ASCIIString}
-        boilTemps::Vector{Float64}
-        molwts::Vector{Float64}
-        casnos::Vector{ASCIIString}
-
-        size=gettablesize("Compounds")
-        
-        compIds=Vector{UInt16}(size)
-        formulae=Vector{ASCIIString}(size)
-        names=Vector{ASCIIString}(size)
-        boilTemps=Vector{Float64}(size)
-        molwts=Vector{Float64}(size)
-        casnos=Vector{ASCIIString}(size)
-        for id = 1:size
-          compIds[id]=round(UInt16,id)
-          data=readbinarydatabase(compIds[id],"Compounds",0%UInt8)
-          formulae[id]=copy(data[2])
-          names[id]=copy(data[1])
-          casnos[id]=copy(data[3])
-          molwts[id]=data[4]
-          boilTemps[id]=data[5]
+        try
+          size=gettablesize("Compounds")        
+          compIds=Vector{UInt16}(size)
+          formulae=Vector{ASCIIString}(size)
+          names=Vector{ASCIIString}(size)
+          boilTemps=Vector{Float64}(size)
+          molwts=Vector{Float64}(size)
+          casnos=Vector{ASCIIString}(size)
+          for id = 1:size
+            compIds[id]=round(UInt16,id)
+            data=readbinarydatabase(compIds[id],"Compounds",0%UInt8)
+            formulae[id]=copy(data[2])
+            names[id]=copy(data[1])
+            casnos[id]=copy(data[3])
+            molwts[id]=data[4]
+            boilTemps[id]=data[5]
+          end
+          return compIds,formulae,names,boilTemps,molwts,casnos
+        catch
+          throw(ECapeUnknown())
         end
-        return compIds,formulae,names,boilTemps,molwts,casnos
     end
 
     """
-      Returns the values of constant Physical Properties for the specified Compounds.
-      #= [retval][out] =# propvals::Vector{Any}
+      Description
+        Returns the values of constant Physical Properties for the specified Compounds.
+      Arguments
+        [in] props::Vector{ASCIIString},
+        [in] compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
+        [in out] propvals::Vector{Any}
+      Exceptions
+        ECapeThrmPropertyNotAvailable – At least one item in the list of Physical Properties is not available for a particular Compound. This exception is meant to be treated as a warning rather than as an error.
+        ECapeLimitedImpl – One or more Physical Properties are not supported by the component that implements this interface. 
+        This exception should also be raised if any element of the props argument is not recognised.
+        ECapeInvalidArgument – To be used when an invalid argument value is passed, for example, an unrecognised Compound identifier or UNDEFINED for the props argument.
+        ECapeUnknown – The error to be raised when other error(s), specified for the operation, are not suitable.
+      Note
+        The GetConstPropList method can be used in order to check which constant Physical Properties are available.
+        If the number of requested Physical Properties is P and the number of Compounds is C, the propvals array will contain C*P variants. 
+        The first C variants will be the values for the first requested Physical Property (one for each Compound) followed by C values of constants for the second Physical Property, and so on. 
+        If the compIds argument is set to 0%UInt16 this is a request to return property values for all compounds in the component that implements the ICapeThermoCompounds interface with the compound order the same as that returned by the GetCompoundList method.
+        If any Physical Property is not available for one or more Compounds, then "UNDEFINED",Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
     """
-    function getcompoundconstant(
+    function getcompoundconstant!(
         proppackage::PropertyPackage,
-        #= [in] =# props::Vector{ASCIIString},
-        #= [in] =# compIds::Vector{UInt16}) # List of Compound identifiers for which constants are to be retrieved. Set compIds to nothing to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
-        propvals::Vector{Union{ASCIIString,Float64}}
-        propvals=Vector{Union{ASCIIString,Float64}}()     
-        for prop in props
-          for compId in compIds            
-            data=getconstpropdata(proppackage,prop,compId)
-            push!(propvals, calculate(prop,data))
+        props::Vector{ASCIIString},
+        compIds::Vector{UInt16},
+        propvals::Vector{Union{ASCIIString,Float64}})
+        thrownotavailable::Bool=false
+        (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
+        allprops=getconstproplist(proppackage)
+        try
+          for prop in props
+            !(prop in allprops) && throw(ECapeInvalidArgument())
+            for compId in compIds            
+              (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+              data=getconstpropdata(proppackage,prop,compId)
+              propval=calculate(prop,data)
+              push!(propvals, propval)
+              isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
+            end
+          end
+        catch err
+          if isa(err,ECapeThrmPropertyNotAvailable)
+            thrownotavailable=true
+          elseif isa(err,ECapeInvalidArgument)
+            throw(err)
+          elseif isa(err,ECapeLimitedImpl)
+            throw(err)
+          else
+            throw(ECapeUnknown())
           end
         end
-        return propvals
+        thrownotavailable && throw(ECapeThrmPropertyNotAvailable()) 
+        return propvals 
     end
 
     """

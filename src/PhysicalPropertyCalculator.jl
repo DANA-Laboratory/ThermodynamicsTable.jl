@@ -69,6 +69,8 @@ module PhysicalPropertyCalculator
     prop=="standardEntropyGas" && (return floats[4])
     prop=="standardFormationEnthalpyGas" && (return floats[2])
     prop=="standardFormationGibbsEnergyGas" && (return floats[3])
+    
+    throw(ECapeThrmPropertyNotAvailable())
   end
 
   function calculate(d::TempPropData)
