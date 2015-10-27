@@ -1,14 +1,10 @@
-thisfiledirname=dirname(@__FILE__())
-binaryfile=open(thisfiledirname * "/Tables/binary.table","r");
-
 include("ECapeExceptions.jl")
 
 module ThermodynamicsTable
   using ECapeExceptions
-  export readbinarydatabase, gettablesize
   
-  binaryfile=Main.binaryfile
-  thisfiledirname=Main.thisfiledirname
+  thisfiledirname=dirname(@__FILE__())
+  binaryfile=open(thisfiledirname * "/Tables/binary.table","r");  
   
   function getdatamatrix(path::AbstractString)
     global floattables,compondtable
@@ -75,3 +71,4 @@ include("ICapeThermoMaterial.jl")
 include("ICapeThermoPhases.jl")
 include("ICapeThermoPropertyRoutine.jl")
 include("ICapeThermoUniversalConstants.jl")
+using ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions

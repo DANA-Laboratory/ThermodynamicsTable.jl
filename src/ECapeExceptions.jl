@@ -1,5 +1,5 @@
 module ECapeExceptions
-    export ECapeOutOfBounds,ECapeInvalidArgument
+    export ECapeOutOfBounds,ECapeInvalidArgument,ECapeUnknown
     
     type ECapeBoundaries <: Exception end
     type ECapeRoot <: Exception end
