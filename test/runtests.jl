@@ -35,6 +35,7 @@ gettdependentproperty(perryanalytic,tdependentproplist,300.,compIds)
 j=1
 
 for prop in tdependentproplist
+  unc::Float64=ICapeThermoCompounds.unitconvertion(perryanalytic,prop)
   fac=1.1
   if (prop=="idealGasHeatCapacity" || prop=="heatCapacityOfLiquid")
     fac=1e-5;
@@ -55,7 +56,7 @@ for prop in tdependentproplist
           r::Float64
           if(isdefined(temppropdata,:test))
             temppropdata.t=temppropdata.test[i]
-            r=calculate(temppropdata)*fac
+            r=calculate(temppropdata)*fac/unc
             err=abs((r-temppropdata.test[i+1])/r)
             if err>0.01
               if (err>0.1) 

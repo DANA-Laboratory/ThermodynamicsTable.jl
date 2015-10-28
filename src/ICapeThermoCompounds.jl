@@ -169,11 +169,12 @@ module ICapeThermoCompounds
       try
         for prop in props
           !(prop in allprops) && throw(ECapeInvalidArgument())
+          unc::Float64=unitconvertion(proppackage,prop)
           for compId in compIds            
             (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
             data=getconstpropdata(proppackage,prop,compId)
             propval=calculate(prop,data)
-            push!(propvals, propval)
+            push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
         end
@@ -226,14 +227,15 @@ module ICapeThermoCompounds
       (compIds==[0%UInt16]) && compIds=[i for i=1%UInt16:345%UInt16]
       allprops=getpdependentproplist(proppackage)
       try
-        for prop in props
+        for prop in props          
           !(prop in allprops) && throw(ECapeInvalidArgument())
+          unc::Float64=unitconvertion(proppackage,prop)
           for compId in compIds
             (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
             temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
             (pressure<0) && throw(ECapeOutOfBounds())
             propval::Float64=calculate(prop,data,pressure)
-            push!(propvals, propval)
+            push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
       catch err
@@ -290,13 +292,14 @@ module ICapeThermoCompounds
       try
         for prop in props
           !(prop in allprops) && throw(ECapeInvalidArgument())
+          unc::Float64=unitconvertion(proppackage,prop)
           for compId in compIds
             (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
             temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
             (temperature<0 || temperature>6000) && throw(ECapeOutOfBounds())
             temppropdata.t=temperature
             propval::Float64=calculate(prop,data)
-            push!(propvals, propval)
+            push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
       catch err
@@ -352,5 +355,28 @@ module ICapeThermoCompounds
       temppropdata.test=[temppropdata.c[6],NaN,temppropdata.c[8],NaN]
     end
     return temppropdata
+  end
+
+  """
+    Convert from perry units to cape-open standard units, for other properties default value of 1.0 is used
+    6-  criticalDensity =>  mol/m3 mol/dm3 *1E+3
+    7-  criticalPressure =>  Pa MPa *1E6
+    9-  criticalVolume => m3/mol m3/Kmol /1E3
+    15- heatOfVaporizationAtNormalBoilingPoint => J/mol J/kmol /1E3
+    16- idealGasGibbsFreeEnergyOfFormationAt25C => J/mol J/kmol /1E3
+    18- liquidVolumeAt25C => m3/mol dm3/mol /1E3
+    24- standardEntropyGas => J/mol J/Kmol /1E3
+    28- standardFormationEnthalpyGas => J/mol  J/Kmol /1E3
+    31- standardFormationGibbsEnergyGas => J/mol J/Kmol /1E3
+    6-  heatCapacityOfLiquid => J/(mol K) J/(Kmol K) /1E3
+    11- heatOfVaporization => J/mol J/kmol /1E3
+    12- idealGasEnthalpy => J/mol J/Kmol /1E3
+    13- idealGasEntropy =>  J/(mol K) J/(Kmol K) /1E3
+    14- idealGasHeatCapacity =>  J/(mol K) J/(Kmol K) /1E3
+    32- volumeOfLiquid => m3/mol dm3/mol /1E3
+  """
+  function unitconvertion(proppackage::PropertyPackage, prop::ASCIIString)
+    haskey(proppackage.convertions, prop) => return proppackage.convertions[prop]
+    return 1.0
   end
 end

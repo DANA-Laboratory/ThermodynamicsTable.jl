@@ -63,7 +63,7 @@ module PhysicalPropertyCalculator
     prop=="heatOfVaporizationAtNormalBoilingPoint" && (return floats[10])
     prop=="idealGasGibbsFreeEnergyOfFormationAt25C" && (return floats[3])
     prop=="liquidDensityAt25C" && (return floats[10])
-    prop=="liquidVolumeAt25C" && (return floats[10])
+    prop=="liquidVolumeAt25C" && (return 1/floats[10])
     prop=="molecularWeight" && (return floats[1])
     prop=="normalBoilingPoint" && (return floats[5])
     prop=="standardEntropyGas" && (return floats[4])
@@ -131,15 +131,17 @@ module PhysicalPropertyCalculator
       # Viscosities are at either 1 atm or the vapor pressure, whichever is lower. in Pa.
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="volumeOfLiquid")
-      #Liquid dencity 
+      #Liquid dencity
+      ld::Float64
       if (d.eqno==2)
-        return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
+        ld=d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
       end
       if (d.eqno==3) # For water over the entire temperature range of 273.16 to 647.096 K.
         ta=1-(d.t/647.096)
-        return 17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
+        ld=17.863+58.606*ta^0.35 - 95.396*ta^(2/3)+213.89*ta- 141.26*ta^(4/3)
       end
-      return d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
+      ld=d.c[1]/(d.c[2]^(1+(1-d.t/d.c[3])^d.c[4]))  # The others
+      return 1/ld
     end
     throw(ECapeThrmPropertyNotAvailable())
   end

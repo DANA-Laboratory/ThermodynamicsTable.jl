@@ -201,6 +201,7 @@ module CapeOpen
   typealias PropertyMap Dict{ASCIIString,ASCIIString}
   propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
   getdatamatrix=ThermodynamicsTable.getdatamatrix
+  
   """
     Property Package – a software component that is both a Physical Property Calculator and
     an Equilibrium Calculator for Materials containing a specific set of Compounds
@@ -212,13 +213,48 @@ module CapeOpen
     external components used in a Property Package is outside the scope of this CAPEOPEN interface specification.
   """
   type PropertyPackage
+    """
+      Convert from perry units to cape-open standard units, for other properties default value of 1.0 is used
+      6-  criticalDensity =>  mol/m3 mol/dm3 1E+3
+      7-  criticalPressure =>  Pa MPa 1E+6
+      9-  criticalVolume => m3/mol m3/Kmol 1E-3
+      15- heatOfVaporizationAtNormalBoilingPoint => J/mol J/kmol 1E-3
+      16- idealGasGibbsFreeEnergyOfFormationAt25C => J/mol J/kmol 1E-3
+      18- liquidVolumeAt25C => m3/mol dm3/mol 1E-3
+      24- standardEntropyGas => J/mol J/Kmol  1E-3
+      28- standardFormationEnthalpyGas => J/mol  J/Kmol 1E-3
+      31- standardFormationGibbsEnergyGas => J/mol J/Kmol 1E-3
+      6-  heatCapacityOfLiquid => J/(mol K) J/(Kmol K) 1E-3
+      11- heatOfVaporization => J/mol J/kmol 1E-3
+      12- idealGasEnthalpy => J/mol J/Kmol 1E-3
+      13- idealGasEntropy =>  J/(mol K) J/(Kmol K) 1E-3
+      14- idealGasHeatCapacity =>  J/(mol K) J/(Kmol K) 1E-3
+      32- volumeOfLiquid => m3/mol dm3/mol 1E-3
+    """
     function PropertyPackage(constantstrings,t1,constantfloats,t2,tempreturedependents,t3,pressuredependents,t4,propertytable)
       new(
         propmap(constantstrings,t1),
         propmap(constantfloats,t2),
         propmap(tempreturedependents,t3),
         propmap(pressuredependents,t4),
-        propertytable
+        propertytable,
+        Dic(
+          "criticalDensity"                         =>1E+3, #mol/m3 <= mol/dm3 
+          "criticalPressure"                        =>1E+6, #Pa <= MPa
+          "criticalVolume"                          =>1E-3, #m3/mol <= m3/Kmol 
+          "heatOfVaporizationAtNormalBoilingPoint"  =>1E-3, #J/mol <= J/kmol 
+          "idealGasGibbsFreeEnergyOfFormationAt25C" =>1E-3, #J/mol <= J/kmol 
+          "liquidVolumeAt25C"                       =>1E-3, #m3/mol <= dm3/mol 
+          "standardEntropyGas"                      =>1E-3, #J/mol <= J/Kmol /1E3
+          "standardFormationEnthalpyGas"            =>1E-3, #J/mol <=  J/Kmol /1E3
+          "standardFormationGibbsEnergyGas"         =>1E-3, #J/mol <= J/Kmol /1E3
+          "heatCapacityOfLiquid"                    =>1E-3, #J/(mol K) <= J/(Kmol K) /1E3
+          "heatOfVaporization"                      =>1E-3, #J/mol <= J/kmol /1E3
+          "idealGasEnthalpy"                        =>1E-3, #J/mol <= J/Kmol /1E3
+          "idealGasEntropy"                         =>1E-3, #J/(mol K) <= J/(Kmol K) 
+          "idealGasHeatCapacity"                    =>1E-3, #J/(mol K) <= J/(Kmol K) 
+          "volumeOfLiquid"                          =>1E-3 #m3/mol <= dm3/mol
+        )
       )
     end
     constantstrings::PropertyMap
@@ -226,6 +262,7 @@ module CapeOpen
     tempreturedependents::PropertyMap
     pressuredependents::PropertyMap
     propertytable::Vector{ASCIIString}
+    convertions::Dict{ASCIIString,Float64}
   end
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
