@@ -238,7 +238,7 @@ module CapeOpen
         propmap(tempreturedependents,t3),
         propmap(pressuredependents,t4),
         propertytable,
-        Dic(
+        Dict(
           "criticalDensity"                         =>1E+3, #mol/m3 <= mol/dm3 
           "criticalPressure"                        =>1E+6, #Pa <= MPa
           "criticalVolume"                          =>1E-3, #m3/mol <= m3/Kmol 
