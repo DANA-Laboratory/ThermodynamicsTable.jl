@@ -4,10 +4,10 @@
 
 ## Introduction
 
-`ThermodynamicsTable` calculates different physical properties of materials, the 0.0.8 version, returns 14 constants, 
+`ThermodynamicsTable` calculates different physical properties of materials, in 0.0.8 version, it can retrieves 14 constants and computes 
 11 temperature dependent and 1 pressure dependent properties for a set of 345 componds.  
-Main reference for the quantities are Perry chemical engineering handbook ed.8,
-but some values have been updated from other sources (e.g. YAWS) for more precision or integrity and some typical typo errors have been corrected.  
+Main reference for the quantities are *Perry chemical engineering handbook ed.8*,
+but some values have been updated using data from sources (e.g. YAWS) for more precision or integrity and also some typical typo errors have been corrected.  
 Since 0.0.8 version this package was fully reviewed for the aim of achieving a similar interface to CAPE-Open Themo 1.1 standard in the case of naming, definitions and behaviours. 
 
 ## Usage
