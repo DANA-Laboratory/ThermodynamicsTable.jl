@@ -3,8 +3,6 @@ using ThermodynamicsTable,ICapeThermoUniversalConstants,ICapeThermoCompounds,ECa
 import CapeOpen: MaterialObject, PropertyPackage
 import ICapeThermoCompounds.TempPropData
 
-perryanalytic = CapeOpen.perryanalytic
-
 #ICapeThermoUniversalConstants
 universalconstantlist=getuniversalconstantlist()
 println("universalconstantlist=",universalconstantlist)
@@ -12,30 +10,30 @@ println("universalconstantlist=",universalconstantlist)
 @test getuniversalconstant("avogadroConstant") == 6.0221419947e23
 
 #ICapeThermoCompounds
-constproplist=getconstproplist(perryanalytic)
+constproplist=getconstproplist()
 @test length(constproplist) == 17
 println("constproplist=",constproplist)
 
-tdependentproplist=gettdependentproplist(perryanalytic)
+tdependentproplist=gettdependentproplist()
 @test length(tdependentproplist) == 11
 println("tdependentproplist=",tdependentproplist)
 
-pdependentproplist=getpdependentproplist(perryanalytic)
+pdependentproplist=getpdependentproplist()
 @test length(pdependentproplist) == 0
 
-@test getnumcompounds(perryanalytic) == 345
+@test getnumcompounds() == 345
 
-compIds,formulae,names,boilTemps,molwts,casnos = getcompoundlist(perryanalytic)
+compIds,formulae,names,boilTemps,molwts,casnos = getcompoundlist()
 
 allconstants = propvals::Vector{Union{ASCIIString,Float64}}()
-getcompoundconstant!(perryanalytic,constproplist,compIds,allconstants)
+getcompoundconstant!(constproplist,compIds,allconstants)
 @test length(allconstants) == length(constproplist)*length(compIds)
 
-gettdependentproperty(perryanalytic,tdependentproplist,300.,compIds)
+gettdependentproperty(tdependentproplist,300.,compIds)
 j=1
 
 for prop in tdependentproplist
-  unc::Float64=ICapeThermoCompounds.unitconvertion(perryanalytic,prop)
+  unc::Float64=ICapeThermoCompounds.unitconvertion(prop)
   fac=1.1
   if (prop=="idealGasHeatCapacity" || prop=="heatCapacityOfLiquid")
     fac=1e-5;
@@ -46,7 +44,7 @@ for prop in tdependentproplist
     for (rowdata=0%UInt8:maxrow)
       temppropdata=nothing
       try
-        temppropdata=TempPropData(perryanalytic,prop,compId,rowdata)
+        temppropdata=TempPropData(prop,compId,rowdata)
       catch err
         break
       end
