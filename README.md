@@ -22,7 +22,7 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
     Description:    
       Methods implemented by components that can supply the values of Universal Constants.  
 
-    Units:    
+    Units:
       * avogadroConstant => 1/mol
       * boltzmannConstant => J/K
       * idealGasStateReferencePressure => Pa
@@ -30,14 +30,14 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
       * speedOfLightInVacuum => m/s
       * standardAccelerationOfGravity => m/s2  
       
-    Methods:    
+    Methods:
       * getuniversalconstant()
       * getuniversalconstantlist()
   2. ICapeThermoCompounds   
     Description:    
       Methods implemented by components that need to describe the Compounds that occur or can occur in a Material.    
 
-    Methods:    
+    Methods:
       * getcompoundlist()
       * getcompoundconstant!()
       * getconstproplist()
