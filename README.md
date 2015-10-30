@@ -18,7 +18,7 @@ julia> using ThermodynamicsTable
 `perryanalytic` Property Package was created and is ready to use.
 ```
 Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be used to interact with the system.  
-  1. ICapeThermoUniversalConstants
+  1. ICapeThermoUniversalConstants    
     Description:
       Methods implemented by components that can supply the values of Universal Constants.
     Units:
