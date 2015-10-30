@@ -4,7 +4,7 @@
 
 ## Introduction
 
-`ThermodynamicsTable` calculates different physical properties of materials, in 0.0.8 version, it can retrieves 14 constants and computes 
+`ThermodynamicsTable` calculates different physical properties of materials, in 0.0.8 version, it can retrieves 17 constants and computes 
 11 temperature dependent and 1 pressure dependent property for a set of 345 componds.  
 Main reference for the quantities are *Perry chemical engineering handbook ed.8*,
 but some values have been updated using data from other sources (e.g. YAWS) for more precision or integrity and also some typical typo errors have been corrected.  
@@ -46,3 +46,30 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
       * getpdependentproplist()
       * gettdependentproperty()
       * gettdependentproplist()
+
+```
+julia> getnumcompounds() # => 345
+julia> compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
+julia> waterid=findfirst(names,"Water") # => 342
+julia> println("formulae=$(formulae[waterid]) boilTemps=$(boilTemps[waterid]) molwts=$(molwts[waterid]) casnos=$(casnos[waterid])")
+formulae=H2O boilTemps=373.1678389916408 molwts=18.015 casnos=7732-18-5
+julia> getconstproplist()
+  17-element Array{ASCIIString,1}:
+   "iupacName"
+   "casRegistryNumber"
+   "chemicalFormula"
+   "standardFormationGibbsEnergyGas"
+   "criticalTemperature"
+   "standardEntropyGas"
+   "criticalVolume"
+   "idealGasGibbsFreeEnergyOfFormationAt25C"
+   "molecularWeight"
+   "criticalPressure"
+   "liquidVolumeAt25C"
+   "criticalCompressibilityFactor"
+   "standardFormationEnthalpyGas"
+   "criticalDensity"
+   "normalBoilingPoint"
+   "liquidDensityAt25C"
+   "heatOfVaporizationAtNormalBoilingPoint"
+```

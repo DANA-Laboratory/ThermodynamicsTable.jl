@@ -1,5 +1,4 @@
 module CapeOpen
-  using ThermodynamicsTable
   export constantstrings, constantfloats, tempreturedependents, pressuredependents
   export MaterialObject, PropertyPackage, PhysicalPropertyCalculator
 
@@ -200,7 +199,6 @@ module CapeOpen
 
   typealias PropertyMap Dict{ASCIIString,ASCIIString}
   propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
-  getdatamatrix=ThermodynamicsTable.getdatamatrix
   
   """
     Property Package – a software component that is both a Physical Property Calculator and
@@ -254,7 +252,22 @@ module CapeOpen
           "idealGasEntropy"                         =>1E-3, #J/(mol K) <= J/(Kmol K) 
           "idealGasHeatCapacity"                    =>1E-3, #J/(mol K) <= J/(Kmol K) 
           "volumeOfLiquid"                          =>1E-3 #m3/mol <= dm3/mol
-        )
+        ),
+        Dict{ASCIIString, Array}(
+          "Criticals"=>       Any[[0,345,50], Vector{Float64}(6)],
+          "LiquidsDensities"=>Any[[17250,347,83], Vector{Float64}(10), 0%UInt8],
+          "FormationEnergy"=> Any[[17250+28801,345,42], Vector{Float64}(5)],
+          "Compounds"=>       Any[[17250+28801+14490,345,67], Vector{UInt8}(29), Vector{UInt8}(9), Vector{UInt8}(11), 0.0, 0.0],
+          "Cp"=>              Any[[17250+28801+14490+23115,402,83], Vector{Float64}(10), 0%UInt8],
+          "LiquidsCp"=>       Any[[17250+28801+14490+23115+33366,348,83], Vector{Float64}(10), 0%UInt8],
+          "VaporizHeat"=>     Any[[17250+28801+14490+23115+33366+28884,345,82], Vector{Float64}(10)],
+          "LiquidThermal"=>   Any[[17250+28801+14490+23115+33366+28884+28290,345,82], Vector{Float64}(10)],
+          "VaporPressure"=>   Any[[17250+28801+14490+23115+33366+28884+2*28290,345,82], Vector{Float64}(10)],
+          "LiquidViscos"=>    Any[[17250+28801+14490+23115+33366+28884+3*28290,345,82], Vector{Float64}(10)],
+          "VaporThermal"=>    Any[[17250+28801+14490+23115+33366+28884+4*28290,345,74], Vector{Float64}(9)],
+          "VaporViscos"=>     Any[[17250+28801+14490+23115+33366+28884+4*28290+25530,345,74], Vector{Float64}(9)]
+        ),
+        "binary.table"
       )
     end
     constantstrings::PropertyMap
@@ -263,6 +276,8 @@ module CapeOpen
     pressuredependents::PropertyMap
     propertytable::Vector{ASCIIString}
     convertions::Dict{ASCIIString,Float64}
+    tableaddreses::Dict{ASCIIString, Array}
+    datafilename::ASCIIString
   end
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),

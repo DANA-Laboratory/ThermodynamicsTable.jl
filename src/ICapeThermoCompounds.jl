@@ -17,9 +17,9 @@
 module ICapeThermoCompounds
     export getconstproplist,gettdependentproplist,getpdependentproplist,getnumcompounds,getcompoundlist
     export getcompoundconstant!,getpdependentproperty!,gettdependentproperty!
-    using ThermodynamicsTable,PhysicalPropertyCalculator,ECapeExceptions
-    using CapeOpen
+    using PhysicalPropertyCalculator,ECapeExceptions,CapeOpen
     import PhysicalPropertyCalculator.TempPropData
+    import ThermodynamicsTable.readbinarydatabase
     spp=CapeOpen.perryanalytic
     """
       Description
@@ -34,7 +34,7 @@ module ICapeThermoCompounds
     """
     function getconstproplist(
         proppackage::PropertyPackage=spp)
-        props::Vector{ASCIIString}
+        props::Vector{ASCIIString}=Vector{ASCIIString}()
         try
           props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
           return props
@@ -102,7 +102,7 @@ module ICapeThermoCompounds
     function getnumcompounds(
       proppackage::PropertyPackage=spp)
       try
-        return  gettablesize("Compounds")
+        return  spp.tableaddreses["Compounds"][1][2]
       catch
         throw(ECapeUnknown())
       end
@@ -130,7 +130,7 @@ module ICapeThermoCompounds
     function getcompoundlist(
       proppackage::PropertyPackage=spp)
       try
-        size=gettablesize("Compounds")        
+        size=spp.tableaddreses["Compounds"][1][2]    
         compIds=Vector{UInt16}(size)
         formulae=Vector{ASCIIString}(size)
         names=Vector{ASCIIString}(size)
@@ -138,16 +138,17 @@ module ICapeThermoCompounds
         molwts=Vector{Float64}(size)
         casnos=Vector{ASCIIString}(size)
         for id = 1:size
-          compIds[id]=round(UInt16,id)
+          compIds[id]=id%UInt16
           data=readbinarydatabase(compIds[id],"Compounds",0%UInt8)
-          formulae[id]=copy(data[2])
-          names[id]=copy(data[1])
-          casnos[id]=copy(data[3])
+          formulae[id]=copy(rstrip(ASCIIString(data[2])))
+          names[id]=copy(rstrip(ASCIIString(data[1])))
+          casnos[id]=copy(rstrip(ASCIIString(data[3])))
           molwts[id]=data[4]
           boilTemps[id]=data[5]
         end
         return compIds,formulae,names,boilTemps,molwts,casnos
       catch err
+        throw(err)
         throw(ECapeUnknown())
       end
     end
