@@ -20,26 +20,26 @@ julia> using ThermodynamicsTable
 Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be used to interact with the system.  
   1. ICapeThermoUniversalConstants    
     Description:    
-      Methods implemented by components that can supply the values of Universal Constants.    
+      Methods implemented by components that can supply the values of Universal Constants. 
     Units:    
->     avogadroConstant => 1/mol
-      boltzmannConstant => J/K
-      idealGasStateReferencePressure => Pa
-      molarGasConstant => J/mol/K
-      speedOfLightInVacuum => m/s
-      standardAccelerationOfGravity => m/s2
+      * avogadroConstant => 1/mol
+      * boltzmannConstant => J/K
+      * idealGasStateReferencePressure => Pa
+      * molarGasConstant => J/mol/K
+      * speedOfLightInVacuum => m/s
+      * standardAccelerationOfGravity => m/s2  
     Methods:    
->     getuniversalconstant()
-      getuniversalconstantlist()
+      * getuniversalconstant()
+      * getuniversalconstantlist()
   2. ICapeThermoCompounds
     Description:    
       Methods implemented by components that need to describe the Compounds that occur or can occur in a Material.    
     Methods:    
->     getcompoundlist()
-      getcompoundconstant!()
-      getconstproplist()
-      getnumcompounds()
-      getpdependentproperty()
-      getpdependentproplist()
-      gettdependentproperty()
-      gettdependentproplist()
+      * getcompoundlist()
+      * getcompoundconstant!()
+      * getconstproplist()
+      * getnumcompounds()
+      * getpdependentproperty()
+      * getpdependentproplist()
+      * gettdependentproperty()
+      * gettdependentproplist()
