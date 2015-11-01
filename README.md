@@ -72,4 +72,7 @@ julia> getconstproplist()
    "normalBoilingPoint"
    "liquidDensityAt25C"
    "heatOfVaporizationAtNormalBoilingPoint"
+julia> comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
+julia> propvals=Vector{Union{ASCIIString,Float64}}();
+julia> getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
 ```
