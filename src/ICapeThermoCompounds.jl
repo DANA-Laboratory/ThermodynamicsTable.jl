@@ -256,7 +256,7 @@ module ICapeThermoCompounds
             (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
             temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
             (pressure<0) && throw(ECapeOutOfBounds())
-            propval::Float64=calculate(prop,data,pressure)
+            propval::Float64=calculate(temppropdata,pressure)
             push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
@@ -272,7 +272,6 @@ module ICapeThermoCompounds
         elseif isa(err,ECapeLimitedImpl)
           throw(err)
         else
-          throw(err)
           throw(ECapeUnknown())
         end
       end
@@ -325,7 +324,7 @@ module ICapeThermoCompounds
             temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
             (temperature<0 || temperature>6000) && throw(ECapeOutOfBounds())
             temppropdata.t=temperature
-            propval::Float64=calculate(prop,data)
+            propval::Float64=calculate(temppropdata)
             push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
           end
@@ -364,10 +363,10 @@ module ICapeThermoCompounds
   function TempPropData(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16, skipdata::UInt8=0%UInt8)
     table::ASCIIString
     floatdata::Vector{Float64}
-    temppropdata::TempPropData
-    if (prop in proppackage.tempreturedependents)
+    temppropdata::TempPropData   
+    if (haskey(proppackage.tempreturedependents,prop))
       table=proppackage.tempreturedependents[prop]
-    elseif (prop in proppackage.pressuredependents)
+    elseif (haskey(proppackage.pressuredependents,prop))
       table=proppackage.pressuredependents[prop]
     else
       throw(ECapeInvalidArgument())
@@ -381,7 +380,7 @@ module ICapeThermoCompounds
     if (prop in ["heatCapacityOfLiquid","heatOfVaporization"])
       temppropdata.tc=calculate(prop,getconstpropdata(proppackage,"criticalTemperature",compId))
     end
-    if (prop in ["heatCapacityOfLiquid","heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","viscosityOfLiquid"])
+    if (prop in ["heatCapacityOfLiquid","heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","boilingPointTemperature","viscosityOfLiquid"])
       temppropdata.test=temppropdata.c[6:9]
     elseif (prop in ["thermalConductivityOfVapor","viscosityOfVapor","volumeOfLiquid"])
       temppropdata.test=temppropdata.c[5:8]

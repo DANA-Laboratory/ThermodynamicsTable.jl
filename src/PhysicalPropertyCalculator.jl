@@ -10,7 +10,7 @@
 """
 module PhysicalPropertyCalculator
 
-  using ECapeExceptions
+  using Roots,ECapeExceptions
   export TempPropData, calculate
 
   type TempPropData
@@ -149,7 +149,7 @@ module PhysicalPropertyCalculator
   function calculate(d::TempPropData, p::Float64)
     (p<d.test[2] || p>d.test[4]) && throw(ECapeOutOfBounds())
     if (d.prop=="boilingPointTemperature")
-      bp=fzeros(t->vp(d.c,p,t),d.test[2],d.test[4])
+      bp=fzeros(t->vp(d.c,p,t),d.test[1],d.test[3])
       (length(bp)==1) && return bp[1]
     end
     throw(ECapeThrmPropertyNotAvailable())

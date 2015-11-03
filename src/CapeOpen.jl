@@ -289,7 +289,7 @@ module CapeOpen
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
     ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
     ["boilingPointTemperature"],
-    getindex(pressuredependents,[1]),                  
+    ["VaporPressure"],                  
     ASCIIString[                
       "Compounds"        ,
       "VaporPressure"    ,
