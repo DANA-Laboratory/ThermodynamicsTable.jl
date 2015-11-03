@@ -8,9 +8,9 @@
     getcompoundconstant!()
     getconstproplist()
     getnumcompounds()
-    getpdependentproperty()
+    getpdependentproperty!()
     getpdependentproplist()
-    gettdependentproperty()
+    gettdependentproperty!()
     gettdependentproplist()
 
 """
@@ -34,7 +34,7 @@ module ICapeThermoCompounds
     """
     function getconstproplist(
         proppackage::PropertyPackage=spp)
-        props::Vector{ASCIIString}=Vector{ASCIIString}()
+        props=Vector{ASCIIString}()
         try
           props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
           return props
@@ -56,7 +56,7 @@ module ICapeThermoCompounds
     """
     function gettdependentproplist(
       proppackage::PropertyPackage=spp)
-      props::Vector{ASCIIString}
+      props=Vector{ASCIIString}()
       try
         props = [keys(proppackage.tempreturedependents)...]
         return props
@@ -78,7 +78,7 @@ module ICapeThermoCompounds
     """
     function getpdependentproplist(
       proppackage::PropertyPackage=spp)
-      props::Vector{ASCIIString}
+      props=Vector{ASCIIString}()
       try
         props = [keys(proppackage.pressuredependents)...]
         return props
@@ -242,7 +242,7 @@ module ICapeThermoCompounds
     function getpdependentproperty!(
       props::Vector{ASCIIString},
       pressure::Float64,
-      compIds::Vector{Float64},
+      compIds::Vector{UInt16},
       propvals::Vector{Float64},
       proppackage::PropertyPackage=spp)
       thrownotavailable::Bool=false
@@ -272,6 +272,7 @@ module ICapeThermoCompounds
         elseif isa(err,ECapeLimitedImpl)
           throw(err)
         else
+          throw(err)
           throw(ECapeUnknown())
         end
       end
@@ -364,14 +365,20 @@ module ICapeThermoCompounds
     table::ASCIIString
     floatdata::Vector{Float64}
     temppropdata::TempPropData
-    table=proppackage.tempreturedependents[prop]
+    if (prop in proppackage.tempreturedependents)
+      table=proppackage.tempreturedependents[prop]
+    elseif (prop in proppackage.pressuredependents)
+      table=proppackage.pressuredependents[prop]
+    else
+      throw(ECapeInvalidArgument())
+    end
     data=readbinarydatabase(compId,table,skipdata)
     floatdata=data[1]
     temppropdata=TempPropData(prop,floatdata[2:end],compId,floatdata[1])
     if (prop in["idealGasEntropy","idealGasEnthalpy","volumeOfLiquid","heatCapacityOfLiquid","idealGasHeatCapacity"])
       temppropdata.eqno=data[2]
     end
-    if (prop in["heatCapacityOfLiquid","heatOfVaporization"])
+    if (prop in ["heatCapacityOfLiquid","heatOfVaporization"])
       temppropdata.tc=calculate(prop,getconstpropdata(proppackage,"criticalTemperature",compId))
     end
     if (prop in ["heatCapacityOfLiquid","heatOfVaporization","idealGasHeatCapacity","thermalConductivityOfLiquid","vaporPressure","viscosityOfLiquid"])

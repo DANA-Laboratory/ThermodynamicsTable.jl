@@ -7,8 +7,8 @@ compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
 comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
 propvals=Vector{Union{ASCIIString,Float64}}();
 @test_throws ECapeThrmPropertyNotAvailable getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
-@show comps
-@show propvals
+propvals=Vector{Float64}()
+getpdependentproperty!(["boilingPointTemperature"],80000.,comps,propvals)
 #=
   #ICapeThermoUniversalConstants
   universalconstantlist=getuniversalconstantlist()

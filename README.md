@@ -42,37 +42,49 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
       * getcompoundconstant!()
       * getconstproplist()
       * getnumcompounds()
-      * getpdependentproperty()
+      * getpdependentproperty!()
       * getpdependentproplist()
-      * gettdependentproperty()
+      * gettdependentproperty!()
       * gettdependentproplist()
 
 ```
-julia> getnumcompounds() # => 345
-julia> compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
-julia> waterid=findfirst(names,"Water") # => 342
-julia> println("formulae=$(formulae[waterid]) boilTemps=$(boilTemps[waterid]) molwts=$(molwts[waterid]) casnos=$(casnos[waterid])")
-formulae=H2O boilTemps=373.1678389916408 molwts=18.015 casnos=7732-18-5
-julia> getconstproplist()
-  17-element Array{ASCIIString,1}:
-   "iupacName"
-   "casRegistryNumber"
-   "chemicalFormula"
-   "standardFormationGibbsEnergyGas"
-   "criticalTemperature"
-   "standardEntropyGas"
-   "criticalVolume"
-   "idealGasGibbsFreeEnergyOfFormationAt25C"
-   "molecularWeight"
-   "criticalPressure"
-   "liquidVolumeAt25C"
-   "criticalCompressibilityFactor"
-   "standardFormationEnthalpyGas"
-   "criticalDensity"
-   "normalBoilingPoint"
-   "liquidDensityAt25C"
-   "heatOfVaporizationAtNormalBoilingPoint"
-julia> comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
-julia> propvals=Vector{Union{ASCIIString,Float64}}();
-julia> getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
+  using ThermodynamicsTable
+  getnumcompounds() # => 345
+  compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
+  waterid=findfirst(names,"Water") # => 342
+  println("formulae=$(formulae[waterid]) boilTemps=$(boilTemps[waterid]) molwts=$(molwts[waterid]) casnos=$(casnos[waterid])")
+# => formulae=H2O boilTemps=373.1678389916408 molwts=18.015 casnos=7732-18-5
+  getconstproplist()
+#=  
+    17-element Array{ASCIIString,1}:
+     "iupacName"
+     "casRegistryNumber"
+     "chemicalFormula"
+     "standardFormationGibbsEnergyGas"
+     "criticalTemperature"
+     "standardEntropyGas"
+     "criticalVolume"
+     "idealGasGibbsFreeEnergyOfFormationAt25C"
+     "molecularWeight"
+     "criticalPressure"
+     "liquidVolumeAt25C"
+     "criticalCompressibilityFactor"
+     "standardFormationEnthalpyGas"
+     "criticalDensity"
+     "normalBoilingPoint"
+     "liquidDensityAt25C"
+     "heatOfVaporizationAtNormalBoilingPoint"
+=#
+  comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
+  propvals=Vector{Union{ASCIIString,Float64}}();
+  try
+    getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
+  catch err
+    if isa(err,ECapeThrmPropertyNotAvailable)
+      println("check $propvals for UNDEFIEND values")
+    end
+  end
+  getpdependentproplist() # => "boilingPointTemperature"
+  propvals=Vector{Float64}()
+  getpdependentproperty!(["boilingPointTemperature"],80000.,comps,propvals)
 ```
