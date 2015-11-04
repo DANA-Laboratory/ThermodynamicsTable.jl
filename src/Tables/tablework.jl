@@ -397,3 +397,53 @@ function heatofvaporizationatnp()
   end
   close(file)
 end
+
+function testperrydata()
+  tdependentproplist=gettdependentproplist()
+  compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
+  j=1
+  for prop in tdependentproplist
+    unc::Float64=ICapeThermoCompounds.unitconvertion(prop)
+    fac=1.1
+    if (prop=="idealGasHeatCapacity" || prop=="heatCapacityOfLiquid")
+      fac=1e-5;
+    end
+    maxrow=0%UInt8
+    (prop in ["idealGasHeatCapacity", "volumeOfLiquid", "heatCapacityOfLiquid"]) && (maxrow=1%UInt8)
+    for compId in compIds
+      for (rowdata=0%UInt8:maxrow)
+        temppropdata=nothing
+        try
+          temppropdata=TempPropData(prop,compId,rowdata)
+        catch err
+          break
+        end
+        rowdata==1%UInt8 && println(" ************ $compId ************ $prop ************ ")
+        for i in [1,3]
+          try
+            r::Float64
+            if(isdefined(temppropdata,:test))
+              temppropdata.t=temppropdata.test[i]
+              r=calculate(temppropdata)*fac/unc
+              err=abs((r-temppropdata.test[i+1])/r)
+              if err>0.01
+                if (err>0.1) 
+                  println("$j EEEEEERRRRRRRRRRRORRRRRRRRRRRRRR")
+                  println("$r!=$(temppropdata.test[i+1]), $err")
+                  dump(temppropdata)
+                  j+=1
+                end
+              end
+            end
+          catch err
+            if isa(err,ECapeOutOfBounds)
+              NaN
+            else
+              throw(err)
+            end
+          end
+        end
+      end
+    end
+  end
+end

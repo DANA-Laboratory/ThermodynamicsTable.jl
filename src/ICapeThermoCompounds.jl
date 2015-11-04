@@ -185,27 +185,27 @@ module ICapeThermoCompounds
       thrownotavailable::Bool=false
       (compIds==[0%UInt16]) && (compIds=[i for i=1%UInt16:345%UInt16])
       allprops=getconstproplist(proppackage)
-      try
-        for prop in props
-          !(prop in allprops) && throw(ECapeInvalidArgument())
-          unc::Float64=unitconvertion(proppackage,prop)
-          for compId in compIds
+      for prop in props
+        !(prop in allprops) && throw(ECapeInvalidArgument())
+        unc::Float64=unitconvertion(proppackage,prop)
+        for compId in compIds
             (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+          try
             data=getconstpropdata(proppackage,prop,compId)
             propval=calculate(prop,data)
             push!(propvals, isa(propval,ASCIIString) ? copy(rstrip(propval)) : (propval*unc))
             isundefied(propval) && throw(ECapeThrmPropertyNotAvailable())
+          catch err
+            if isa(err,ECapeThrmPropertyNotAvailable)
+              thrownotavailable=true
+            elseif isa(err,ECapeInvalidArgument)
+              throw(err)
+            elseif isa(err,ECapeLimitedImpl)
+              throw(err)
+            else
+              throw(ECapeUnknown())
+            end
           end
-        end
-      catch err
-        if isa(err,ECapeThrmPropertyNotAvailable)
-          thrownotavailable=true
-        elseif isa(err,ECapeInvalidArgument)
-          throw(err)
-        elseif isa(err,ECapeLimitedImpl)
-          throw(err)
-        else
-          throw(ECapeUnknown())
         end
       end
       thrownotavailable && throw(ECapeThrmPropertyNotAvailable())
@@ -311,36 +311,36 @@ module ICapeThermoCompounds
       temperature::Float64,
       compIds::Vector{UInt16},
       propvals::Vector{Float64},
-      proppackage::PropertyPackage)
+      proppackage::PropertyPackage=spp)
       thrownotavailable::Bool=false
       (compIds==[0%UInt16]) && (compIds=[i for i=1%UInt16:345%UInt16])
       allprops=gettdependentproplist(proppackage)
-      try
-        for prop in props
-          !(prop in allprops) && throw(ECapeInvalidArgument())
-          unc::Float64=unitconvertion(proppackage,prop)
-          for compId in compIds
-            (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+      for prop in props
+        !(prop in allprops) && throw(ECapeInvalidArgument())
+        unc::Float64=unitconvertion(proppackage,prop)
+        for compId in compIds
+          (compId>345%UInt16 || compId==0%UInt16) && throw(ECapeInvalidArgument())
+          try
             temppropdata::TempPropData=TempPropData(proppackage,prop,compId)
             (temperature<0 || temperature>6000) && throw(ECapeOutOfBounds())
             temppropdata.t=temperature
             propval::Float64=calculate(temppropdata)
             push!(propvals, propval*unc)
             isnan(propval) && throw(ECapeThrmPropertyNotAvailable())
+          catch err
+            if isa(err,ECapeThrmPropertyNotAvailable)
+              thrownotavailable=true
+            elseif isa(err,ECapeOutOfBounds)
+              thrownotavailable=true
+              push!(propvals, NaN)
+            elseif isa(err,ECapeInvalidArgument)
+              throw(err)
+            elseif isa(err,ECapeLimitedImpl)
+              throw(err)
+            else
+              throw(ECapeUnknown())
+            end
           end
-        end
-      catch err
-        if isa(err,ECapeThrmPropertyNotAvailable)
-          thrownotavailable=true
-        elseif isa(err,ECapeOutOfBounds)
-          thrownotavailable=true
-          push!(propvals, NaN)
-        elseif isa(err,ECapeInvalidArgument)
-          throw(err)
-        elseif isa(err,ECapeLimitedImpl)
-          throw(err)
-        else
-          throw(ECapeUnknown())
         end
       end
       thrownotavailable && throw(ECapeThrmPropertyNotAvailable())
