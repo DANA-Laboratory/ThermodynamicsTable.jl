@@ -4,7 +4,7 @@
 
 ## Introduction
 
-`ThermodynamicsTable` calculates different physical properties of materials, in 0.0.8 version, it can retrieves 17 constants and computes
+`ThermodynamicsTable` calculates different physical properties of materials, in 0.0.4 version, it can retrieves 17 constants and computes
 11 temperature dependent and 1 pressure dependent property for a set of 345 compounds.  
 Main reference for the quantities are *Perry chemical engineering handbook ed.8*,
 but some values have been updated using data from other sources (e.g. YAWS) for more precision or integrity and also some typical typo errors have been corrected.  
