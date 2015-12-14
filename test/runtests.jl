@@ -2,6 +2,7 @@ using Base.Test
 using ThermodynamicsTable,ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions,PhysicalPropertyCalculator
 import CapeOpen: MaterialObject, PropertyPackage
 import ICapeThermoCompounds.TempPropData
+using CoolProp
 
 #ICapeThermoUniversalConstants
 universalconstantlist=getuniversalconstantlist()
@@ -30,3 +31,6 @@ propvals=Vector{Float64}()
 getpdependentproperty!(["boilingPointTemperature"],80000.,comps,propvals)
 propvals=Vector{Float64}()
 @test_throws ECapeThrmPropertyNotAvailable gettdependentproperty!(tdependentproplist,300.,compIds,propvals)
+
+#CoolProp
+@test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
