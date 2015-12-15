@@ -58,3 +58,4 @@ using ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions
 perryanalytic = CapeOpen.perryanalytic
 println("`perryanalytic` Property Package was created and is ready to use.")
 include("CoolProp.jl")
+include("FreeSteam.jl")

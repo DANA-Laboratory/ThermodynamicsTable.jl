@@ -3,6 +3,7 @@ using ThermodynamicsTable,ICapeThermoUniversalConstants,ICapeThermoCompounds,ECa
 import CapeOpen: MaterialObject, PropertyPackage
 import ICapeThermoCompounds.TempPropData
 using CoolProp
+using FreeSteam
 
 #ICapeThermoUniversalConstants
 universalconstantlist=getuniversalconstantlist()
@@ -34,3 +35,14 @@ propvals=Vector{Float64}()
 
 #CoolProp
 @test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
+
+T = 400. # in Kelvin! 
+p = 1e5  # 1 bar
+ss = freesteam_set_pT(p, T) 
+s = freesteam_s(ss);
+@test_approx_eq 7502.40089208754 s # J/kgK
+ss2 = freesteam_set_ps(p*10, s)
+T2 = freesteam_T(ss2)
+@test_approx_eq 684.5051229099 T2
+p2 = freesteam_p(ss2)
+@test_approx_eq 7502.40089208754 freesteam_s(ss2) # J/kgK
