@@ -1,6 +1,5 @@
 # Download latest binary shared library of CoolProp project
 import JSON
-
 const destpathbase = abspath(joinpath(@__FILE__,"..","..","lib"));
 const OS_ARCH_CoolProp = (WORD_SIZE == 64) ? "64bit" : "32bit__cdecl";
 const OS_ARCH_FreeSteam = (WORD_SIZE == 64) ? "win64" : "win32";
@@ -34,4 +33,14 @@ end
     urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/$latestVersion_FreeSteam/linux/"
     download(joinpath(urlbase,"libfreesteam.so.1.0"),joinpath(destpathbase,"libfreesteam.so"))
     println("downloaded => lib/libfreesteam.so")
+end
+@linux_only begin
+  using BinDeps
+  @BinDeps.setup
+  libgsl = library_dependency("libgsl")
+  provides(AptGet, Dict(
+      "libgsl0ldbl" => libgsl
+  ))
+  provides(Yum,"gsl",[libgsl])
+  @BinDeps.install
 end
