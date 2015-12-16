@@ -36,6 +36,12 @@ propvals=Vector{Float64}()
 #CoolProp
 @test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
 
+#freesteam
+
+libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
+gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"))
+gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"))
+
 T = 400. # in Kelvin! 
 p = 1e5  # 1 bar
 ss = freesteam_set_pT(p, T) 
@@ -46,3 +52,6 @@ T2 = freesteam_T(ss2)
 @test_approx_eq 684.5051229099 T2
 p2 = freesteam_p(ss2)
 @test_approx_eq 7502.40089208754 freesteam_s(ss2) # J/kgK
+
+Libdl.dlclose(gsl)
+Libdl.dlclose(gslcblas)
