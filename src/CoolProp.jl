@@ -5,7 +5,7 @@ module CoolProp
 export F2K, K2F, HAPropsSI, PropsSI, PhaseSI, get_global_param_string, get_param_index, get_input_pair_index, AbstractState_factory, AbstractState_free, AbstractState_set_fractions, AbstractState_update, AbstractState_keyed_output
 
 @windows_only const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","CoolProp.dll"));
-@linux_only const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","CoolProp.so"));
+@linux_only const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","libCoolProp.so"));
 
 errcode = Ref{Clong}(0)
 
@@ -13,15 +13,15 @@ const buffer_length = 255
 message_buffer = Array(UInt8, buffer_length)
 
 function F2K(TF::Number)
-  return ccall( (:F2K, CoolPropLib), Float64, (Float64,), TF)
+  return ccall( (:F2K, CoolPropLib), Cdouble, (Cdouble,), TF)
 end
 
 function K2F(TK::Number)
-  return ccall( (:K2F, CoolPropLib), Float64, (Float64,), TK)
+  return ccall( (:K2F, CoolPropLib), Cdouble, (Cdouble,), TK)
 end
 
 function HAPropsSI(Output::AbstractString, Name1::AbstractString, Value1::Number, Name2::AbstractString, Value2::Number, Name3::AbstractString, Value3::Number)
-  val = ccall( (:HAPropsSI, CoolPropLib), Float64, (Ptr{UInt8},Ptr{UInt8},Float64,Ptr{UInt8},Float64,Ptr{UInt8},Float64), Output,Name1,Value1,Name2,Value2,Name3,Value3)
+  val = ccall( (:HAPropsSI, CoolPropLib), Cdouble, (Ptr{UInt8},Ptr{UInt8},Float64,Ptr{UInt8},Float64,Ptr{UInt8},Float64), Output,Name1,Value1,Name2,Value2,Name3,Value3)
   if val == Inf
     error("CoolProp: ", get_global_param_string("errstring"))
   end
@@ -29,7 +29,7 @@ function HAPropsSI(Output::AbstractString, Name1::AbstractString, Value1::Number
 end
 
 function PropsSI(Output::AbstractString, Name1::AbstractString, Value1::Number, Name2::AbstractString, Value2::Number, Fluid::AbstractString)
-  val = ccall( (:PropsSI, CoolPropLib), Float64, (Ptr{UInt8},Ptr{UInt8},Float64,Ptr{UInt8},Float64,Ptr{UInt8}), Output,Name1,Value1,Name2,Value2,Fluid)
+  val = ccall( (:PropsSI, CoolPropLib), Cdouble, (Ptr{UInt8},Ptr{UInt8},Float64,Ptr{UInt8},Float64,Ptr{UInt8}), Output,Name1,Value1,Name2,Value2,Fluid)
   if val == Inf
     error("CoolProp: ", get_global_param_string("errstring"))
   end
@@ -37,7 +37,7 @@ function PropsSI(Output::AbstractString, Name1::AbstractString, Value1::Number, 
 end
 
 function PropsSI(FluidName::AbstractString, Output::AbstractString)
-  val = ccall( (:Props1SI, CoolPropLib), Float64, (Ptr{UInt8},Ptr{UInt8}), FluidName,Output)
+  val = ccall( (:Props1SI, CoolPropLib), Cdouble, (Ptr{UInt8},Ptr{UInt8}), FluidName,Output)
   if val == Inf
     error("CoolProp: ", get_global_param_string("errstring"))
   end
@@ -117,7 +117,7 @@ end
 # param handle The integer handle for the state class stored in memory
 # param fractions The array of fractions
 function AbstractState_set_fractions(handle::Clong,fractions::Array)
-  ccall( (:AbstractState_set_fractions, CoolPropLib), Void, (Clong,Ptr{Float64},Clong,Ref{Clong},Ptr{UInt8},Clong), handle,fractions,length(fractions),errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
+  ccall( (:AbstractState_set_fractions, CoolPropLib), Void, (Clong,Ptr{Cdouble},Clong,Ref{Clong},Ptr{UInt8},Clong), handle,fractions,length(fractions),errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
   if errcode[] != 0
     if errcode[] == 1
       error("CoolProp: ", bytestring(convert(Ptr{UInt8}, pointer(message_buffer))))
@@ -136,7 +136,7 @@ end
 # param value1 The first input value
 # param value2 The second input value
 function AbstractState_update(handle::Clong,input_pair::Clong,value1::Number,value2::Number)
-  ccall( (:AbstractState_update, CoolPropLib), Void, (Clong,Clong,Float64,Float64,Ref{Clong},Ptr{UInt8},Clong), handle,input_pair,value1,value2,errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
+  ccall( (:AbstractState_update, CoolPropLib), Void, (Clong,Clong,Cdouble,Cdouble,Ref{Clong},Ptr{UInt8},Clong), handle,input_pair,value1,value2,errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
   if errcode[] != 0
     if errcode[] == 1
       error("CoolProp: ", bytestring(convert(Ptr{UInt8}, pointer(message_buffer))))
@@ -153,7 +153,7 @@ end
 # param handle The integer handle for the state class stored in memory
 # param param The integer value for the parameter you want
 function AbstractState_keyed_output(handle::Clong, param::Clong)
-  output = ccall( (:AbstractState_keyed_output, CoolPropLib), Float64, (Clong,Clong,Ref{Clong},Ptr{UInt8},Clong), handle,param,errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
+  output = ccall( (:AbstractState_keyed_output, CoolPropLib), Cdouble, (Clong,Clong,Ref{Clong},Ptr{UInt8},Clong), handle,param,errcode::RefValue{Clong,1},message_buffer::Array{UInt8,1},buffer_length)
   if errcode[] != 0
     if errcode[] == 1
       error("CoolProp: ", bytestring(convert(Ptr{UInt8}, pointer(message_buffer))))

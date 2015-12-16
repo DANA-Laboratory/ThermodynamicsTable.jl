@@ -7,7 +7,7 @@ export freesteam_k, freesteam_mu, freesteam_x, freesteam_w, freesteam_cv, freest
 export freesteam_s, freesteam_h, freesteam_u, freesteam_v, freesteam_rho, freesteam_p, freesteam_T
 
 @windows_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.dll"));
-@linux_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.so"));
+@linux_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","libfreesteam.so"));
 
 immutable SteamState
     region::Char 

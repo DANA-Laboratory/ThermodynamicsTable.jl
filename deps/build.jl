@@ -27,9 +27,9 @@ end
 end
 @linux_only begin
     # CoolProp
-    urlbase = "http://netassist.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/shared_library/Linux/64bit/libCoolProp.so.1.0"
-    download(urlbase,joinpath(destpathbase,"CoolProp.so"))
-    println("downloaded => lib/CoolProp.so")
+    urlbase = "http://netassist.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
+    download(urlbase,joinpath(destpathbase,"libCoolProp.so"))
+    println("downloaded => lib/libCoolProp.so")
     # FreeSteam
     urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/$latestVersion_FreeSteam/linux/"
     download(joinpath(urlbase,"libfreesteam.so.1.0"),joinpath(destpathbase,"libfreesteam.so"))
