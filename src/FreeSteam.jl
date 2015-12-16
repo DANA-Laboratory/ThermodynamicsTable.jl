@@ -99,4 +99,86 @@ function freesteam_k(S::SteamState)
   return ccall( (:freesteam_k, FreeSteamLib), Float64, (SteamState,), S)
 end
 
+function freesteam_region1_set_pT(p::Float64, T::Float64)
+  return ccall( (:freesteam_region1_set_pT, FreeSteamLib), SteamState, (Float64, Float64), p, T)
+end
+
+#=
+FREESTEAM_DLL double freesteam_region4_psat_T(double T);
+FREESTEAM_DLL double freesteam_region4_Tsat_p(double p);
+
+FREESTEAM_DLL double freesteam_region4_rhof_T(double T);
+FREESTEAM_DLL double freesteam_region4_rhog_T(double T);
+
+FREESTEAM_DLL double freesteam_region4_v_Tx(double T, double x);
+FREESTEAM_DLL double freesteam_region4_u_Tx(double T, double x);
+FREESTEAM_DLL double freesteam_region4_h_Tx(double T, double x);
+FREESTEAM_DLL double freesteam_region4_s_Tx(double T, double x);
+FREESTEAM_DLL double freesteam_region4_cp_Tx(double T, double x);
+FREESTEAM_DLL double freesteam_region4_cv_Tx(double T, double x);
+
+FREESTEAM_DLL double freesteam_region4_dpsatdT_T(double T);
+
+FREESTEAM_DLL double freesteam_region3_p_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_u_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_s_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_h_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_cp_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_cv_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_region3_w_rhoT(double rho, double T);
+
+FREESTEAM_DLL double freesteam_region2_v_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_u_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_s_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_h_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_cp_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_cv_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_w_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_a_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region2_g_pT(double p, double T);
+
+FREESTEAM_DLL double freesteam_region1_u_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_v_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_s_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_h_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_cp_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_cv_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_w_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_a_pT(double p, double T);
+FREESTEAM_DLL double freesteam_region1_g_pT(double p, double T);
+
+FREESTEAM_DLL double freesteam_b23_p_T(double T);
+FREESTEAM_DLL double freesteam_b23_T_p(double p);
+
+FREESTEAM_DLL double freesteam_region1_T_ph(double p, double h);
+FREESTEAM_DLL double freesteam_region2_T_ph(double p, double h);
+FREESTEAM_DLL double freesteam_region3_T_ph(double p, double h);
+FREESTEAM_DLL double freesteam_region3_v_ph(double p, double h);
+FREESTEAM_DLL double freesteam_region3_psat_h(double h);
+FREESTEAM_DLL double freesteam_region3_psat_s(double s);
+
+FREESTEAM_DLL double freesteam_region3_T_ps(double p, double h);
+FREESTEAM_DLL double freesteam_region3_v_ps(double p, double h);
+
+FREESTEAM_DLL SteamState freesteam_bound_pmax_T(double T);
+
+FREESTEAM_DLL double freesteam_deriv(SteamState S, char xyz[3]);
+
+FREESTEAM_DLL double freesteam_drhofdT_T(double T);
+FREESTEAM_DLL double freesteam_drhogdT_T(double T);
+
+FREESTEAM_DLL double freesteam_region3_dAdvT(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region3_dAdTv(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region1_dAdTp(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region1_dAdpT(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region2_dAdTp(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region2_dAdpT(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region4_dAdTx(FREESTEAM_CHAR,SteamState);
+FREESTEAM_DLL double freesteam_region4_dAdxT(FREESTEAM_CHAR,SteamState);
+
+FREESTEAM_DLL double freesteam_surftens_T(double T);
+FREESTEAM_DLL double freesteam_k_rhoT(double rho, double T);
+FREESTEAM_DLL double freesteam_mu_rhoT(double rho, double T);
+=#
+
 end #module

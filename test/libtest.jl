@@ -1,50 +1,57 @@
 using CoolProp
 using FreeSteam
 @osx? println("no osx support") : begin
-  #CoolProp
-  @test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
+#CoolProp
+@test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
 
-  #freesteam
+#freesteam
 
-  libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
-  @linux_only gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"))
-  @linux_only gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"))
+libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
+@linux_only gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"))
+@linux_only gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"))
+function test_region1_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
 
-  T = 400. # in Kelvin! 
-  p = 1e5  # 1 bar
-  ss = freesteam_set_pT(p, T) 
-  s = freesteam_s(ss);
-  @test_approx_eq 7502.40089208754 s # J/kgK
-  ss2 = freesteam_set_ps(p*10, s)
-  T2 = freesteam_T(ss2)
-  @test_approx_eq 684.5051229099 T2
-  p2 = freesteam_p(ss2)
-  @test_approx_eq 7502.40089208754 freesteam_s(ss2) # J/kgK
+#=
+	Note: inputs to this function need units conversion!
+		Temperature temp;    ///< K
+		Pressure pres;       ///< MPa
+		SpecificVolume v;    ///< m³/kg
+		SpecificEnergy h;    ///< enthalpy / kJ/kg
+		SpecificEnergy u;    ///< internal energy / kJ/kg
+		SpecificEntropy s;   ///< kJ/kg.K
+		SpecHeatCap cp;      ///< specific heat capacity at constant pressure
+		Velocity w;          ///< speed of sound
+=#
 
-  @linux_only Libdl.dlclose(gsl)
-  @linux_only Libdl.dlclose(gslcblas)
+	S = freesteam_region1_set_pT(p*1e6, T);
+	@test_approx_eq freesteam_p(S)  p*1e6
+	@test_approx_eq freesteam_T(S)  T
+	@test_approx_eq freesteam_v(S)  v
+	@test_approx_eq freesteam_h(S)  h*1e3
+	@test_approx_eq freesteam_u(S)  u*1e3
+	@test_approx_eq freesteam_s(S)  s*1e3
+	@test_approx_eq freesteam_cp(S) cp*1e3
+	@test_approx_eq freesteam_w(S)  w
+
+end
+
+T = 400. # in Kelvin! 
+p = 1e5  # 1 bar
+ss = freesteam_set_pT(p, T) 
+s = freesteam_s(ss);
+@test_approx_eq 7502.40089208754 s # J/kgK
+ss2 = freesteam_set_ps(p*10, s)
+T2 = freesteam_T(ss2)
+@test_approx_eq 684.5051229099 T2
+p2 = freesteam_p(ss2)
+@test_approx_eq 7502.40089208754 freesteam_s(ss2) # J/kgK
+
+@linux_only Libdl.dlclose(gsl)
+@linux_only Libdl.dlclose(gslcblas)
+
 end
 
 #=
-
-/*
-freesteam - IAPWS-IF97 steam tables library
-Copyright (C) 2004-2009  John Pye
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
 
 #include "steam.h"
 #include "region4.h"

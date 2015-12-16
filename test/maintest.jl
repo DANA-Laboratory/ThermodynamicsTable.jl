@@ -1,7 +1,6 @@
-using ThermodynamicsTable,ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions,PhysicalPropertyCalculator
+using ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions,PhysicalPropertyCalculator
 import CapeOpen: MaterialObject, PropertyPackage
 import ICapeThermoCompounds.TempPropData
-
 
 #ICapeThermoUniversalConstants
 universalconstantlist=getuniversalconstantlist()
