@@ -1,13 +1,9 @@
 # Original file is a part of CoolProp project http://www.coolprop.org/coolprop/wrappers/Julia/index.html#julia
-
+# 73+13+14=100 == 106-1(common)-4(solver)-1(print)
+# 12+13+39+8+1=73 == 74-1(common) => doubles OK
+# 12+1=13 == 17-4(solver) => SteamStates OK
+# 6+7+1=14 == 15-1(print) => Int OK
 module FreeSteam
-
-export freesteam_set_Ts, freesteam_set_Tx, freesteam_set_pT, freesteam_set_ph, freesteam_set_ps, freesteam_set_pu, freesteam_set_pv, freesteam_set_uv
-export freesteam_k, freesteam_mu, freesteam_x, freesteam_w, freesteam_cv, freesteam_cp
-export freesteam_s, freesteam_h, freesteam_u, freesteam_v, freesteam_rho, freesteam_p, freesteam_T
-
-@windows_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.dll"));
-@linux_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","libfreesteam.so"));
 
 immutable SteamState
     region::Char 
@@ -15,170 +11,112 @@ immutable SteamState
     x2::Float64    
 end
 
-function freesteam_set_Ts(T::Number, s::Number)
-  return ccall( (:freesteam_set_Ts, FreeSteamLib), SteamState, (Float64, Float64), T, s)
+immutable XYZ
+  x::Char
+  y::Char 
+  z::Char 
 end
 
-function freesteam_set_Tx(p::Number, x::Number)
-  return ccall( (:freesteam_set_Tx, FreeSteamLib), SteamState, (Float64, Float64), p, x)
+#all 12 double functions (double) exported (part 1)
+const set_xy = [:freesteam_set_Ts, :freesteam_set_Tx, :freesteam_set_pT, :freesteam_set_ph, 
+                 :freesteam_set_ps, :freesteam_set_pu, :freesteam_set_pv, :freesteam_set_uv]
+@eval export($(set_xy...))
+
+#all 12 double functions (double) exported (part 2)
+const reg_set_xy = [:freesteam_region1_set_pT, :freesteam_region2_set_pT, :freesteam_region3_set_rhoT, :freesteam_region4_set_Tx]
+@eval export($(reg_set_xy...))
+for f in [set_xy; reg_set_xy]
+  @eval function $f(x::Number, y::Number)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), SteamState, (Float64, Float64), x, y)
+  end
 end
 
-function freesteam_set_pT(p::Number, T::Number)
-  return ccall( (:freesteam_set_pT, FreeSteamLib), SteamState, (Float64, Float64), p, T)
+#all 13 double functions (SteamState) exported
+const _S = [:freesteam_k,  :freesteam_mu, :freesteam_x,   :freesteam_w, 
+             :freesteam_cv, :freesteam_cp, :freesteam_s, :freesteam_h, 
+             :freesteam_u,  :freesteam_v,  :freesteam_rho, :freesteam_p, 
+             :freesteam_T]
+@eval export($(_S...)) 
+for f in _S
+  @eval function $f(S::SteamState)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Float64, (SteamState, ), S)
+  end
 end
 
-function freesteam_set_ph(p::Number, h::Number)
-  return ccall( (:freesteam_set_ph, FreeSteamLib), SteamState, (Float64, Float64), p, h)
+#all 39 double functions (double,double) exported
+const z_for_xy = [:freesteam_region4_v_Tx,   :freesteam_region4_u_Tx,    :freesteam_region4_h_Tx,   :freesteam_region4_s_Tx,   :freesteam_region4_cp_Tx, 
+                  :freesteam_region4_cv_Tx,   :freesteam_region3_p_rhoT,  :freesteam_region3_u_rhoT, :freesteam_region3_s_rhoT, :freesteam_region3_h_rhoT, 
+                  :freesteam_region3_cp_rhoT, :freesteam_region3_cv_rhoT, :freesteam_region3_w_rhoT, :freesteam_region2_v_pT,   :freesteam_region2_u_pT, 
+                  :freesteam_region2_s_pT,    :freesteam_region2_h_pT,    :freesteam_region2_cp_pT,  :freesteam_region2_cv_pT,  :freesteam_region2_w_pT, 
+                  :freesteam_region2_a_pT,    :freesteam_region2_g_pT,    :freesteam_region1_u_pT,   :freesteam_region1_v_pT,   :freesteam_region1_s_pT, 
+                  :freesteam_region1_h_pT,    :freesteam_region1_cp_pT,   :freesteam_region1_cv_pT,  :freesteam_region1_w_pT,   :freesteam_region1_a_pT, 
+                  :freesteam_region1_T_ph,    :freesteam_region2_T_ph,    :freesteam_region3_T_ph,   :freesteam_region3_v_ph,   :freesteam_region3_T_ps, 
+                  :freesteam_region3_v_ps,    :freesteam_k_rhoT,          :freesteam_mu_rhoT,        :freesteam_region1_g_pT]
+@eval export($(z_for_xy...)) 
+for f in z_for_xy
+  @eval function $f(x::Float64, y::Float64)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Float64, (Float64, Float64), x, y)
+  end
 end
 
-function freesteam_set_ps(p::Number, s::Number)
-  return ccall( (:freesteam_set_ps, FreeSteamLib), SteamState, (Float64, Float64), p, s)
+#all 8 double functions (char,SteamState) exported
+const d_for_cS = [:freesteam_region3_dAdvT, :freesteam_region3_dAdTv, :freesteam_region1_dAdTp, :freesteam_region1_dAdpT, 
+                   :freesteam_region2_dAdTp, :freesteam_region2_dAdpT, :freesteam_region4_dAdTx, :freesteam_region4_dAdxT]
+@eval export($(d_for_cS...)) 
+for f in d_for_cS 
+  @eval function $f(i::Char, S::SteamState)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Float64, (Char, SteamState), c, S)
+  end
 end
 
-function freesteam_set_pu(p::Number, u::Number)
-  return ccall( (:freesteam_set_pu, FreeSteamLib), SteamState, (Float64, Float64), p, u)
+#1 double function (SteamState,xyz) exported
+export freesteam_deriv
+function freesteam_deriv(S::SteamState, xyz::XYZ)
+  return ccall( (:freesteam_deriv, FreeSteamLib), Float64, (SteamState, XYZ), S, xyz)
 end
 
-function freesteam_set_pv(p::Number, v::Number)
-  return ccall( (:freesteam_set_pv, FreeSteamLib), SteamState, (Float64, Float64), p, v)
+#all 12 SteamState functions (double, double) exported
+const _x = [:freesteam_region4_Tsat_p, :freesteam_region4_rhof_T, :freesteam_region4_psat_T, :freesteam_region4_rhog_T, :freesteam_region4_dpsatdT_T,
+             :freesteam_b23_p_T,        :freesteam_b23_T_p,        :freesteam_region3_psat_h, :freesteam_region3_psat_s, :freesteam_drhofdT_T,
+             :freesteam_drhogdT_T,      :freesteam_surftens_T]
+@eval export($(_x...)) 
+for f in _x
+  @eval function $f(x::Float64)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Float64, (Float64,), x)
+  end
 end
 
-function freesteam_set_uv(u::Number, v::Number)
-  return ccall( (:freesteam_set_uv, FreeSteamLib), SteamState, (Float64, Float64), u, v)
+#1 SteamState function (double) exported
+export freesteam_bound_pmax_T
+function freesteam_bound_pmax_T(x::Float64)
+  return ccall( (:freesteam_bound_pmax_T, FreeSteamLib), SteamState, (Float64, ), x)
 end
 
-function freesteam_p(S::SteamState)
-  return ccall( (:freesteam_p, FreeSteamLib), Float64, (SteamState, ), S)
+#all 6 int functions (double,double,int) exported
+const i_for_xyi = [:freesteam_bounds_ph, :freesteam_bounds_ps, :freesteam_bounds_pv, :freesteam_bounds_Ts, :freesteam_bounds_Tx, :freesteam_bounds_uv]
+@eval export($(i_for_xyi...)) 
+for f in i_for_xyi 
+  @eval function $f(x::Float64, y::Float64, i::Cint)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Cint, (Float64, Float64, Cint), x, y, i)
+  end
 end
 
-function freesteam_T(S::SteamState)
-  return ccall( (:freesteam_T, FreeSteamLib), Float64, (SteamState, ), S)
+#all 7 int functions (double,double) exported
+const i_for_xy = [:freesteam_region_ph, :freesteam_region_ps, :freesteam_region_pu, :freesteam_region_pv, :freesteam_region_Ts, :freesteam_region_Tx, :freesteam_region_uv]
+@eval export($(i_for_xy...)) 
+for f in i_for_xy 
+  @eval function $f(x::Float64, y::Float64)
+    return ccall( ($(QuoteNode(f)), FreeSteamLib), Cint, (Float64, Float64), x, y)
+  end
 end
 
-function freesteam_rho(S::SteamState)
-  return ccall( (:freesteam_rho, FreeSteamLib), Float64, (SteamState, ), S)
+#1 int function (SteamState) exported
+export freesteam_region
+function freesteam_region(S::SteamState)
+  return ccall( (:freesteam_region, FreeSteamLib), Cint, (SteamState, ), S)
 end
 
-function freesteam_v(S::SteamState)
-  return ccall( (:freesteam_v, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_u(S::SteamState)
-  return ccall( (:freesteam_u, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_h(S::SteamState)
-  return ccall( (:freesteam_h, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_s(S::SteamState)
-  return ccall( (:freesteam_s, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_cp(S::SteamState)
-  return ccall( (:freesteam_cp, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_cv(S::SteamState)
-  return ccall( (:freesteam_cv, FreeSteamLib), Float64, (SteamState, ), S)
-end
-
-function freesteam_w(S::SteamState)
-  return ccall( (:freesteam_w, FreeSteamLib), Float64, (SteamState,), S)
-end
-
-function freesteam_x(S::SteamState)
-  return ccall( (:freesteam_x, FreeSteamLib), Float64, (SteamState,), S)
-end
-
-function freesteam_mu(S::SteamState)
-  return ccall( (:freesteam_mu, FreeSteamLib), Float64, (SteamState,), S)
-end
-
-function freesteam_k(S::SteamState)
-  return ccall( (:freesteam_k, FreeSteamLib), Float64, (SteamState,), S)
-end
-
-function freesteam_region1_set_pT(p::Float64, T::Float64)
-  return ccall( (:freesteam_region1_set_pT, FreeSteamLib), SteamState, (Float64, Float64), p, T)
-end
-
-#=
-FREESTEAM_DLL double freesteam_region4_psat_T(double T);
-FREESTEAM_DLL double freesteam_region4_Tsat_p(double p);
-
-FREESTEAM_DLL double freesteam_region4_rhof_T(double T);
-FREESTEAM_DLL double freesteam_region4_rhog_T(double T);
-
-FREESTEAM_DLL double freesteam_region4_v_Tx(double T, double x);
-FREESTEAM_DLL double freesteam_region4_u_Tx(double T, double x);
-FREESTEAM_DLL double freesteam_region4_h_Tx(double T, double x);
-FREESTEAM_DLL double freesteam_region4_s_Tx(double T, double x);
-FREESTEAM_DLL double freesteam_region4_cp_Tx(double T, double x);
-FREESTEAM_DLL double freesteam_region4_cv_Tx(double T, double x);
-
-FREESTEAM_DLL double freesteam_region4_dpsatdT_T(double T);
-
-FREESTEAM_DLL double freesteam_region3_p_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_u_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_s_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_h_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_cp_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_cv_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_region3_w_rhoT(double rho, double T);
-
-FREESTEAM_DLL double freesteam_region2_v_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_u_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_s_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_h_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_cp_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_cv_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_w_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_a_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region2_g_pT(double p, double T);
-
-FREESTEAM_DLL double freesteam_region1_u_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_v_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_s_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_h_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_cp_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_cv_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_w_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_a_pT(double p, double T);
-FREESTEAM_DLL double freesteam_region1_g_pT(double p, double T);
-
-FREESTEAM_DLL double freesteam_b23_p_T(double T);
-FREESTEAM_DLL double freesteam_b23_T_p(double p);
-
-FREESTEAM_DLL double freesteam_region1_T_ph(double p, double h);
-FREESTEAM_DLL double freesteam_region2_T_ph(double p, double h);
-FREESTEAM_DLL double freesteam_region3_T_ph(double p, double h);
-FREESTEAM_DLL double freesteam_region3_v_ph(double p, double h);
-FREESTEAM_DLL double freesteam_region3_psat_h(double h);
-FREESTEAM_DLL double freesteam_region3_psat_s(double s);
-
-FREESTEAM_DLL double freesteam_region3_T_ps(double p, double h);
-FREESTEAM_DLL double freesteam_region3_v_ps(double p, double h);
-
-FREESTEAM_DLL SteamState freesteam_bound_pmax_T(double T);
-
-FREESTEAM_DLL double freesteam_deriv(SteamState S, char xyz[3]);
-
-FREESTEAM_DLL double freesteam_drhofdT_T(double T);
-FREESTEAM_DLL double freesteam_drhogdT_T(double T);
-
-FREESTEAM_DLL double freesteam_region3_dAdvT(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region3_dAdTv(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region1_dAdTp(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region1_dAdpT(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region2_dAdTp(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region2_dAdpT(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region4_dAdTx(FREESTEAM_CHAR,SteamState);
-FREESTEAM_DLL double freesteam_region4_dAdxT(FREESTEAM_CHAR,SteamState);
-
-FREESTEAM_DLL double freesteam_surftens_T(double T);
-FREESTEAM_DLL double freesteam_k_rhoT(double rho, double T);
-FREESTEAM_DLL double freesteam_mu_rhoT(double rho, double T);
-=#
+@windows_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.dll"));
+@linux_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","libfreesteam.so"));
 
 end #module

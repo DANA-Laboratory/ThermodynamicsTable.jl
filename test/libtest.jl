@@ -1,5 +1,8 @@
 using CoolProp
 using FreeSteam
+
+const eps = 1e-8
+
 @osx? println("no osx support") : begin
 #CoolProp
 @test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
@@ -9,31 +12,122 @@ using FreeSteam
 libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
 @linux_only gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"))
 @linux_only gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"))
+
 function test_region1_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
 
-#=
-	Note: inputs to this function need units conversion!
-		Temperature temp;    ///< K
-		Pressure pres;       ///< MPa
-		SpecificVolume v;    ///< m³/kg
-		SpecificEnergy h;    ///< enthalpy / kJ/kg
-		SpecificEnergy u;    ///< internal energy / kJ/kg
-		SpecificEntropy s;   ///< kJ/kg.K
-		SpecHeatCap cp;      ///< specific heat capacity at constant pressure
-		Velocity w;          ///< speed of sound
-=#
-
+  #=
+    Note: inputs to this function need units conversion!
+      Temperature temp;    ///< K
+      Pressure pres;       ///< MPa
+      SpecificVolume v;    ///< m³/kg
+      SpecificEnergy h;    ///< enthalpy / kJ/kg
+      SpecificEnergy u;    ///< internal energy / kJ/kg
+      SpecificEntropy s;   ///< kJ/kg.K
+      SpecHeatCap cp;      ///< specific heat capacity at constant pressure
+      Velocity w;          ///< speed of sound
+  =#
+  
 	S = freesteam_region1_set_pT(p*1e6, T);
-	@test_approx_eq freesteam_p(S)  p*1e6
-	@test_approx_eq freesteam_T(S)  T
-	@test_approx_eq freesteam_v(S)  v
-	@test_approx_eq freesteam_h(S)  h*1e3
-	@test_approx_eq freesteam_u(S)  u*1e3
-	@test_approx_eq freesteam_s(S)  s*1e3
-	@test_approx_eq freesteam_cp(S) cp*1e3
-	@test_approx_eq freesteam_w(S)  w
+	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
+	@test_approx_eq_eps freesteam_T(S)  T         eps*T
+	@test_approx_eq_eps freesteam_v(S)  v         eps*v
+	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
+	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_w(S)  w         eps*w
 
 end
+
+function testregion1()
+	println("REGION 1 TESTS")
+	test_region1_point(300., 3., 0.100215168E-2, 0.115331273E3, 0.112324818E3, 0.392294792, 0.417301218E1, 0.150773921E4)
+	test_region1_point(300., 80., 0.971180894E-3, 0.184142828E3, 0.106448356E3, 0.368563852, 0.401008987E1, 0.163469054E4)
+	test_region1_point(500., 3., 0.120241800E-2, 0.975542239E3, 0.971934985E3, 0.258041912E1, 0.465580682E1, 0.124071337E4)
+end
+
+function test_region2_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
+
+	# units of measurement as for region1 test 
+
+	S = freesteam_region2_set_pT(p*1e6, T);
+	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
+	@test_approx_eq_eps freesteam_T(S)  T         eps*T
+	@test_approx_eq_eps freesteam_v(S)  v         eps*v
+	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
+	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_w(S)  w         eps*w
+  
+end
+
+function testregion2()
+	println("REGION 2 TESTS")
+	test_region2_point(300., 0.0035, 0.394913866E2, 0.254991145E4, 0.241169160E4, 0.852238967E1, 0.191300162E1, 0.427920172E3)
+	test_region2_point(700., 0.0035, 0.923015898E2, 0.333568375E4, 0.301262819E4, 0.101749996E2, 0.208141274E1, 0.644289068E3)
+	test_region2_point(700., 30., 0.542946619E-02, 0.263149474E+4, 0.246861076E+4, 0.517540298E+1, 0.103505092E+2, 0.480386523E+3)
+end
+
+function test_region3_point(T::Float64 ,rho::Float64 ,p::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
+
+	# units of measurement as for region1 test 
+
+	S = freesteam_region3_set_rhoT(rho, T)
+	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
+	@test_approx_eq_eps freesteam_T(S)  T         eps*T
+	@test_approx_eq_eps freesteam_v(S)  1./rho    eps*1./rho 
+	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
+	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_w(S)  w         eps*w
+  
+end
+
+function testregion3()
+	println("REGION 3 TESTS")
+	test_region3_point(650., 500., 0.255837018E2, 0.186343019E4, 0.181226279E4, 0.405427273E1,0.138935717E2, 0.502005554E3)
+	test_region3_point(650., 200., 0.222930643E2, 0.237512401E4, 0.226365868E4, 0.485438792E1, 0.446579342E2, 0.383444594E3)
+	test_region3_point(750., 500., 0.783095639E2, 0.225868845E4, 0.210206932E4, 0.446971906E1, 0.634165359E1, 0.760696041E3);
+end
+
+# --- REGION 4 SATURATION LINE
+
+function test_region4_point(T::Float64 ,p::Float64)
+	S = freesteam_region4_set_Tx(T,0.)
+	p1 = freesteam_p(S)
+	@test_approx_eq_eps p1  p*1e6 eps*p*1e6
+	T1 = freesteam_region4_Tsat_p(p1)
+	@test_approx_eq_eps T1  T eps*T
+end
+
+function testregion4()
+	println("REGION 4 TESTS")
+	test_region4_point(300.,	0.353658941E-2)
+	test_region4_point(500.,	0.263889776E1)
+	test_region4_point(600.,	0.123443146E2)
+end
+
+# --- REGION 1 BACKWARDS (P,H)
+
+function test_region1_ph_point(p::Float64, h::Float64, T::Float64)
+	T1 = freesteam_region1_T_ph(p*1e6,h*1e3)
+	@test_approx_eq_eps T1 T T/eps
+end
+
+function testregion1ph()
+	println("REGION 1 (P,H)")
+	test_region1_ph_point(3.,	500.,	0.391798509e3)
+	test_region1_ph_point(80.,	500.,	0.378108626e3)
+	test_region1_ph_point(80.,	1500.,	0.611041229e3)
+end
+
+testregion1()
+testregion2()
+testregion3()
+testregion4()
+testregion1ph()
 
 T = 400. # in Kelvin! 
 p = 1e5  # 1 bar
@@ -110,162 +204,25 @@ int verbose = 0;
 }
 
 /*------------------------------------------------------------------------------
-  REGION 1: FORWARDS
+  
 */
 
-#define RELTOL 5e-9
 
-void test_region1_point(double T,double p, double v,double h,double u, double s, double cp, double w){
-
-/*
-	Note: inputs to this function need units conversion!
-		Temperature temp;    ///< K
-		Pressure pres;       ///< MPa
-		SpecificVolume v;    ///< m³/kg
-		SpecificEnergy h;    ///< enthalpy / kJ/kg
-		SpecificEnergy u;    ///< internal energy / kJ/kg
-		SpecificEntropy s;   ///< kJ/kg.K
-		SpecHeatCap cp;      ///< specific heat capacity at constant pressure
-		Velocity w;          ///< speed of sound
-*/
-
-	SteamState S = freesteam_region1_set_pT(p*1e6, T);
-	CHECK_VAL(freesteam_p(S),p*1e6,RELTOL);
-	CHECK_VAL(freesteam_T(S),T,RELTOL);
-	CHECK_VAL(freesteam_v(S),v,RELTOL);
-	CHECK_VAL(freesteam_h(S),h*1e3,RELTOL);
-	CHECK_VAL(freesteam_u(S),u*1e3,RELTOL);
-	CHECK_VAL(freesteam_s(S),s*1e3,RELTOL);
-	CHECK_VAL(freesteam_cp(S),cp*1e3,RELTOL);
-	CHECK_VAL(freesteam_w(S),w,RELTOL);
-
-}
-
-void testregion1(void){
-	fprintf(stderr,"REGION 1 TESTS\n");
-	test_region1_point(300., 3., 0.100215168E-2, 0.115331273E3, 0.112324818E3, 0.392294792, 0.417301218E1, 0.150773921E4);
-	test_region1_point(300., 80., 0.971180894E-3, 0.184142828E3, 0.106448356E3, 0.368563852, 0.401008987E1, 0.163469054E4);
-	test_region1_point(500., 3., 0.120241800E-2, 0.975542239E3, 0.971934985E3, 0.258041912E1, 0.465580682E1, 0.124071337E4);
-}
 
 /*------------------------------------------------------------------------------
-  REGION 2: FORWARDS
+  
 */
 
-void test_region2_point(double T,double p, double v,double h,double u, double s, double cp, double w){
 
-	/* units of measurement as for region1 test */
-
-	SteamState S = freesteam_region2_set_pT(p*1e6, T);
-	CHECK_VAL(freesteam_p(S),p*1e6,RELTOL);
-	CHECK_VAL(freesteam_T(S),T,RELTOL);
-	CHECK_VAL(freesteam_v(S),v,RELTOL);
-	CHECK_VAL(freesteam_h(S),h*1e3,RELTOL);
-	CHECK_VAL(freesteam_u(S),u*1e3,RELTOL);
-	CHECK_VAL(freesteam_s(S),s*1e3,RELTOL);
-	CHECK_VAL(freesteam_cp(S),cp*1e3,RELTOL);
-	CHECK_VAL(freesteam_w(S),w,RELTOL);
-}
-
-void testregion2(void){
-	fprintf(stderr,"REGION 2 TESTS\n");
-	test_region2_point(300., 0.0035, 0.394913866E2, 0.254991145E4, 0.241169160E4, 0.852238967E1, 0.191300162E1, 0.427920172E3);
-	test_region2_point(700., 0.0035, 0.923015898E2, 0.333568375E4, 0.301262819E4, 0.101749996E2, 0.208141274E1, 0.644289068E3);
-	test_region2_point(700., 30., 0.542946619E-02, 0.263149474E+4, 0.246861076E+4, 0.517540298E+1, 0.103505092E+2, 0.480386523E+3);
-}
-
-/*------------------------------------------------------------------------------
-  REGION 3: FORWARDS
-*/
-
-void test_region3_point(double T,double rho, double p,double h,double u, double s, double cp, double w){
-
-	/* units of measurement as for region1 test */
-
-	SteamState S = freesteam_region3_set_rhoT(rho, T);
-	CHECK_VAL(freesteam_p(S),p*1e6,RELTOL);
-	CHECK_VAL(freesteam_T(S),T,RELTOL);
-	CHECK_VAL(freesteam_v(S),1./rho,RELTOL);
-	CHECK_VAL(freesteam_h(S),h*1e3,RELTOL);
-	CHECK_VAL(freesteam_u(S),u*1e3,RELTOL);
-	CHECK_VAL(freesteam_s(S),s*1e3,RELTOL);
-	CHECK_VAL(freesteam_cp(S),cp*1e3,RELTOL);
-	CHECK_VAL(freesteam_w(S),w,RELTOL);
-}
-
-void testregion3(void){
-	fprintf(stderr,"REGION 3 TESTS\n");
-
-	test_region3_point(650., 500., 0.255837018E2,
-			           0.186343019E4, 0.181226279E4, 0.405427273E1,
-			           0.138935717E2, 0.502005554E3);
-
-	test_region3_point(650., 200., 0.222930643E2,
-			           0.237512401E4, 0.226365868E4, 0.485438792E1,
-			           0.446579342E2, 0.383444594E3);
-
-	test_region3_point(750., 500., 0.783095639E2, 0.225868845E4,
-			           0.210206932E4, 0.446971906E1, 0.634165359E1,
-			           0.760696041E3);
-}
-
-/*------------------------------------------------------------------------------
-  REGION 4 SATURATION LINE
-*/
-
-void test_region4_point(double T,double p){
-	SteamState S = freesteam_region4_set_Tx(T,0.);
-	double p1 = freesteam_p(S);
-	CHECK_VAL(p1,p*1e6,RELTOL);
-	double T1 = freesteam_region4_Tsat_p(p1);
-	CHECK_VAL(T1,T,RELTOL);
-}
-
-void testregion4(void){
-	fprintf(stderr,"REGION 4 TESTS\n");
-	test_region4_point(300.,	0.353658941E-2);
-	test_region4_point(500.,	0.263889776E1);
-	test_region4_point(600.,	0.123443146E2);
-}
-
-/*------------------------------------------------------------------------------
-  REGION 1 BACKWARDS (P,H)
-*/
-
-void test_region1_ph_point(double p,double h, double T){
-	double T1 = freesteam_region1_T_ph(p*1e6,h*1e3);
-	CHECK_VAL(T1,T,RELTOL);
-}
-
-void testregion1ph(void){
-	fprintf(stderr,"REGION 1 (P,H) TESTS\n");
-	test_region1_ph_point(3.,	500.,	0.391798509e3);
-	test_region1_ph_point(80.,	500.,	0.378108626e3);
-	test_region1_ph_point(80.,	1500.,	0.611041229e3);
-}
-
-#if 0
-void test_region1_ps_point(double p,double s, double T){
-	double T1 = freesteam_region1_T_ps(p*1e6,s*1e3);
-	CHECK_VAL(T1,T,RELTOL);
-}
-
-void testregion1ps(void){
-	fprintf(stderr,"REGION 1 (P,S) TESTS\n");
-	test_region1_ps_point(3.,	0.5.,  0.307842258e3);
-	test_region1_ps_point(80.,	0.5.,  0.309979785e3);
-	test_region1_ps_point(80.,	3.,    0.565899909E3);
-}
-#endif
 
 
 /*------------------------------------------------------------------------------
   REGION 2 BACKWARDS (P,H)
 */
 
-void test_region2_ph_point(double p,double h, double T){
+void test_region2_ph_point(p::Float64,h::Float64, double T){
 	double T1 = freesteam_region2_T_ph(p*1e6,h*1e3);
-	CHECK_VAL(T1,T,RELTOL);
+	@test_approx_eq_eps (T1,T,eps);
 }
 
 void testregion2ph(void){
@@ -287,11 +244,11 @@ void testregion2ph(void){
   REGION 3 BACKWARDS (P,H)
 */
 
-void test_region3_ph_point(double p,double h, double T, double v){
+void test_region3_ph_point(p::Float64,h::Float64, T::Float64, double v){
 	double T1 = freesteam_region3_T_ph(p*1e6,h*1e3);
-	CHECK_VAL(T1,T,RELTOL);
+	@test_approx_eq_eps (T1,T,eps);
 	double v1 = freesteam_region3_v_ph(p*1e6,h*1e3);
-	CHECK_VAL(v1,v,RELTOL);
+	@test_approx_eq_eps (v1,v,eps);
 }
 
 void testregion3ph(void){
@@ -309,9 +266,9 @@ void testregion3ph(void){
   REGION 3 PSAT(H)
 */
 
-void test_region3_psath_point(double h,double p){
+void test_region3_psath_point(h::Float64,double p){
 	double p1 = freesteam_region3_psat_h(h*1e3);
-	CHECK_VAL(p1,p*1e6,RELTOL);
+	@test_approx_eq_eps (p1,p*1e6,eps);
 }
 
 void testregion3psath(void){
@@ -325,9 +282,9 @@ void testregion3psath(void){
   REGION 3 PSAT(S)
 */
 
-void test_region3_psats_point(double s,double p){
+void test_region3_psats_point(s::Float64,double p){
 	double p1 = freesteam_region3_psat_s(s*1e3);
-	CHECK_VAL(p1,p*1e6,RELTOL);
+	@test_approx_eq_eps (p1,p*1e6,eps);
 }
 
 void testregion3psats(void){
@@ -346,26 +303,26 @@ void testb23(){
 	double p = 0.165291643e8;
 	fprintf(stderr,"REGION 2-3 BOUNDARY TESTS\n");
 	double p1 = freesteam_b23_p_T(T);
-	CHECK_VAL(p1,p,RELTOL);
+	@test_approx_eq_eps (p1,p,eps);
 	double T1 = freesteam_b23_T_p(p);
-	CHECK_VAL(T1,T,RELTOL);
+	@test_approx_eq_eps (T1,T,eps);
 }
 
 /*------------------------------------------------------------------------------
   FULL (P,H) ROUTINES
 */
 
-/* #define PHRELTOL 6e-5 ---region 2 */
-#define PHRELTOL 1e-3 /* region 1 */
+/* #define PHeps 6e-5 ---region 2 */
+#define PHeps 1e-3 /* region 1 */
 
-void test_steam_ph(double p,double h){
+void test_steam_ph(p::Float64,double h){
 	//fprintf(stderr,"------------\n");
 	//fprintf(stderr,"p = %f MPa, h = %f kJ/kg\n",p, h);
 	SteamState S = freesteam_set_ph(p*1e6,h*1e3);
 	//if(S.region !=1)return;
 	//fprintf(stderr,"--> region = %d\n", S.region);
-	CHECK_VAL(freesteam_p(S),p*1e6,PHRELTOL);
-	CHECK_VAL(freesteam_h(S),h*1e3,PHRELTOL);
+	@test_approx_eq_eps (freesteam_p(S),p*1e6,PHeps);
+	@test_approx_eq_eps (freesteam_h(S),h*1e3,PHeps);
 
 };
 
@@ -390,10 +347,10 @@ void testph(void){
   PROPERTY EVALULATION WITHIN REGION 4
 */
 
-#define R4RELTOL 4.3e-4
+#define R4eps 4.3e-4
 
 typedef struct R4TestProps_struct{
-	double T, p, rhof, rhog, hf, hg, sf, sg;
+	T::Float64, p, rhof, rhog, hf, hg, sf, sg;
 } R4TestProps;
 
 /**
@@ -411,15 +368,15 @@ const int r4testprops_max = sizeof(r4testprops_data)/sizeof(R4TestProps);
 void test_steam_region4_props(const R4TestProps *P){
 	SteamState S;
 	S = freesteam_region4_set_Tx(P->T, 0.);
-	CHECK_VAL(freesteam_p(S),P->p*1e6,R4RELTOL);
-	CHECK_VAL(freesteam_v(S),1./P->rhof,R4RELTOL);
-	CHECK_VAL(freesteam_h(S),P->hf*1e3,R4RELTOL);
-	CHECK_VAL(freesteam_s(S),P->sf*1e3,R4RELTOL);
+	@test_approx_eq_eps (freesteam_p(S),P->p*1e6,R4eps);
+	@test_approx_eq_eps (freesteam_v(S),1./P->rhof,R4eps);
+	@test_approx_eq_eps (freesteam_h(S),P->hf*1e3,R4eps);
+	@test_approx_eq_eps (freesteam_s(S),P->sf*1e3,R4eps);
 	S = freesteam_region4_set_Tx(P->T, 1.);
-	CHECK_VAL(freesteam_p(S),P->p*1e6,R4RELTOL);
-	CHECK_VAL(freesteam_v(S),1./P->rhog,R4RELTOL);
-	CHECK_VAL(freesteam_h(S),P->hg*1e3,R4RELTOL);
-	CHECK_VAL(freesteam_s(S),P->sg*1e3,R4RELTOL);
+	@test_approx_eq_eps (freesteam_p(S),P->p*1e6,R4eps);
+	@test_approx_eq_eps (freesteam_v(S),1./P->rhog,R4eps);
+	@test_approx_eq_eps (freesteam_h(S),P->hg*1e3,R4eps);
+	@test_approx_eq_eps (freesteam_s(S),P->sg*1e3,R4eps);
 };
 
 void testregion4props(void){
@@ -434,7 +391,7 @@ void testregion4props(void){
   DERIVATIVE ROUTINES
 */
 
-void test_ph_derivs(double p, double h){
+void test_ph_derivs(p::Float64, double h){
 	SteamState S;
 	S = freesteam_set_ph(p,h);
 	freesteam_fprint(stderr,S);
@@ -462,7 +419,7 @@ void test_ph_derivs(double p, double h){
 
 	double dvdp_h_fdiff = (freesteam_v(Sdp) - freesteam_v(S))/dp;
 	double dvdp_h = freesteam_deriv(S,"vph");
-	CHECK_VAL(dvdp_h,dvdp_h_fdiff,1e-3);
+	@test_approx_eq_eps (dvdp_h,dvdp_h_fdiff,1e-3);
 #endif
 
 	double dh = 1.;
@@ -487,7 +444,7 @@ void test_ph_derivs(double p, double h){
 	
 	double dvdh_p = freesteam_deriv(S,"vhp");
 
-	CHECK_VAL(dvdh_p,dvdh_p_fdiff,1e-3);
+	@test_approx_eq_eps (dvdh_p,dvdh_p_fdiff,1e-3);
 
 
 }
@@ -515,7 +472,7 @@ typedef struct{
 	double a,b,c;
 } TestQuadratic;
 
-double test_zeroin_subject(double x, void *user_data){
+double test_zeroin_subject(x::Float64, void *user_data){
 #define Q ((TestQuadratic *)user_data)
 	double res = Q->a*x*x + Q->b*x + Q->c;
 	//fprintf(stderr,"f(x = %f) = %f x² + %f x + %f = %f\n",x,Q->a,Q->b, Q->c,res);
@@ -528,7 +485,7 @@ void testzeroin(void){
 	fprintf(stderr,"BRENT SOLVER TESTS\n");
 	double sol = 0, err = 0;
 	zeroin_solve(&test_zeroin_subject,&Q1, -10., 4.566, 1e-10, &sol, &err);
-	CHECK_VAL(sol,2.,1e-10);
+	@test_approx_eq_eps (sol,2.,1e-10);
 }
 
 /*------------------------------------------------------------------------------
@@ -550,8 +507,8 @@ void testsolver2(void){
 	SteamState guess = freesteam_region3_set_rhoT(1./0.00317, 673.15);	
 	S2 = freesteam_solver2_region3('p','h',p,h,guess,&status);
 	assert(status==0);
-	CHECK_VAL(freesteam_p(S2),p, 1e-7);
-	CHECK_VAL(freesteam_h(S2),h, 1e-7);
+	@test_approx_eq_eps (freesteam_p(S2),p, 1e-7);
+	@test_approx_eq_eps (freesteam_h(S2),h, 1e-7);
 
 	/* test in region 4 */
 	S = freesteam_region4_set_Tx(440., 0.9);
@@ -561,8 +518,8 @@ void testsolver2(void){
 	guess = freesteam_region4_set_Tx(IAPWS97_TCRIT - 1.,0.5);
 	S2 = freesteam_solver2_region4('p','h',p,h,guess,&status);
 	assert(status==0);
-	CHECK_VAL(freesteam_p(S2),p, 1e-7);
-	CHECK_VAL(freesteam_h(S2),h, 1e-7);
+	@test_approx_eq_eps (freesteam_p(S2),p, 1e-7);
+	@test_approx_eq_eps (freesteam_h(S2),h, 1e-7);
 
 	/* test in region 2 */
 	S = freesteam_region2_set_pT(1e5, 273.15+180.);
@@ -572,8 +529,8 @@ void testsolver2(void){
 	guess = freesteam_region2_set_pT(200e5,273.15+500.);
 	S2 = freesteam_solver2_region2('p','h',p,h,guess,&status);
 	assert(status==0);
-	CHECK_VAL(freesteam_p(S2),p, 1e-7);
-	CHECK_VAL(freesteam_h(S2),h, 1e-7);
+	@test_approx_eq_eps (freesteam_p(S2),p, 1e-7);
+	@test_approx_eq_eps (freesteam_h(S2),h, 1e-7);
 
 	/* test in region 1 */
 	S = freesteam_region1_set_pT(1e5, 273.15+40.);
@@ -583,8 +540,8 @@ void testsolver2(void){
 	guess = freesteam_region1_set_pT(200e5,273.15+20.);
 	S2 = freesteam_solver2_region1('p','h',p,h,guess,&status);
 	assert(status==0);
-	CHECK_VAL(freesteam_p(S2),p, 1e-7);
-	CHECK_VAL(freesteam_h(S2),h, 1e-7);
+	@test_approx_eq_eps (freesteam_p(S2),p, 1e-7);
+	@test_approx_eq_eps (freesteam_h(S2),h, 1e-7);
 }
 
 
@@ -592,11 +549,11 @@ void testsolver2(void){
   FULL (P,T) ROUTINES
 */
 
-void test_point_pT(double p, double T){
+void test_point_pT(p::Float64, double T){
 	SteamState S = freesteam_set_pT(p,T);
 	//fprintf(stderr,"region = %d\n",S.region);
-	CHECK_VAL(freesteam_p(S),p,1e-7);
-	CHECK_VAL(freesteam_T(S),T,1e-7);
+	@test_approx_eq_eps (freesteam_p(S),p,1e-7);
+	@test_approx_eq_eps (freesteam_T(S),T,1e-7);
 }
 
 void testpT(void){
@@ -614,15 +571,15 @@ void testpT(void){
   REGION 3 (p,s) TEST DATA
 */
 
-void test_region3_ps_point(double p,double s, double T, double v){
+void test_region3_ps_point(p::Float64,s::Float64, T::Float64, double v){
 	double T1 = freesteam_region3_T_ps(p*1e6,s*1e3);
-	CHECK_VAL(T1,T,RELTOL);
+	@test_approx_eq_eps (T1,T,eps);
 	double v1 = freesteam_region3_v_ps(p*1e6,s*1e3);
-	CHECK_VAL(v1,v,RELTOL);
+	@test_approx_eq_eps (v1,v,eps);
 
 	//SteamState S = freesteam_set_ps(p*1e6,s*1e3);
-	//CHECK_VAL(freesteam_p(S)/1e6,p,RELTOL);
-	//CHECK_VAL(freesteam_s(S)/1e3,s,RELTOL);
+	//@test_approx_eq_eps (freesteam_p(S)/1e6,p,eps);
+	//@test_approx_eq_eps (freesteam_s(S)/1e3,s,eps);
 }
 
 void testregion3ps(void){
@@ -640,10 +597,10 @@ void testregion3ps(void){
   FULL (P,S) ROUTINES
 */
 
-/* #define PHRELTOL 6e-5 ---region 2 */
-#define PHRELTOL 1e-3 /* region 1 */
+/* #define PHeps 6e-5 ---region 2 */
+#define PHeps 1e-3 /* region 1 */
 
-void test_steam_ps(double p,double s){
+void test_steam_ps(p::Float64,double s){
 	//fprintf(stderr,"------------\n");
 	//fprintf(stderr,"%s: p = %f MPa, s = %f kJ/kgK\n",__func__, p, s);
 	freesteam_bounds_ps(p*1e6,s*1e3,1);
@@ -651,8 +608,8 @@ void test_steam_ps(double p,double s){
 	//if(S.region !=1)return;
 	//fprintf(stderr,"--> region = %d\n", S.region);
 	//if(S.region==4)fprintf(stderr,"--> p = %g\n", freesteam_region4_psat_T(S.R4.T));
-	CHECK_VAL(freesteam_p(S),p*1e6,PHRELTOL);
-	CHECK_VAL(freesteam_s(S),s*1e3,PHRELTOL);
+	@test_approx_eq_eps (freesteam_p(S),p*1e6,PHeps);
+	@test_approx_eq_eps (freesteam_s(S),s*1e3,PHeps);
 
 };
 
@@ -677,7 +634,7 @@ void testps(void){
   FULL (T,S) ROUTINES
 */
 
-void test_steam_Ts(double T,double s){
+void test_steam_Ts(T::Float64,double s){
 	//fprintf(stderr,"------------\n");
 	//fprintf(stderr,"%s: T = %f K, s = %f kJ/kgK\n",__func__, T, s);
 	freesteam_bounds_Ts(T,s*1e3,1);
@@ -685,8 +642,8 @@ void test_steam_Ts(double T,double s){
 	//if(S.region !=1)return;
 	//fprintf(stderr,"--> region = %d\n", S.region);
 	//if(S.region==4)fprintf(stderr,"--> p = %g\n", freesteam_region4_psat_T(S.R4.T));
-	CHECK_VAL(freesteam_T(S),T,RELTOL);
-	CHECK_VAL(freesteam_s(S),s*1e3,RELTOL);
+	@test_approx_eq_eps (freesteam_T(S),T,eps);
+	@test_approx_eq_eps (freesteam_s(S),s*1e3,eps);
 };
 
 void testTs(void){
@@ -715,9 +672,9 @@ void testTs(void){
   FULL (P,V) ROUTINES
 */
 
-#define PVRELTOL 1.e-8
+#define PVeps 1.e-8
 
-void test_steam_pv(double p,double v){
+void test_steam_pv(p::Float64,double v){
 	//fprintf(stderr,"------------\n");
 	//fprintf(stderr,"%s: p = %f MPa, v = %f m3/kg\n",__func__, p, v);
 	freesteam_bounds_pv(p*1e6,v,1);
@@ -725,8 +682,8 @@ void test_steam_pv(double p,double v){
 	//if(S.region != 3)return;
 	//fprintf(stderr,"--> region = %d\n", S.region);
 	//if(S.region==4)fprintf(stderr,"--> T = %g\n", freesteam_T(S));
-	CHECK_VAL(freesteam_p(S),p*1e6,PVRELTOL);
-	CHECK_VAL(freesteam_v(S),v,PVRELTOL);
+	@test_approx_eq_eps (freesteam_p(S),p*1e6,PVeps);
+	@test_approx_eq_eps (freesteam_v(S),v,PVeps);
 };
 
 void testpv(void){
@@ -755,7 +712,7 @@ void testpv(void){
   FULL (T, x) ROUTINES
 */
 
-#define TXRELTOL 1.e-4
+#define TXeps 1.e-4
 
 void testTx(void){
 	SteamState S;
@@ -781,8 +738,8 @@ void testTx(void){
 			if(*T == IAPWS97_TCRIT)continue;
 			S = freesteam_set_Tx(*T, *x);
 			//fprintf(stderr,"T = %f, x = %f... region %d\n", *T, *x, S.region);
-			CHECK_VAL(freesteam_T(S), *T, TXRELTOL);
-			CHECK_VAL(freesteam_x(S), *x, TXRELTOL);
+			@test_approx_eq_eps (freesteam_T(S), *T, TXeps);
+			@test_approx_eq_eps (freesteam_x(S), *x, TXeps);
 			++n;
 		}
 	}
@@ -819,8 +776,8 @@ void testuv(void){
 			if(*T == IAPWS97_TCRIT)continue;
 			S = freesteam_set_Tx(*T, *x);
 			//fprintf(stderr,"T = %f, x = %f... region %d\n", *T, *x, S.region);
-			CHECK_VAL(freesteam_T(S), *T, TXRELTOL);
-			CHECK_VAL(freesteam_x(S), *x, TXRELTOL);
+			@test_approx_eq_eps (freesteam_T(S), *T, TXeps);
+			@test_approx_eq_eps (freesteam_x(S), *x, TXeps);
 			++n;
 		}
 	}
@@ -832,11 +789,11 @@ void testuv(void){
   VISCOSITY ROUTINES
 */
 
-#define MURELTOL 1e-6
+#define MUeps 1e-6
 
-void test_viscosity_rhoT_point(double rho, double T, double mu){
+void test_viscosity_rhoT_point(double rho, T::Float64, double mu){
 	double mu1 = freesteam_mu_rhoT(rho,T)*1e6; // compare in microPascal-s
-	CHECK_VAL(mu1,mu,MURELTOL);
+	@test_approx_eq_eps (mu1,mu,MUeps);
 }
 
 void testviscosityrhoT(void){
@@ -858,12 +815,12 @@ void testviscosityrhoT(void){
   THERMAL CONDUCTIVITY ROUTINES
 */
 
-#define KRELTOL 0.0013
+#define Keps 0.0013
 /*
 	@param p pressure/[MPa]
 	@param T temperature/[°C]
 */
-void test_k_pT_point(double p, double T, double k){
+void test_k_pT_point(p::Float64, T::Float64, double k){
 #if 0
 	fprintf(stderr,"\n\np = %f MPa, T = %f °C, expect k = %f mW/m·K\n", p, T, k);
 #endif
@@ -871,8 +828,8 @@ void test_k_pT_point(double p, double T, double k){
 	SteamState S = freesteam_set_pT(p * 1e6, T + 273.15);
 
 #if 0
-	CHECK_VAL(freesteam_p(S), p*1e6, 1e-5);
-	CHECK_VAL(freesteam_T(S), T + 273.15,1e-5);
+	@test_approx_eq_eps (freesteam_p(S), p*1e6, 1e-5);
+	@test_approx_eq_eps (freesteam_T(S), T + 273.15,1e-5);
 	fprintf(stderr,"rho = %f\n", freesteam_rho(S));
 #endif
 
@@ -882,7 +839,7 @@ void test_k_pT_point(double p, double T, double k){
 	fprintf(stderr,"===> error = %f mW/m·K\n", k1 - k);
 #endif
 
-	CHECK_VAL(k1,k,KRELTOL);
+	@test_approx_eq_eps (k1,k,Keps);
 }
 
 void testconductivitypT(void){
@@ -941,7 +898,7 @@ typedef struct{
 void testsurftens(void){
 	fprintf(stderr,"SURFACE TENSION (T) TESTS\n");
 
-#define SURFTENS_RELTOL 5e-3
+#define SURFTENS_eps 5e-3
 #define SURFTENS_COUNT 75
 	SurfTensData td[SURFTENS_COUNT] = {
 		{0.01,	75.65}
@@ -1025,7 +982,7 @@ void testsurftens(void){
 	for(i=0; i<SURFTENS_COUNT; ++i){
 		double sig = td[i].sigma * 1e-3;
 		double sig1 = freesteam_surftens_T(td[i].T + 273.15);
-		CHECK_VAL(sig1, sig, SURFTENS_RELTOL);
+		@test_approx_eq_eps (sig1, sig, SURFTENS_eps);
 	}
 }
 
@@ -1071,7 +1028,7 @@ int main(void){
 	v(p,h) routines will introduce some errors, and we are seeing this.
 
 	Having said that, the big errors are coming from region 1 T(p,h); without
-	that, the value of PHRELTOL could be reduced to 
+	that, the value of PHeps could be reduced to 
 
 		1e-3 (region 1)
 		6e-5 (region 2)
