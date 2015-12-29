@@ -5,7 +5,7 @@ module ThermodynamicsTable
   import CapeOpen.perryanalytic
   thisfiledirname=dirname(@__FILE__())
   
-  pabf=open(thisfiledirname * "/Tables/"*perryanalytic.datafilename,"r");  
+  pabf=open(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename),"r");  
   pata=perryanalytic.tableaddreses
   
   function getdatamatrix(path::AbstractString)

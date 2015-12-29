@@ -267,7 +267,7 @@ module CapeOpen
           "VaporThermal"=>    Any[[17250+28801+14490+23115+33366+28884+4*28290,345,74], Vector{Float64}(9)],
           "VaporViscos"=>     Any[[17250+28801+14490+23115+33366+28884+4*28290+25530,345,74], Vector{Float64}(9)]
         ),
-        "binary.table"
+        "perryanalytic.binary"
       )
     end
     constantstrings::PropertyMap
@@ -293,16 +293,17 @@ module CapeOpen
     ASCIIString[                
       "Compounds"        ,
       "VaporPressure"    ,
-      "LiquidsDensities" ,
+      "LiquidsDensities",
       "Criticals"        ,
       "VaporizHeat"      ,
       "LiquidsCp"        ,
-      "Cp"               ,
-      "FormationEnergy"  ,
+      "Cp"                ,
+      "FormationEnergy" ,
       "VaporViscos"      ,
       "LiquidViscos"     ,
       "VaporThermal"     ,
       "LiquidThermal"    
     ]                    
-  )                      
+  )            
+  
 end
