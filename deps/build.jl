@@ -105,12 +105,12 @@ function buildbinarydatabase(database,si)
     end
   end
   if si!=nothing
-    databaseaddress=open(joinpath(destpathbase,"perryranalyticaddress.txt"),"w")
+    databaseaddress=open(joinpath(destpathbase,"perryanalytic.addresses"),"w")
     println("Writing addresses .....")
     startaddress=0;
     for i=1:length(tablenames)
       s=si[i]
-      println(databaseaddress,propnames[i],';',startaddress,';',s[2],';',s[1]/s[2],';',rowtypes[i])
+      println(databaseaddress,propnames[i],';',startaddress,';',s[2],';',round(Int,s[1]/s[2]),';',rowtypes[i])
       startaddress+=s[1]
     end
     close(databaseaddress)

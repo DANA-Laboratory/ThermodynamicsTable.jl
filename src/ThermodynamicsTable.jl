@@ -5,9 +5,12 @@ module ThermodynamicsTable
   import CapeOpen.perryanalytic
   thisfiledirname=dirname(@__FILE__())
   
-  pabf=open(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename),"r");  
+  pabf=open(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename*".binary"),"r");  
   pata=perryanalytic.tableaddreses
-  
+  adrs=readdlm(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename*".addresses"),';')
+  for i=1:size(adrs)[1]
+    pata[adrs[i]][1][1:3]=adrs[i,2:4]
+  end
   function getdatamatrix(path::AbstractString)
     global floattables,compondtable
     file=open(thisfiledirname * "/Tables/"*path);
