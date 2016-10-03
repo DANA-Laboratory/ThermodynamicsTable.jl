@@ -18,11 +18,11 @@ immutable XYZ
 end
 
 #all 12 SteamState functions (double, double) exported (part 1)
-const set_xy = [:freesteam_set_Ts, :freesteam_set_Tx, :freesteam_set_pT, :freesteam_set_ph,
-                 :freesteam_set_ps, :freesteam_set_pu, :freesteam_set_pv, :freesteam_set_uv]
+  const set_xy = [:freesteam_set_Ts, :freesteam_set_Tx, :freesteam_set_pT, :freesteam_set_ph,
+                    :freesteam_set_ps, :freesteam_set_pu, :freesteam_set_pv, :freesteam_set_uv]
 @eval export($(set_xy...))
 
-#all 12 double functions (double) exported (part 2)
+#all 12 SteamState functions (double, double) exported (part 2)
 const reg_set_xy = [:freesteam_region1_set_pT, :freesteam_region2_set_pT, :freesteam_region3_set_rhoT, :freesteam_region4_set_Tx]
 @eval export($(reg_set_xy...))
 for f in [set_xy; reg_set_xy]
@@ -44,14 +44,14 @@ for f in _S
 end
 
 #all 39 double functions (double,double) exported
-const z_for_xy = [:freesteam_region4_v_Tx,   :freesteam_region4_u_Tx,    :freesteam_region4_h_Tx,   :freesteam_region4_s_Tx,   :freesteam_region4_cp_Tx,
+const z_for_xy = [:freesteam_region4_v_Tx,    :freesteam_region4_u_Tx,    :freesteam_region4_h_Tx,   :freesteam_region4_s_Tx,   :freesteam_region4_cp_Tx,
                   :freesteam_region4_cv_Tx,   :freesteam_region3_p_rhoT,  :freesteam_region3_u_rhoT, :freesteam_region3_s_rhoT, :freesteam_region3_h_rhoT,
-                  :freesteam_region3_cp_rhoT, :freesteam_region3_cv_rhoT, :freesteam_region3_w_rhoT, :freesteam_region2_v_pT,   :freesteam_region2_u_pT,
-                  :freesteam_region2_s_pT,    :freesteam_region2_h_pT,    :freesteam_region2_cp_pT,  :freesteam_region2_cv_pT,  :freesteam_region2_w_pT,
-                  :freesteam_region2_a_pT,    :freesteam_region2_g_pT,    :freesteam_region1_u_pT,   :freesteam_region1_v_pT,   :freesteam_region1_s_pT,
+                  :freesteam_region3_cp_rhoT, :freesteam_region3_cv_rhoT, :freesteam_region3_w_rhoT, :freesteam_region3_T_ph,   :freesteam_region3_v_ph,
+                  :freesteam_region3_T_ps,    :freesteam_region3_v_ps,    :freesteam_region2_v_pT,   :freesteam_region2_u_pT,   :freesteam_region2_s_pT,
+                  :freesteam_region2_h_pT,    :freesteam_region2_cp_pT,   :freesteam_region2_cv_pT,  :freesteam_region2_w_pT,   :freesteam_region2_a_pT,
+                  :freesteam_region2_g_pT,    :freesteam_region2_T_ph,    :freesteam_region1_u_pT,   :freesteam_region1_v_pT,   :freesteam_region1_s_pT,
                   :freesteam_region1_h_pT,    :freesteam_region1_cp_pT,   :freesteam_region1_cv_pT,  :freesteam_region1_w_pT,   :freesteam_region1_a_pT,
-                  :freesteam_region1_T_ph,    :freesteam_region2_T_ph,    :freesteam_region3_T_ph,   :freesteam_region3_v_ph,   :freesteam_region3_T_ps,
-                  :freesteam_region3_v_ps,    :freesteam_k_rhoT,          :freesteam_mu_rhoT,        :freesteam_region1_g_pT]
+                  :freesteam_region1_T_ph,    :freesteam_k_rhoT,          :freesteam_mu_rhoT,        :freesteam_region1_g_pT]
 @eval export($(z_for_xy...))
 for f in z_for_xy
   @eval function $f(x::Float64, y::Float64)
