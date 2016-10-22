@@ -4,8 +4,12 @@ module CoolProp
 
 export F2K, K2F, HAPropsSI, PropsSI, PhaseSI, get_global_param_string, get_param_index, get_input_pair_index, AbstractState_factory, AbstractState_free, AbstractState_set_fractions, AbstractState_update, AbstractState_keyed_output
 
-@windows_only const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","CoolProp.dll"));
-@linux_only const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","libCoolProp.so"));
+@static if is_windows()
+  const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","CoolProp.dll"));
+end
+@static if is_linux()
+  const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib","libCoolProp.so"));
+end
 
 errcode = Ref{Clong}(0)
 

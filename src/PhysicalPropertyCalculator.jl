@@ -14,10 +14,10 @@ module PhysicalPropertyCalculator
   export TempPropData, calculate
 
   type TempPropData
-    function TempPropData(prop::ASCIIString,c::Vector{Float64},compId::UInt16,molweight::Float64)
+    function TempPropData(prop::String,c::Vector{Float64},compId::UInt16,molweight::Float64)
       new(prop,c,NaN,NaN,compId,molweight,0%UInt8)
     end
-    prop::ASCIIString
+    prop::String
     c::Vector{Float64}
     t::Float64
     tc::Float64
@@ -26,12 +26,12 @@ module PhysicalPropertyCalculator
     eqno::UInt8
     test::Vector{Float64}
   end
-  
+
   """
     casRegistryNumber, # Chemical Abstract Service Registry Number
     chemicalFormula, # Chemical formula
     iupacName, # Complete IUPAC Name
-    
+
     5-  criticalCompressibilityFactor => critical compressibility factor Z
     6-  criticalDensity => critical density in mol/m3
     7-  criticalPressure => critical pressure in Pa
@@ -47,13 +47,13 @@ module PhysicalPropertyCalculator
     28- standardFormationEnthalpyGas => standard enthalpy change on formation of gas in J/mol
     31- standardFormationGibbsEnergyGas => standard Gibbs energy change on formation of gas in J/mol
   """
-  function calculate(prop::ASCIIString, data::Array)
-    floats::Vector{Float64}
-    
-    prop=="casRegistryNumber" && (return ASCIIString(data[1]))
-    prop=="chemicalFormula" && (return ASCIIString(data[2]))
-    prop=="iupacName" && (return ASCIIString(data[3]))
-    
+  function calculate(prop::String, data::Array)
+    local floats::Vector{Float64}
+
+    prop=="casRegistryNumber" && (return String(data[1]))
+    prop=="chemicalFormula" && (return String(data[2]))
+    prop=="iupacName" && (return String(data[3]))
+
     floats=data[1]
     prop=="criticalCompressibilityFactor" && (return floats[5])
     prop=="criticalDensity" && (return floats[4])
@@ -69,13 +69,13 @@ module PhysicalPropertyCalculator
     prop=="standardEntropyGas" && (return floats[4])
     prop=="standardFormationEnthalpyGas" && (return floats[2])
     prop=="standardFormationGibbsEnergyGas" && (return floats[3])
-    
+
     throw(ECapeThrmPropertyNotAvailable())
   end
 
   function calculate(d::TempPropData)
-    tr::Float64
-    ta::Float64
+    local tr::Float64
+    local ta::Float64
     (d.t<d.test[1] || d.t>d.test[3]) && throw(ECapeOutOfBounds())
     if (d.prop=="heatCapacityOfLiquid")
       if (d.eqno!=2)
@@ -93,10 +93,10 @@ module PhysicalPropertyCalculator
       if (d.eqno==1)
         return d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*1e-5*d.t^3+d.c[5]*1e-10*d.t^4
       elseif (d.eqno==2)
-        c1::Float64
-        c2::Float64
-        c3::Float64
-        c4::Float64
+        local c1::Float64
+        local c2::Float64
+        local c3::Float64
+        local c4::Float64
         c1=d.c[1]*1e5
         c2=d.c[2]*1e5
         c3=d.c[3]*1e3
@@ -109,7 +109,7 @@ module PhysicalPropertyCalculator
       elseif(d.eqno==2)
         return d.c[1]*d.t+d.c[2]*d.c[3]*coth(d.c[3]/d.t)-d.c[4]*d.c[5]*tanh(d.c[5]/d.t) # Integ of Cp Hyper
       end
-    elseif (d.prop=="idealGasEntropy") 
+    elseif (d.prop=="idealGasEntropy")
       if(d.eqno==1)
         return d.c[2]*d.t+(d.c[3]*d.t^2)/2+(d.c[4]*d.t^3)/3+(d.c[5]*d.t^4)/4+d.c[1]*log(d.t) # Integral of Cp/T Poly
       elseif(d.eqno==2)
@@ -132,7 +132,7 @@ module PhysicalPropertyCalculator
       return d.c[1]*(d.t^d.c[2])/(1+d.c[3]/d.t+d.c[4]/(d.t^2))
     elseif (d.prop=="volumeOfLiquid")
       #Liquid dencity
-      ld::Float64
+      local ld::Float64
       if (d.eqno==2)
         ld=d.c[1]+d.c[2]*d.t+d.c[3]*d.t^2+d.c[4]*d.t^3 # o-terphenyl and water limited range
       end
@@ -145,7 +145,7 @@ module PhysicalPropertyCalculator
     end
     throw(ECapeThrmPropertyNotAvailable())
   end
-  
+
   function calculate(d::TempPropData, p::Float64)
     (p<d.test[2] || p>d.test[4]) && throw(ECapeOutOfBounds())
     if (d.prop=="boilingPointTemperature")
@@ -156,6 +156,6 @@ module PhysicalPropertyCalculator
   end
   function vp(c::Vector{Float64}, p::Float64, t::Float64)
     return exp(c[1] + c[2]/t + c[3]*log(t) + c[4]*t^c[5])-p
-  end  
+  end
 
 end

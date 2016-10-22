@@ -20,7 +20,7 @@ module ThermodynamicsTable
   end
 
   #for LiquidsDensities, Cp, LiquidsCp props Max of two data row per prop may exists
-  function readbinarydatabase(id::UInt16, table::ASCIIString, skipdata::UInt8=0%UInt8)
+  function readbinarydatabase(id::UInt16, table::String, skipdata::UInt8=0%UInt8)
     if haskey(pata,table) 
       v=pata[table]
     else

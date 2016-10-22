@@ -20,9 +20,9 @@ pdependentproplist=getpdependentproplist()
 @test getnumcompounds() == 345
 compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
 comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
-propvals=Vector{Union{ASCIIString,Float64}}();
+propvals=Vector{Union{String,Float64}}();
 @test_throws ECapeThrmPropertyNotAvailable getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
-allconstants=Vector{Union{ASCIIString,Float64}}()
+allconstants=Vector{Union{String,Float64}}()
 @test_throws ECapeThrmPropertyNotAvailable getcompoundconstant!(constproplist,compIds,allconstants)
 @test length(allconstants) == length(constproplist)*length(compIds)
 propvals=Vector{Float64}()

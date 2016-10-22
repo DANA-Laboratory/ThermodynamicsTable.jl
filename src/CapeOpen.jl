@@ -10,7 +10,7 @@ module CapeOpen
       3- iupacName => Complete IUPAC Name
       4- SMILESformula => SMILES chemical structure formula
   """
-  constantstrings=ASCIIString[
+  constantstrings=String[
     "casRegistryNumber", # Chemical Abstract Service Registry Number
     "chemicalFormula", # Chemical formula
     "iupacName", # Complete IUPAC Name
@@ -58,7 +58,7 @@ module CapeOpen
       37- vanderwaalsArea => van der Waals area in m3/mol
       38- vanderwaalsVolume => van der Waals volume in m3/mol
   """
-  constantfloats=ASCIIString[
+  constantfloats=String[
     "acentricFactor", # Pitzer acentric factor
     "associationParameter", # association-parameter (Hayden-O’Connell)
     "bornRadius", # in m
@@ -136,7 +136,7 @@ module CapeOpen
       33- volumeOfSolid => Volume of solid at 1 atm in m3/mol
 
   """
-  tempreturedependents=ASCIIString[
+  tempreturedependents=String[
     "cpAqueousInfiniteDilution", # Heat capacity of a solute in an infinitely dilute aqueous solution. in J/(mol K)
     "dielectricConstant", # The ratio of the capacity of a condenser with a particular substance as dielectric to the capacity of the same condenser with a vacuum for dielectric.
     "expansivity", # Coefficient of linear expansion for a solid at 1 atm in 1/K
@@ -178,7 +178,7 @@ module CapeOpen
       3- meltingTemperature => Temperature on melting line in K
       4- solidSolidPhaseTransitionTemperature => Temperature at phase transition in K
   """
-  pressuredependents=ASCIIString[
+  pressuredependents=String[
     "boilingPointTemperature", # Temperature at liquid-vapour transition in K
     "glassTransitionTemperature", # Glass transition temperature in K
     "meltingTemperature", # Temperature on melting line in K
@@ -197,9 +197,9 @@ module CapeOpen
   type MaterialObject
   end
 
-  typealias PropertyMap Dict{ASCIIString,ASCIIString}
-  propmap(stvec,t)=[cs=>t[ind] for (ind,cs) in enumerate(stvec)]
-  
+  typealias PropertyMap Dict{String,String}
+  propmap(stvec,t)=Dict(cs=>t[ind] for (ind,cs) in enumerate(stvec))
+
   """
     Property Package – a software component that is both a Physical Property Calculator and
     an Equilibrium Calculator for Materials containing a specific set of Compounds
@@ -237,23 +237,23 @@ module CapeOpen
         propmap(pressuredependents,t4),
         propertytable,
         Dict(
-          "criticalDensity"                         =>1E+3, #mol/m3 <= mol/dm3 
+          "criticalDensity"                         =>1E+3, #mol/m3 <= mol/dm3
           "criticalPressure"                        =>1E+6, #Pa <= MPa
-          "criticalVolume"                          =>1E-3, #m3/mol <= m3/Kmol 
-          "heatOfVaporizationAtNormalBoilingPoint"  =>1E-3, #J/mol <= J/kmol 
-          "idealGasGibbsFreeEnergyOfFormationAt25C" =>1E-3, #J/mol <= J/kmol 
-          "liquidVolumeAt25C"                       =>1E-3, #m3/mol <= dm3/mol 
+          "criticalVolume"                          =>1E-3, #m3/mol <= m3/Kmol
+          "heatOfVaporizationAtNormalBoilingPoint"  =>1E-3, #J/mol <= J/kmol
+          "idealGasGibbsFreeEnergyOfFormationAt25C" =>1E-3, #J/mol <= J/kmol
+          "liquidVolumeAt25C"                       =>1E-3, #m3/mol <= dm3/mol
           "standardEntropyGas"                      =>1E-3, #J/mol <= J/Kmol /1E3
           "standardFormationEnthalpyGas"            =>1E-3, #J/mol <=  J/Kmol /1E3
           "standardFormationGibbsEnergyGas"         =>1E-3, #J/mol <= J/Kmol /1E3
           "heatCapacityOfLiquid"                    =>1E-3, #J/(mol K) <= J/(Kmol K) /1E3
           "heatOfVaporization"                      =>1E-3, #J/mol <= J/kmol /1E3
           "idealGasEnthalpy"                        =>1E-3, #J/mol <= J/Kmol /1E3
-          "idealGasEntropy"                         =>1E-3, #J/(mol K) <= J/(Kmol K) 
-          "idealGasHeatCapacity"                    =>1E-3, #J/(mol K) <= J/(Kmol K) 
+          "idealGasEntropy"                         =>1E-3, #J/(mol K) <= J/(Kmol K)
+          "idealGasHeatCapacity"                    =>1E-3, #J/(mol K) <= J/(Kmol K)
           "volumeOfLiquid"                          =>1E-3 #m3/mol <= dm3/mol
         ),
-        Dict{ASCIIString, Array}(
+        Dict{String, Array}(
           "Criticals"=>       Any[[0,0,0], Vector{Float64}(6)],
           "LiquidsDensities"=>Any[[0,0,0], Vector{Float64}(10), 0%UInt8],
           "FormationEnergy"=> Any[[0,0,0], Vector{Float64}(5)],
@@ -274,23 +274,23 @@ module CapeOpen
     constantfloats::PropertyMap
     tempreturedependents::PropertyMap
     pressuredependents::PropertyMap
-    propertytable::Vector{ASCIIString}
-    convertions::Dict{ASCIIString,Float64}
-    tableaddreses::Dict{ASCIIString, Array}
-    datafilename::ASCIIString
+    propertytable::Vector{String}
+    convertions::Dict{String,Float64}
+    tableaddreses::Dict{String, Array}
+    datafilename::String
   end
   perryanalytic=PropertyPackage(
     getindex(constantstrings,1:3),
     ["Compounds" for i=1:3],
     getindex(constantfloats,[ 5,6,7,8,9,15,16,17,18,
-                                20,21,24,28,31]),         
+                                20,21,24,28,31]),
     ["Criticals", "Criticals", "Criticals", "Criticals", "Criticals", "VaporizHeat", "FormationEnergy", "LiquidsDensities", "LiquidsDensities",
      "Compounds", "Compounds", "FormationEnergy", "FormationEnergy", "FormationEnergy"],
     getindex(tempreturedependents,[6,11,12,13,14,21,23,24,26,27,32]),
     ["LiquidsCp", "VaporizHeat", "Cp", "Cp", "Cp", "LiquidThermal", "VaporThermal", "VaporPressure", "LiquidViscos", "VaporViscos", "LiquidsDensities"],
     ["boilingPointTemperature"],
-    ["VaporPressure"],                  
-    ASCIIString[                
+    ["VaporPressure"],
+    String[
       "Compounds"        ,
       "VaporPressure"    ,
       "LiquidsDensities",
@@ -302,7 +302,7 @@ module CapeOpen
       "VaporViscos"      ,
       "LiquidViscos"     ,
       "VaporThermal"     ,
-      "LiquidThermal"    
-    ]                    
-  )      
+      "LiquidThermal"
+    ]
+  )
 end

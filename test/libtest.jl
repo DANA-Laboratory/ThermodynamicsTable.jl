@@ -3,15 +3,19 @@ using FreeSteam
 
 const eps = 1e-8
 
-@osx? println("no osx support") : begin
+@static is_apple() ? println("no osx support") : begin
 #CoolProp
 @test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
 
 #freesteam
 
 libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
-@linux_only gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"))
-@linux_only gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"))
+@static if is_linux()
+  gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"));
+end
+@static if is_linux()
+  gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"));
+end
 
 function test_region1_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
 
@@ -19,22 +23,22 @@ function test_region1_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::F
     Note: inputs to this function need units conversion!
       Temperature temp;    ///< K
       Pressure pres;       ///< MPa
-      SpecificVolume v;    ///< m³/kg
+      SpecificVolume v;    ///< mï¿½/kg
       SpecificEnergy h;    ///< enthalpy / kJ/kg
       SpecificEnergy u;    ///< internal energy / kJ/kg
       SpecificEntropy s;   ///< kJ/kg.K
       SpecHeatCap cp;      ///< specific heat capacity at constant pressure
       Velocity w;          ///< speed of sound
   =#
-  
+
 	S = freesteam_region1_set_pT(p*1e6, T);
 	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
 	@test_approx_eq_eps freesteam_T(S)  T         eps*T
 	@test_approx_eq_eps freesteam_v(S)  v         eps*v
 	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
 	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
-	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
-	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3
 	@test_approx_eq_eps freesteam_w(S)  w         eps*w
 
 end
@@ -48,7 +52,7 @@ end
 
 function test_region2_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
 
-	# units of measurement as for region1 test 
+	# units of measurement as for region1 test
 
 	S = freesteam_region2_set_pT(p*1e6, T);
 	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
@@ -56,10 +60,10 @@ function test_region2_point(T::Float64 ,p::Float64 ,v::Float64 ,h::Float64 ,u::F
 	@test_approx_eq_eps freesteam_v(S)  v         eps*v
 	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
 	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
-	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
-	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3
 	@test_approx_eq_eps freesteam_w(S)  w         eps*w
-  
+
 end
 
 function testregion2()
@@ -71,18 +75,18 @@ end
 
 function test_region3_point(T::Float64 ,rho::Float64 ,p::Float64 ,h::Float64 ,u::Float64 ,s::Float64 ,cp::Float64 ,w::Float64)
 
-	# units of measurement as for region1 test 
+	# units of measurement as for region1 test
 
 	S = freesteam_region3_set_rhoT(rho, T)
 	@test_approx_eq_eps freesteam_p(S)  p*1e6     eps*p*1e6
 	@test_approx_eq_eps freesteam_T(S)  T         eps*T
-	@test_approx_eq_eps freesteam_v(S)  1./rho    eps*1./rho 
+	@test_approx_eq_eps freesteam_v(S)  1./rho    eps*1./rho
 	@test_approx_eq_eps freesteam_h(S)  h*1e3     eps*h*1e3
 	@test_approx_eq_eps freesteam_u(S)  u*1e3     eps*u*1e3
-	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3 
-	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3 
+	@test_approx_eq_eps freesteam_s(S)  s*1e3     eps*s*1e3
+	@test_approx_eq_eps freesteam_cp(S) cp*1e3    eps*cp*1e3
 	@test_approx_eq_eps freesteam_w(S)  w         eps*w
-  
+
 end
 
 function testregion3()
@@ -129,9 +133,9 @@ testregion3()
 testregion4()
 testregion1ph()
 
-T = 400. # in Kelvin! 
+T = 400. # in Kelvin!
 p = 1e5  # 1 bar
-ss = freesteam_set_pT(p, T) 
+ss = freesteam_set_pT(p, T)
 s = freesteam_s(ss);
 @test_approx_eq 7502.40089208754 s # J/kgK
 ss2 = freesteam_set_ps(p*10, s)
@@ -140,7 +144,11 @@ T2 = freesteam_T(ss2)
 p2 = freesteam_p(ss2)
 @test_approx_eq 7502.40089208754 freesteam_s(ss2) # J/kgK
 
-@linux_only Libdl.dlclose(gsl)
-@linux_only Libdl.dlclose(gslcblas)
+@static if is_linux()
+  Libdl.dlclose(gsl);
+end
+@static if is_linux()
+  Libdl.dlclose(gslcblas);
+end
 
 end

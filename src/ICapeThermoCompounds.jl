@@ -27,14 +27,14 @@ module ICapeThermoCompounds
         Returns the list of supported constant Physical Properties.
       Arguments
 
-        [retval] props::Vector{ASCIIString}
+        [retval] props::Vector{String}
       Exceptions
 
         ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function getconstproplist(
         proppackage::PropertyPackage=spp)
-        props=Vector{ASCIIString}()
+        props=Vector{String}()
         try
           props = [keys(proppackage.constantstrings)...; keys(proppackage.constantfloats)...]
           return props
@@ -49,14 +49,14 @@ module ICapeThermoCompounds
         Returns the list of supported temperature-dependent Physical Properties.
       Arguments
 
-        [retval]props::Vector{ASCIIString}
+        [retval]props::Vector{String}
       Exceptions
 
         ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function gettdependentproplist(
       proppackage::PropertyPackage=spp)
-      props=Vector{ASCIIString}()
+      props=Vector{String}()
       try
         props = [keys(proppackage.tempreturedependents)...]
         return props
@@ -71,14 +71,14 @@ module ICapeThermoCompounds
         Returns the list of supported pressure-dependent properties.
       Arguments
 
-        [retval]props::Vector{ASCIIString}
+        [retval]props::Vector{String}
       Exceptions
 
         ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
     """
     function getpdependentproplist(
       proppackage::PropertyPackage=spp)
-      props=Vector{ASCIIString}()
+      props=Vector{String}()
       try
         props = [keys(proppackage.pressuredependents)...]
         return props
@@ -114,12 +114,12 @@ module ICapeThermoCompounds
         Returns the list of all Compounds. This includes the Compound identifiers recognised and extra information that can be used to further identify the Compounds.
       Arguments
 
-        [retval] compIds::Vector{ASCIIString} List of Compound identifiers.
-        [retval] formulae::Vector{ASCIIString} List of Compound formulae.
-        [retval] names::Vector{ASCIIString} List of Compound names.
+        [retval] compIds::Vector{String} List of Compound identifiers.
+        [retval] formulae::Vector{String} List of Compound formulae.
+        [retval] names::Vector{String} List of Compound names.
         [retval] boilTemps::Vector{Float64} List of boiling point temperatures.
         [retval] molwts::Vector{Float64} List of molecular weights.
-        [retval] casnos::Vector{ASCIIString}) List of Chemical Abstract Service (CAS) Registry numbers.
+        [retval] casnos::Vector{String}) List of Chemical Abstract Service (CAS) Registry numbers.
       Exceptions
 
         ECapeUnknown – The error to be raised when other error(s), specified for the GetConstPropList operation, are not suitable.
@@ -132,17 +132,17 @@ module ICapeThermoCompounds
       try
         size=spp.tableaddreses["Compounds"][1][2]
         compIds=Vector{UInt16}(size)
-        formulae=Vector{ASCIIString}(size)
-        names=Vector{ASCIIString}(size)
+        formulae=Vector{String}(size)
+        names=Vector{String}(size)
         boilTemps=Vector{Float64}(size)
         molwts=Vector{Float64}(size)
-        casnos=Vector{ASCIIString}(size)
+        casnos=Vector{String}(size)
         for id = 1:size
           compIds[id]=id%UInt16
           data=readbinarydatabase(compIds[id],"Compounds",0%UInt8)
-          formulae[id]=copy(rstrip(ASCIIString(data[2])))
-          names[id]=copy(rstrip(ASCIIString(data[1])))
-          casnos[id]=copy(rstrip(ASCIIString(data[3])))
+          formulae[id]=identity(rstrip(String(data[2])))
+          names[id]=identity(rstrip(String(data[1])))
+          casnos[id]=identity(rstrip(String(data[3])))
           molwts[id]=data[4]
           boilTemps[id]=data[5]
         end
@@ -158,7 +158,7 @@ module ICapeThermoCompounds
         Returns the values of constant Physical Properties for the specified Compounds.
       Arguments
 
-        [in] props::Vector{ASCIIString}
+        [in] props::Vector{String}
         [in] compIds::Vector{UInt16}) List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         [in out] propvals::Vector{Any}
       Exceptions
@@ -178,9 +178,9 @@ module ICapeThermoCompounds
         If any Physical Property is not available for one or more Compounds, then UNDEFINED,Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
     """
     function getcompoundconstant!(
-      props::Vector{ASCIIString},
+      props::Vector{String},
       compIds::Vector{UInt16},
-      propvals::Vector{Union{ASCIIString,Float64}},
+      propvals::Vector{Union{String,Float64}},
       proppackage::PropertyPackage=spp)
       thrownotavailable::Bool=false
       (compIds==[0%UInt16]) && (compIds=[i for i=1%UInt16:345%UInt16])
@@ -193,7 +193,7 @@ module ICapeThermoCompounds
           try
             data=getconstpropdata(proppackage,prop,compId)
             propval=calculate(prop,data)
-            push!(propvals, isa(propval,ASCIIString) ? copy(rstrip(propval)) : (propval*unc))
+            push!(propvals, isa(propval,String) ? identity(rstrip(propval)) : (propval*unc))
             isundefied(propval) && throw(ECapeThrmPropertyNotAvailable())
           catch err
             if isa(err,ECapeThrmPropertyNotAvailable)
@@ -218,7 +218,7 @@ module ICapeThermoCompounds
         Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
       Arguments
 
-        [in] props::Vector{ASCIIString}
+        [in] props::Vector{String}
         [in] pressure::Float64
         [in] compIds::Vector{UInt16}) List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         [in out] propvals::Vector{Any}
@@ -240,7 +240,7 @@ module ICapeThermoCompounds
         If any Physical Property is not available for one or more Compounds, then UNDEFINED,Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
     """
     function getpdependentproperty!(
-      props::Vector{ASCIIString},
+      props::Vector{String},
       pressure::Float64,
       compIds::Vector{UInt16},
       propvals::Vector{Float64},
@@ -285,7 +285,7 @@ module ICapeThermoCompounds
         Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
       Arguments
 
-        [in] props::Vector{ASCIIString}
+        [in] props::Vector{String}
         [in] temperature::Float64
         [in] compIds::Vector{UInt16}) List of Compound identifiers for which constants are to be retrieved. Set compIds to 0%UInt16 to denote all Compounds in the component that implements the ICapeThermoCompounds interface.
         [in out] propvals::Vector{Any}
@@ -307,7 +307,7 @@ module ICapeThermoCompounds
         If any Physical Property is not available for one or more Compounds, then UNDEFINED,Float64(NaN) values must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception must be raised.
     """
     function gettdependentproperty!(
-      props::Vector{ASCIIString},
+      props::Vector{String},
       temperature::Float64,
       compIds::Vector{UInt16},
       propvals::Vector{Float64},
@@ -350,8 +350,8 @@ module ICapeThermoCompounds
   #***********************************************
   #                 Privates
   #***********************************************
-  function getconstpropdata(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16)
-    table::ASCIIString
+  function getconstpropdata(proppackage::PropertyPackage, prop::String, compId::UInt16)
+    local table::String
     if haskey(proppackage.constantstrings, prop)
       table=proppackage.constantstrings[prop]
     elseif haskey(proppackage.constantfloats, prop)
@@ -360,10 +360,10 @@ module ICapeThermoCompounds
     return readbinarydatabase(compId,table,0%UInt8)
   end
 
-  function TempPropData(proppackage::PropertyPackage, prop::ASCIIString, compId::UInt16, skipdata::UInt8=0%UInt8)
-    table::ASCIIString
-    floatdata::Vector{Float64}
-    temppropdata::TempPropData   
+  function TempPropData(proppackage::PropertyPackage, prop::String, compId::UInt16, skipdata::UInt8=0%UInt8)
+    local table::String
+    local floatdata::Vector{Float64}
+    local temppropdata::TempPropData
     if (haskey(proppackage.tempreturedependents,prop))
       table=proppackage.tempreturedependents[prop]
     elseif (haskey(proppackage.pressuredependents,prop))
@@ -409,12 +409,12 @@ module ICapeThermoCompounds
     14- idealGasHeatCapacity =>  J/(mol K) J/(Kmol K) /1E3
     32- volumeOfLiquid => m3/mol dm3/mol /1E3
   """
-  function unitconvertion(proppackage::PropertyPackage, prop::ASCIIString)
+  function unitconvertion(proppackage::PropertyPackage, prop::String)
     haskey(proppackage.convertions, prop) && return proppackage.convertions[prop]
     return 1.0
   end
-  
+
   isundefied(x::Float64)=isnan(x)
-  isundefied(x::ASCIIString)=(x=="UNDEFINED")
-  
+  isundefied(x::String)=(x=="UNDEFINED")
+
 end

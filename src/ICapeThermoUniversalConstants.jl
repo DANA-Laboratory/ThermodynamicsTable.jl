@@ -18,16 +18,16 @@
 module ICapeThermoUniversalConstants
     import ..ECapeExceptions: ECapeInvalidArgument, ECapeUnknown
     export getuniversalconstant,getuniversalconstantlist
-    universalConstants=Dict{ASCIIString,Float64}("avogadroConstant"=>6.0221419947E23,"boltzmannConstant"=>1.380650324E-23,"idealGasStateReferencePressure"=>101325,"molarGasConstant"=>8.31447215,"speedOfLightInVacuum"=>2.997924581E8,"standardAccelerationOfGravity"=>9.80665)
+    universalConstants=Dict{String,Float64}("avogadroConstant"=>6.0221419947E23,"boltzmannConstant"=>1.380650324E-23,"idealGasStateReferencePressure"=>101325,"molarGasConstant"=>8.31447215,"speedOfLightInVacuum"=>2.997924581E8,"standardAccelerationOfGravity"=>9.80665)
     
     """
       Retrieves the value of a Universal Constant.
       
-        [in] constantId::ASCIIString
+        [in] constantId::String
         [out] constantValue::Float64
     """
     function getuniversalconstant( 
-      constantId::ASCIIString)
+      constantId::String)
       try
         return constantValue=universalConstants[constantId]
       catch err
@@ -42,10 +42,10 @@ module ICapeThermoUniversalConstants
     """
       Returns the identifiers of the supported Universal Constants.
       
-        [out] constantId::Vector{ASCIIString}
+        [out] constantId::Vector{String}
     """
     function getuniversalconstantlist() 
-      [key::ASCIIString for key in keys(universalConstants)]
+      [key::String for key in keys(universalConstants)]
     end
     
 end

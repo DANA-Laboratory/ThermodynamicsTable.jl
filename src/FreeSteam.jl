@@ -116,7 +116,10 @@ function freesteam_region(S::SteamState)
   return ccall( (:freesteam_region, FreeSteamLib), Cint, (SteamState, ), S)
 end
 
-@windows_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.dll"));
-@linux_only const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","libfreesteam.so"));
-
+@static if is_windows()
+  const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","freesteam.dll"));
+end
+@static if is_linux()
+  const FreeSteamLib = abspath(joinpath(@__FILE__,"..","..","lib","libfreesteam.so"));
+end
 end #module

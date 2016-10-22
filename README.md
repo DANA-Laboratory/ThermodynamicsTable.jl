@@ -56,7 +56,7 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
 # => formulae=H2O boilTemps=373.1678389916408 molwts=18.015 casnos=7732-18-5
   getconstproplist()
 #=  
-    17-element Array{ASCIIString,1}:
+    17-element Array{String,1}:
      "iupacName"
      "casRegistryNumber"
      "chemicalFormula"
@@ -76,7 +76,7 @@ Two interfaces of CAPE-Open thermo 1.1 standard have been implemented and can be
      "heatOfVaporizationAtNormalBoilingPoint"
 =#
   comps=UInt16[findfirst(names,name) for name in ["Air","Water","Nitrogen"]];
-  propvals=Vector{Union{ASCIIString,Float64}}();
+  propvals=Vector{Union{String,Float64}}();
   try
     getcompoundconstant!(["casRegistryNumber","chemicalFormula","criticalPressure","liquidDensityAt25C"],comps,propvals)
   catch err
