@@ -120,9 +120,9 @@ end
 
 try
   mkdir(destpathbase)
-  const OS_ARCH_CoolProp = (WORD_SIZE == 64) ? "64bit" : "32bit__cdecl";
-  const OS_ARCH_FreeSteam = (WORD_SIZE == 64) ? "win64" : "win32";
-  const latestVersion_CoolProp = JSON.parse(readstring(download("http://sourceforge.net/projects/coolprop/best_release.json")))["release"]["filename"][11:15];
+  const OS_ARCH_CoolProp = (Sys.WORD_SIZE == 64) ? "64bit" : "32bit__cdecl";
+  const OS_ARCH_FreeSteam = (Sys.WORD_SIZE == 64) ? "win64" : "win32";
+  const latestVersion_CoolProp = JSON.parse(readstring(download("https://sourceforge.net/projects/coolprop/best_release.json")))["release"]["filename"][11:15];
   const latestVersion_FreeSteam = "2.1"
   println("CoolProp latestVersion = $latestVersion_CoolProp, by default I am going to install it...")
 
