@@ -1,11 +1,8 @@
-using CoolProp
 using FreeSteam
 
 const eps = 1e-8
 
 @static is_apple() ? println("no osx support") : begin
-#CoolProp
-@test_approx_eq 373.1242958476879 PropsSI("T","P",101325.0,"Q",0.0,"Water")
 
 #freesteam
 

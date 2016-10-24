@@ -153,6 +153,8 @@ try
       download(joinpath(urlbase,"libgslcblas.so.0"),joinpath(destpathbase,"libgslcblas.so"))
       println("downloaded => lib/libgslcblas.so")
   end
+  download("http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/Julia/CoolProp.jl",joinpath(destpathbase,"CoolProp.jl"))
+  println("downloaded => CoolProp.jl")
 catch err
   println("$err\n => If lib folder exists, and you want to refresh existing files, remove lib folder and retry")
 end
