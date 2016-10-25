@@ -6,6 +6,7 @@ end
 @static if is_linux()
   const CoolPropLib = abspath(joinpath(@__FILE__,"..","..","lib"));
 end
+println(CoolPropLib);
 push!(Libdl.DL_LOAD_PATH, CoolPropLib);
 
 include("../lib/CoolProp.jl")
