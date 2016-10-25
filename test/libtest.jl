@@ -9,8 +9,6 @@ const eps = 1e-8
 libpath = abspath(joinpath(@__FILE__,"..","..","lib"))
 @static if is_linux()
   gsl = Libdl.dlopen(joinpath(libpath, "libgsl.so"));
-end
-@static if is_linux()
   gslcblas = Libdl.dlopen(joinpath(libpath, "libgslcblas.so"));
 end
 
