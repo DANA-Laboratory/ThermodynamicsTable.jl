@@ -1,4 +1,5 @@
 # Download latest binary shared library of CoolProp project
+# http://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
 import JSON
 const destpathbase = abspath(joinpath(@__FILE__,"..","..","lib"));
 println(destpathbase);
@@ -141,8 +142,8 @@ try
   @static if is_linux()
       # CoolProp
       urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
-      download(urlbase,joinpath(destpathbase,"libCoolProp.so"))
-      println("downloaded => lib/libCoolProp.so")
+      download(urlbase,joinpath(destpathbase,"CoolProp.so"))
+      println("downloaded => lib/CoolProp.so")
       # FreeSteam
       println("I'm Getting FreeSteam Binaries...")
       urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/"
