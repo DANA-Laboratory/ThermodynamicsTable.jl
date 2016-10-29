@@ -27,9 +27,7 @@ const inputparamsindex = [[2,3], [4,5], 6, 7, [8,9], 11, [12,13]];
   end
   println("testing CoolProp....")
   #PropsSI
-  #@test_approx_eq 266.8440252864121 PropsSI("A","P",101325.0,"Q",0.0,fluids[1])
-  println(PropsSI("A","P",101325.0,"Q",0.0,fluids[1]))
-  println(PropsSI("P","A",1049.8359368286092,"Q",0.0,fluids[1]))
+  @test_approx_eq 1049.8359368286092 PropsSI("A","P",101325.0,"Q",0.0,fluids[1])
   #PhaseSI
   #get_global_param_string
   #get_parameter_information_string
