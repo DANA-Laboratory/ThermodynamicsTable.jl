@@ -141,8 +141,6 @@ p2 = freesteam_p(ss2)
 
 @static if is_linux()
   Libdl.dlclose(gsl);
-end
-@static if is_linux()
   Libdl.dlclose(gslcblas);
 end
 
