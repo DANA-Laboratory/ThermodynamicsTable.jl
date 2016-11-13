@@ -20,7 +20,7 @@ param_list = split(get_global_param_string("parameter_list"),',');
 fluids_list = split(get_global_param_string("FluidsList"),',');
 println("number of defined parameters = $(length(param_list))")
 for param in param_list
-  println("$param ---> $(get_parameter_information_string(String(param)))");
+  println("$param ---> $(get_parameter_information_string(String(param), "long"))");
 end
 for fluid in fluids_list
   for param in param_list

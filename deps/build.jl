@@ -125,10 +125,11 @@ try
   const OS_ARCH_FreeSteam = (Sys.WORD_SIZE == 64) ? "win64" : "win32";
   const latestVersion_CoolProp = JSON.parse(readstring(download("https://sourceforge.net/projects/coolprop/best_release.json")))["release"]["filename"][11:15];
   const latestVersion_FreeSteam = "2.1"
-  println("CoolProp latestVersion = $latestVersion_CoolProp, by default I am going to install it...")
+  const nightly_CoolProp = "nightly"
+  println("CoolProp latestVersion = $latestVersion_CoolProp, by default I am going to install nightly version...")
 
   @static if is_windows()
-      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/shared_library/Windows/$OS_ARCH_CoolProp/"
+      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$nightly_CoolProp/shared_library/Windows/$OS_ARCH_CoolProp/"
       download(joinpath(urlbase,"CoolProp.dll"),joinpath(destpathbase,"CoolProp.dll"))
       download(joinpath(urlbase,"CoolProp.lib"),joinpath(destpathbase,"CoolProp.lib"))
       download(joinpath(urlbase,"exports.txt"),joinpath(destpathbase,"exports.txt"))
@@ -141,7 +142,7 @@ try
   end
   @static if is_linux()
       # CoolProp
-      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
+      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$nightly_CoolProp/shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
       download(urlbase,joinpath(destpathbase,"CoolProp.so"))
       println("downloaded => lib/CoolProp.so")
       # FreeSteam
@@ -154,7 +155,7 @@ try
       download(joinpath(urlbase,"libgslcblas.so.0"),joinpath(destpathbase,"libgslcblas.so"))
       println("downloaded => lib/libgslcblas.so")
   end
-  download("http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$latestVersion_CoolProp/Julia/CoolProp.jl",joinpath(destpathbase,"CoolProp.jl"))
+  download("http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$nightly_CoolProp/Julia/CoolProp.jl",joinpath(destpathbase,"CoolProp.jl"))
   println("downloaded => CoolProp.jl")
 catch err
   println("$err\n => If lib folder exists, and you want to refresh existing files, remove lib folder and retry")
