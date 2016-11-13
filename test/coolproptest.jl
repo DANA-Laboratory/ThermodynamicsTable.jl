@@ -7,7 +7,7 @@ const inputparamsindex = [[2,3], [4,5], 6, 7, [8,9], 11, [12,13]];
   #Trivial inputs
   i=1
   while i<size(coolpropparameters)[2]
-    p = (parameters[[1,4],i]);
+    p = (coolpropparameters[[1,4],i]);
     if (p[1][1] in buggy)
       for fluid in coolpropfluids
         try
@@ -26,7 +26,7 @@ const inputparamsindex = [[2,3], [4,5], 6, 7, [8,9], 11, [12,13]];
   end
   println("testing CoolProp....")
   #PropsSI
-  @test_approx_eq 1049.8359368286092 PropsSI("A","P",101325.0,"Q",0.0,fluids[1])
+  @test_approx_eq 1049.8359368286092 PropsSI("A","P",101325.0,"Q",0.0,coolpropfluids[1])
   #PhaseSI
   #get_global_param_string
   #get_parameter_information_string
