@@ -1,35 +1,27 @@
 using CoolProp
 using CoolPropDefs
-const buggy = ["DIPOLE_MOMENT","FRACTION_MAX","FRACTION_MIN","GWP100","GWP20","GWP500","ODP","RHOMASS_REDUCING","T_FREEZE"]
-const inputparamsindex = [[2,3], [4,5], 6, 7, [8,9], 11, [12,13]];
+const buggy = ["T_FREEZE","RHOMASS_REDUCING","ODP","GWP500","GWP20","GWP100","FRACTION_MIN","FRACTION_MAX","DIPOLE_MOMENT"]
 #CoolProp
 @static is_apple() ? println("CoolProp: no osx support") : begin
+  #get_global_param_string
+  coolpropfluids = split(get_global_param_string("FluidsList"),',');
+  coolpropparameters = split(get_global_param_string("parameter_list"),',');
+  #get_parameter_information_string
   #Trivial inputs
-  i=1
-  while i<size(coolpropparameters)[2]
-    p = (coolpropparameters[[1,4],i]);
-    if (p[1][1] in buggy)
-      for fluid in coolpropfluids
-        try
-          res = ("$(PropsSI(p[1][1], fluid))")
-          #println("$(p[1][1]) $fluid")
-        catch err
-        end
+  for p in coolproptrivialparameters
+    for fluid in coolpropfluids
+      try
+        res = ("$(PropsSI(String(p), String(fluid)))");
+        findfirst(buggy, p) != 0 && println(get_parameter_information_string(p, "long") * " for $fluid is $res (" * get_parameter_information_string(p, "units") * ")");
+      catch err
+        findfirst(buggy, p) == 0 && println("can't get $p for $fluid");
       end
     end
-    if p[2] & !(p[1][1] in buggy)
-      for fluid in coolpropfluids
-        res = ("$(PropsSI(p[1][1], fluid))")
-      end
-    end
-    i+=1;
   end
   println("testing CoolProp....")
   #PropsSI
-  @test_approx_eq 1049.8359368286092 PropsSI("A","P",101325.0,"Q",0.0,coolpropfluids[1])
+  #@test_approx_eq 1049.8359368286092 PropsSI("A","P",101325.0,"Q",0.0,coolpropfluids[1])
   #PhaseSI
-  #get_global_param_string
-  #get_parameter_information_string
   #get_fluid_param_string
   #set_reference_stateS
   #get_param_index

@@ -8,15 +8,22 @@ using CoolPropDefs
 
   import ICapeThermoCompounds
   compIds,formulae,names,boilTemps,molwts,casnos=getcompoundlist();
+  #get_global_param_string
   for param in ["version", "gitrevision", "errstring", "warnstring", "FluidsList", "incompressible_list_pure", "incompressible_list_solution", "mixture_binary_pairs_list", "parameter_list", "predefined_mixtures", "HOME", "cubic_fluids_schema"]
     println(param * " = " * get_global_param_string(param))
   end
   param_list = split(get_global_param_string("parameter_list"),',');
   fluids_list = split(get_global_param_string("FluidsList"),',');
   println("number of defined parameters = $(length(param_list))")
+  #get_parameter_information_string
   for param in param_list
-    println("$param ---> $(get_parameter_information_string(String(param), "long")) $(get_parameter_information_string(String(param), "short")) $(get_parameter_information_string(String(param), "units")) $(get_parameter_information_string(String(param), "IO"))");
+    println("""$param ---> long  $(get_parameter_information_string(String(param), "long"))
+                           short $(get_parameter_information_string(String(param), "short"))
+                           units $(get_parameter_information_string(String(param), "units"))
+                           IO    $(get_parameter_information_string(String(param), "IO"))"""
+           );
   end
+  #get_fluid_param_string
   nf=0;cf=0;
   for fluid in fluids_list
     println("$fluid aliases ----> $(get_fluid_param_string(String(fluid), String("aliases")))");
@@ -26,10 +33,8 @@ using CoolPropDefs
     end
     if f==0
       nf+=1
-      println("$nf - not find $fluid");
     else
       cf+=1
-      println("$cf - find $fluid");
     end
   end
   println("common fluids: $cf and coolprop special fluids: $nf")
