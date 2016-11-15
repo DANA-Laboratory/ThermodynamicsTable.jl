@@ -6,6 +6,6 @@ const coolproptrivialparameters = ["ACENTRIC", "DIPOLE_MOMENT", "FH", "FRACTION_
   "GAS_CONSTANT", "GWP100", "GWP20", "GWP500", "HH", "M", "ODP", "PCRIT", "PH", "PMAX", "PMIN", "PTRIPLE",
   "P_REDUCING", "RHOCRIT", "RHOMASS_REDUCING", "RHOMOLAR_CRITICAL", "RHOMOLAR_REDUCING", "TCRIT", "TMAX",
   "TMIN", "TTRIPLE", "T_FREEZE", "T_REDUCING"];
-const coolpropmapping = Dict("molarGasConstant"=>"gas_constant");
+const coolpropmapping = Dict("molarGasConstant"=>"gas_constant", "acentricFactor"=>"ACENTRIC", "criticalDensity"=>"RHOMOLAR_CRITICAL", "criticalPressure"=>"PCRIT", "criticalTemperature"=>"TCRIT", "triplePointPressure"=>"PTRIPLE", "triplePointTemperature"=>"TTRIPLE");
 end
 include("../lib/CoolProp.jl")
