@@ -3,8 +3,6 @@ using CoolPropDefs
 const trivalwithnumval = ["FH","GWP100","PMIN","TMIN","P_REDUCING","PCRIT","GWP20","GAS_CONSTANT","PMAX","RHOCRIT","TCRIT","T_REDUCING","ACENTRIC","GWP500","RHOMOLAR_REDUCING","TMAX","TTRIPLE","PH","M","PTRIPLE","RHOMOLAR_CRITICAL","ODP","HH"];
 const trivalwithoutnumval = ["DIPOLE_MOMENT","FRACTION_MAX","FRACTION_MIN","RHOMASS_REDUCING","T_FREEZE"];
 const pseudopuremixtures = ["R134a","R116","n-Pentane","R11","n-Nonane","MDM","Oxygen","R41","MM","Neon","Fluorine","n-Undecane","Isohexane","Helium","IsoButane","D5"];
-const pureincompwithfreeze = [];
-const incompsolutionswithfreeze = [];
 #CoolProp
 @static is_apple() ? println("CoolProp: no osx support") : begin
   println("testing CoolProp....")
@@ -37,8 +35,6 @@ const incompsolutionswithfreeze = [];
   maxdiffreduvscriti = 0.0;
   maxfluid = "";
   ppm = Set();
-  piwf = Set();
-  iswf = Set();
   for fluid in  coolpropfluids
     id+=1;
     print("\n$id-$fluid aliases:$(get_fluid_param_string(String(fluid), String("aliases")))");
@@ -55,29 +51,10 @@ const incompsolutionswithfreeze = [];
       maxfluid = fluid;
       maxdiffreduvscriti = diffreduvscriti;
     end
-    #pure incompressibles with t_freeze
-    try
-      println("freeze temp of $fluid = $(PropsSI("T_FREEZE" ,"INCOMP::" * fluid))");
-      push!(piwf, fluid)
-    catch err
-    end
   end
   println("\nmax diff between reducing vs critical point temp: $maxdiffreduvscriti for $maxfluid");
   @test ppm == Set(pseudopuremixtures);
   println("pseudopuremixtures $ppm");
-  @test piwf == Set(pureincompwithfreeze);
-  println("pure incompresssibles with freeze: $pureincompwithfreeze")
-  for fluid in coolpropmix
-    println(fluid)
-    #incompressibles solutions with t_freeze
-    try
-      println("freeze temp of $fluid = $(PropsSI("T_FREEZE" ,"INCOMP::" * fluid * "[0.5]"))");
-      push!(iswf, fluid)
-    catch err
-    end
-  end
-  @test iswf == Set(incompsolutionswithfreeze);
-  println("incompresssible solutions with freeze: $incompsolutionswithfreeze")
   #PhaseSI
   #set_reference_stateS
   #get_param_index
