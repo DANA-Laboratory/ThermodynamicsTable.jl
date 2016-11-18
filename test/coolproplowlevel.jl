@@ -37,13 +37,25 @@ AbstractState_free(TTSE);
 AbstractState_free(BICU);
 AbstractState_free(SRK);
 AbstractState_free(PR);
-println("IF97:")
 IF97 = AbstractState_factory(IF97_BACKEND_FAMILY, "");
-AbstractState_update(IF97, PT_INPUTS, 101325, 308.15);
-for p in "HDCO"
+println("IF97::Water property for PT_INPUTS @pin @tin")
+pin = 101325;
+tin = 308.15;
+AbstractState_update(IF97, PT_INPUTS, pin, tin);
+for p in "PTHDSAUCO"
   pi = get_param_index("$p");
   println("IF97 $p = ", AbstractState_keyed_output(IF97, pi));
 end
-QT_INPUTS = get_input_pair_index("QT_INPUTS");
-#AbstractState_update(IF97, QT_INPUTS, 0.5, 300);
+try
+  println("IF97::Water property for QT_INPUTS @qin @tin")
+  QT_INPUTS = get_input_pair_index("QT_INPUTS");
+  qin = 0.5;
+  AbstractState_update(IF97, QT_INPUTS, qin, tin);
+  for p in "PTHDSAUQ"
+    pi = get_param_index("$p");
+    println("IF97 $p = ", AbstractState_keyed_output(IF97, pi));
+  end
+catch
+  println("QT_INPUTS not ready");
+end
 AbstractState_free(IF97);

@@ -132,23 +132,36 @@ try
   end
   const latestVersion_FreeSteam = "2.1"
   const recommend_CoolProp = "nightly"
-  println("Default I am going to install $recommend_CoolProp version...")
-
+  println("CoolProp: I am going to install $recommend_CoolProp version...")
+  if ((recommend_CoolProp == "nightly") & (is_windows()))
+    coolpropurlbase = "http://www.coolprop.dreamhosters.com/binaries/";
+  else
+    coolpropurlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$recommend_CoolProp/";
+  end
+  if recommend_CoolProp == "nightly"
+    download("http://www.coolprop.dreamhosters.com/binaries/Julia/CoolProp.jl", joinpath(destpathbase,"CoolProp.jl"));
+  else
+    download(coolpropurlbase * "Julia/CoolProp.jl", joinpath(destpathbase,"CoolProp.jl"));
+  end
+  println("downloaded => CoolProp.jl")
   @static if is_windows()
-      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$recommend_CoolProp/shared_library/Windows/$OS_ARCH_CoolProp/"
-      download(joinpath(urlbase,"CoolProp.dll"),joinpath(destpathbase,"CoolProp.dll"))
-      download(joinpath(urlbase,"CoolProp.lib"),joinpath(destpathbase,"CoolProp.lib"))
-      download(joinpath(urlbase,"exports.txt"),joinpath(destpathbase,"exports.txt"))
-      println("downloaded => lib/CoolProp.dll")
+      # CoolProp
+      println("I'm Getting CoolProp Binaries...")
+      urlbase = coolpropurlbase * "shared_library/Windows/$OS_ARCH_CoolProp/";
+      download(joinpath(urlbase,"CoolProp.dll"), joinpath(destpathbase,"CoolProp.dll"))
+      download(joinpath(urlbase,"CoolProp.lib"), joinpath(destpathbase,"CoolProp.lib"))
+      download(joinpath(urlbase,"exports.txt"), joinpath(destpathbase,"exports.txt"))
+      println("downloaded => lib/CoolProp.dll, lib ,exports.txt")
       # FreeSteam
       println("I'm Getting FreeSteam Binaries...")
       urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/$latestVersion_FreeSteam/$OS_ARCH_FreeSteam/"
-      download(joinpath(urlbase,"freesteam.dll"),joinpath(destpathbase,"freesteam.dll"))
+      download(joinpath(urlbase,"freesteam.dll"), joinpath(destpathbase,"freesteam.dll"))
       println("downloaded => lib/freesteam.dll")
   end
   @static if is_linux()
       # CoolProp
-      urlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$recommend_CoolProp/shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
+      println("I'm Getting CoolProp Binaries...")
+      urlbase = coolpropurlbase * "shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
       download(urlbase,joinpath(destpathbase,"CoolProp.so"))
       println("downloaded => lib/CoolProp.so")
       # FreeSteam
@@ -156,17 +169,11 @@ try
       urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/"
       download(joinpath(urlbase,"$latestVersion_FreeSteam","linux","libfreesteam.so.1.0"),joinpath(destpathbase,"libfreesteam.so"))
       println("downloaded => lib/libfreesteam.so")
-      download(joinpath(urlbase,"libgsl.so.0"),joinpath(destpathbase,"libgsl.so"))
+      download(joinpath(urlbase,"libgsl.so.0"), joinpath(destpathbase,"libgsl.so"))
       println("downloaded => lib/libgsl.so")
-      download(joinpath(urlbase,"libgslcblas.so.0"),joinpath(destpathbase,"libgslcblas.so"))
+      download(joinpath(urlbase,"libgslcblas.so.0"), joinpath(destpathbase,"libgslcblas.so"))
       println("downloaded => lib/libgslcblas.so")
   end
-  if(recommend_CoolProp == "nightly")
-    download("https://cdn.rawgit.com/CoolProp/CoolProp/master/wrappers/Julia/CoolProp.jl",joinpath(destpathbase,"CoolProp.jl"));
-  else
-    download("http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$recommend_CoolProp/Julia/CoolProp.jl",joinpath(destpathbase,"CoolProp.jl"));
-  end
-  println("downloaded => CoolProp.jl")
 catch err
   println("$err\n => If lib folder exists, and you want to refresh existing files, remove lib folder and retry")
 end
