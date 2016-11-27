@@ -1,6 +1,14 @@
 # Download latest binary shared library of CoolProp project
 # http://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
 import JSON
+try
+  Pkg.installed("CoolProp");
+  info("CoolProp in allready installed.")
+catch err
+  Pkg.clone("https://github.com/DANA-Laboratory/CoolProp.jl.git", "CoolProp");
+  Pkg.checkout("CoolProp", "nightly");
+  Pkg.build("CoolProp");
+end
 const destpathbase = abspath(joinpath(@__FILE__,"..","..","lib"));
 println(destpathbase);
 const srctablepath = abspath(joinpath(@__FILE__,"..","..","src","Tables"));
@@ -121,37 +129,9 @@ end
 
 try
   mkdir(destpathbase)
-  const OS_ARCH_CoolProp = (Sys.WORD_SIZE == 64) ? "64bit" : "32bit__cdecl";
   const OS_ARCH_FreeSteam = (Sys.WORD_SIZE == 64) ? "win64" : "win32";
-  latestVersion_CoolProp = "";
-  try
-    latestVersion_CoolProp = JSON.parse(readstring(download("https://sourceforge.net/projects/coolprop/best_release.json")))["release"]["filename"][11:15];
-    println("CoolProp latestVersion = $latestVersion_CoolProp ...")
-  catch err
-
-  end
   const latestVersion_FreeSteam = "2.1"
-  const recommend_CoolProp = "nightly"
-  println("CoolProp: I am going to install $recommend_CoolProp version...")
-  if ((recommend_CoolProp == "nightly") & (is_windows()))
-    coolpropurlbase = "http://www.coolprop.dreamhosters.com/binaries/";
-  else
-    coolpropurlbase = "http://netix.dl.sourceforge.net/project/coolprop/CoolProp/$recommend_CoolProp/";
-  end
-  if recommend_CoolProp == "nightly"
-    download("http://www.coolprop.dreamhosters.com/binaries/Julia/CoolProp.jl", joinpath(destpathbase,"CoolProp.jl"));
-  else
-    download(coolpropurlbase * "Julia/CoolProp.jl", joinpath(destpathbase,"CoolProp.jl"));
-  end
-  println("downloaded => CoolProp.jl")
   @static if is_windows()
-      # CoolProp
-      println("I'm Getting CoolProp Binaries...")
-      urlbase = coolpropurlbase * "shared_library/Windows/$OS_ARCH_CoolProp/";
-      download(joinpath(urlbase,"CoolProp.dll"), joinpath(destpathbase,"CoolProp.dll"))
-      download(joinpath(urlbase,"CoolProp.lib"), joinpath(destpathbase,"CoolProp.lib"))
-      download(joinpath(urlbase,"exports.txt"), joinpath(destpathbase,"exports.txt"))
-      println("downloaded => lib/CoolProp.dll, lib ,exports.txt")
       # FreeSteam
       println("I'm Getting FreeSteam Binaries...")
       urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/$latestVersion_FreeSteam/$OS_ARCH_FreeSteam/"
@@ -159,11 +139,6 @@ try
       println("downloaded => lib/freesteam.dll")
   end
   @static if is_linux()
-      # CoolProp
-      println("I'm Getting CoolProp Binaries...")
-      urlbase = coolpropurlbase * "shared_library/Linux/64bit/libCoolProp.so.$latestVersion_CoolProp"
-      download(urlbase,joinpath(destpathbase,"CoolProp.so"))
-      println("downloaded => lib/CoolProp.so")
       # FreeSteam
       println("I'm Getting FreeSteam Binaries...")
       urlbase = "http://cdn.rawgit.com/DANA-Laboratory/FreeSteamBinary/master/"
