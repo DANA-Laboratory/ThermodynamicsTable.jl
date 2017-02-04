@@ -1,6 +1,7 @@
 # Download latest binary shared library of CoolProp project
 # http://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
 import JSON
+#=
 try
   Pkg.installed("CoolProp");
   info("CoolProp in allready installed.")
@@ -9,6 +10,7 @@ catch err
   Pkg.checkout("CoolProp", "nightly");
   Pkg.build("CoolProp");
 end
+=#
 const destpathbase = abspath(joinpath(@__FILE__,"..","..","lib"));
 println(destpathbase);
 const srctablepath = abspath(joinpath(@__FILE__,"..","..","src","Tables"));

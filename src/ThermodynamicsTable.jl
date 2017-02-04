@@ -4,8 +4,8 @@ module ThermodynamicsTable
   using ECapeExceptions
   import CapeOpen.perryanalytic
   thisfiledirname=dirname(@__FILE__())
-  
-  pabf=open(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename*".binary"),"r");  
+
+  pabf=open(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename*".binary"),"r");
   pata=perryanalytic.tableaddreses
   adrs=readdlm(joinpath(thisfiledirname,"..","lib",perryanalytic.datafilename*".addresses"),';')
   for i=1:size(adrs)[1]
@@ -21,7 +21,7 @@ module ThermodynamicsTable
 
   #for LiquidsDensities, Cp, LiquidsCp props Max of two data row per prop may exists
   function readbinarydatabase(id::UInt16, table::String, skipdata::UInt8=0%UInt8)
-    if haskey(pata,table) 
+    if haskey(pata,table)
       v=pata[table]
     else
       throw(ECapeInvalidArgument())
@@ -33,7 +33,7 @@ module ThermodynamicsTable
       skip(pabf,skipsize)
       j+=1
     end
-    if(skipdata>0 && j+skipdata<=v[1][2]) 
+    if(skipdata>0 && j+skipdata<=v[1][2])
       skip(pabf,skipdata*skipsize)
       id!=(read(pabf,UInt16)) && throw(ECapeInvalidArgument())
     end
@@ -60,5 +60,4 @@ include("ICapeThermoUniversalConstants.jl")
 using ICapeThermoUniversalConstants,ICapeThermoCompounds,ECapeExceptions
 perryanalytic = CapeOpen.perryanalytic
 println("`perryanalytic` Property Package was created and is ready to use.")
-include("CoolProp.jl")
 include("FreeSteam.jl")
